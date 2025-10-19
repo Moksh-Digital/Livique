@@ -91,3 +91,87 @@ img:hover {
 .read-the-docs {
   color: #888;
 }
+
+/* ✨ RESPONSIVE DIWALI SECTION */
+.diwali-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 20px;
+}
+
+.diwali-boxes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  max-height: fit-content;
+}
+
+/* Desktop - Make boxes square with equal proportions */
+@media (min-width: 1024px) {
+  .diwali-grid {
+    grid-template-columns: 1fr 1.8fr;
+    gap: 24px;
+  }
+
+  .diwali-boxes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1023px) and (min-width: 769px) {
+  .diwali-grid {
+    grid-template-columns: 1fr 1.5fr;
+    gap: 16px;
+  }
+
+  .diwali-boxes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+
+/* Mobile - Stack vertically */
+@media (max-width: 768px) {
+  .diwali-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .diwali-boxes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  /* Reduce padding on mobile */
+  main {
+    padding: 16px !important;
+  }
+
+  /* Adjust font sizes for mobile */
+  h2 {
+    font-size: 1.5rem !important;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  main {
+    padding: 12px !important;
+  }
+
+  h2 {
+    font-size: 1.25rem !important;
+  }
+
+  .diwali-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .diwali-boxes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
