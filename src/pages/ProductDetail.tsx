@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Clock, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useProducts } from "@/contexts/ProductsContext";
@@ -17,7 +17,7 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [deliveryOption, setDeliveryOption] = useState("hand");
 
-  const product = getProductById(Number(id));
+  const product = getProductById(id || '');
 
   if (!product) {
     return (
@@ -25,7 +25,7 @@ const ProductDetail = () => {
         <Header />
         <div className="max-w-[1400px] mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold">Product not found</h1>
-          <Button className="mt-4" onClick={() => navigate("/products")}>
+          <Button className="mt-4" onClick={() => navigate("/")}>
             Browse Products
           </Button>
         </div>
@@ -63,7 +63,7 @@ const ProductDetail = () => {
           {/* Product Images */}
           <div>
             <Card className="mb-4 rounded-2xl overflow-hidden">
-              <div className="aspect-square bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
+              <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
                 <span className="text-[200px]">{images[selectedImage].emoji}</span>
               </div>
             </Card>
@@ -77,7 +77,7 @@ const ProductDetail = () => {
                   }`}
                   onClick={() => setSelectedImage(idx)}
                 >
-                  <div className="aspect-square bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
+                  <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
                     <span className="text-4xl">{img.emoji}</span>
                   </div>
                 </Card>
@@ -90,8 +90,8 @@ const ProductDetail = () => {
             <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
             
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-3xl font-bold">₹ {product.price}</span>
-              <span className="text-muted-foreground line-through">₹ {product.originalPrice}</span>
+              <span className="text-3xl font-bold">₹{product.price.toLocaleString()}</span>
+              <span className="text-muted-foreground line-through">₹{product.originalPrice.toLocaleString()}</span>
               <span className="text-success font-semibold">{product.discount}</span>
             </div>
 
@@ -106,10 +106,12 @@ const ProductDetail = () => {
                   />
                 ))}
               </div>
-              <span className="text-sm">({product.reviews} reviews)</span>
+              <span className="text-sm">({product.reviews.toLocaleString()} reviews)</span>
             </div>
 
-            <p className="text-muted-foreground mb-6">{product.description}</p>
+            <p className="text-muted-foreground mb-6">
+              {product.description || `Experience the best in class ${product.name}. Premium quality with great features and excellent build quality. Perfect for everyday use with outstanding performance.`}
+            </p>
 
             {/* Available Options */}
             <div className="mb-6">
@@ -123,7 +125,7 @@ const ProductDetail = () => {
                   onClick={() => setDeliveryOption("hand")}
                 >
                   <div className="text-center">
-                    <p className="font-semibold text-sm mb-1">Hand Delivery ₹ 599</p>
+                    <p className="font-semibold text-sm mb-1">Hand Delivery ₹599</p>
                     <p className="text-xs text-muted-foreground">Earliest by {product.delivery}</p>
                   </div>
                 </Card>
@@ -135,7 +137,7 @@ const ProductDetail = () => {
                   onClick={() => setDeliveryOption("courier")}
                 >
                   <div className="text-center">
-                    <p className="font-semibold text-sm mb-1">Courier ₹ 449</p>
+                    <p className="font-semibold text-sm mb-1">Courier ₹449</p>
                     <p className="text-xs text-muted-foreground">Earliest by Tomorrow</p>
                   </div>
                 </Card>
