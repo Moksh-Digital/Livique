@@ -42,7 +42,12 @@ const Cart = () => {
               <Card key={item.id} className="p-4 rounded-2xl">
                 <div className="flex gap-4">
                   <div className="w-24 h-24 bg-gradient-to-br from-muted to-muted/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <span className="text-4xl">{item.image}</span>
+                    {typeof item.image === "string" && (item.image.startsWith?.("data:") || item.image.startsWith?.("http")) ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={item.image} alt={item.name} className="object-cover w-full h-full" />
+                    ) : (
+                      <span className="text-4xl">{item.image}</span>
+                    )}
                   </div>
                   
                   <div className="flex-1 min-w-0">

@@ -124,13 +124,23 @@ const ProductList = () => {
             <Link key={product.id} to={`/product/${product.id}`}>
               <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full rounded-2xl">
                 <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
-                  <span className="text-6xl">{product.image}</span>
-                  {product.badge && (
-                    <Badge className="absolute bottom-2 left-2 right-2 bg-secondary text-white text-xs">
-                      {product.badge}
-                    </Badge>
+                  {((product as any).mainImage || (product as any).images?.[0] || product.image).toString().startsWith('data:') ||
+                  ((product as any).mainImage || (product as any).images?.[0] || product.image).toString().startsWith('http') ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={(product as any).mainImage || (product as any).images?.[0] || product.image}
+                      alt={product.name}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <span className="text-6xl">{(product as any).mainImage || (product as any).images?.[0] || product.image}</span>
                   )}
-                </div>
+                   {product.badge && (
+                     <Badge className="absolute bottom-2 left-2 right-2 bg-secondary text-white text-xs">
+                       {product.badge}
+                     </Badge>
+                   )}
+                 </div>
                 
                 <div className="p-3">
                   <h3 className="text-sm font-medium mb-2 line-clamp-2 min-h-[40px]">

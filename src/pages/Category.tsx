@@ -272,14 +272,24 @@ const Category = () => {
                   <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full rounded-xl group">
                     <div className="relative aspect-square bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center overflow-hidden">
                       {product.badge && (
-                        <div className="absolute top-2 left-2 bg-success text-success-foreground px-2 py-1 rounded-md text-xs font-semibold z-10">
-                          {product.badge}
-                        </div>
+                         <div className="absolute top-2 left-2 bg-success text-success-foreground px-2 py-1 rounded-md text-xs font-semibold z-10">
+                           {product.badge}
+                         </div>
+                       )}
+                      {(((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith('data:') ||
+                      (((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith('http') ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={(product as any).mainImage || (product as any).images?.[0] || product.image}
+                          alt={product.name}
+                          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
+                        />
+                      ) : (
+                        <span className="text-6xl group-hover:scale-110 transition-transform duration-300">
+                          {(product as any).mainImage || (product as any).images?.[0] || product.image}
+                        </span>
                       )}
-                      <span className="text-6xl group-hover:scale-110 transition-transform duration-300">
-                        {product.image}
-                      </span>
-                    </div>
+                     </div>
                     
                     <div className="p-3">
                       <h3 className="text-sm font-medium mb-2 line-clamp-2 min-h-[40px]">

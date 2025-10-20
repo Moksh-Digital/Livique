@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,14 +33,27 @@ const ProductDetail = () => {
     );
   }
 
-  const images = Array(4).fill({ emoji: product.image });
+  // Ensure mainImage is included first, then gallery images, then legacy image.
+  // Remove falsy values and duplicates so mainImage always appears in the array.
+  const ordered = [
+    product.mainImage,
+    ...(product.images || []),
+    product.image
+  ].filter(Boolean) as string[];
+  const unique = Array.from(new Set(ordered));
+  const images = unique.slice(0, 4);
+
+  // if selectedImage is out of bounds (e.g. images changed), reset to 0
+  useEffect(() => {
+    if (selectedImage >= images.length) setSelectedImage(0);
+  }, [images, selectedImage]);
 
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image,
+      image: product.mainImage || (product.images && product.images[0]) || product.image,
       delivery: product.delivery
     });
     toast({
@@ -64,26 +77,36 @@ const ProductDetail = () => {
           <div>
             <Card className="mb-4 rounded-2xl overflow-hidden">
               <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                <span className="text-[200px]">{images[selectedImage].emoji}</span>
+                {(() => {
+                  const display = images[selectedImage] ?? images[0] ?? (product.mainImage || product.image);
+                  if (typeof display === "string" && (display.startsWith?.("data:") || display.startsWith?.("http"))) {
+                    // eslint-disable-next-line @next/next/no-img-element
+                    return <img src={display} alt={product.name} className="object-contain w-full h-full" />;
+                  }
+                  return <span className="text-[200px]">{display}</span>;
+                })()}
               </div>
             </Card>
             
             <div className="grid grid-cols-4 gap-2">
-              {images.map((img, idx) => (
-                <Card 
-                  key={idx}
-                  className={`cursor-pointer rounded-xl overflow-hidden ${
-                    selectedImage === idx ? "ring-2 ring-primary" : ""
-                  }`}
-                  onClick={() => setSelectedImage(idx)}
-                >
-                  <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                    <span className="text-4xl">{img.emoji}</span>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
+              {images.map((src, idx) => (
+                 <Card
+                   key={idx}
+                   className={`cursor-pointer rounded-xl overflow-hidden ${selectedImage === idx ? "ring-2 ring-primary" : ""}`}
+                   onClick={() => setSelectedImage(idx)}
+                 >
+                   <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                     {src && (src.startsWith?.("data:") || src.startsWith?.("http")) ? (
+                       // eslint-disable-next-line @next/next/no-img-element
+                       <img src={src} alt={`thumb-${idx}`} className="object-contain w-full h-full" />
+                     ) : (
+                       <span className="text-4xl">{src || (product.mainImage || product.image)}</span>
+                     )}
+                   </div>
+                 </Card>
+               ))}
+             </div>
+           </div>
 
           {/* Product Info */}
           <div>

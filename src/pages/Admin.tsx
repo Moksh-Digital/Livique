@@ -205,6 +205,8 @@ const Admin = () => {
     category: "",
     subcategory: "",
     image: "🎁",
+    mainImage: "",   // new - main image url/data
+    images: [] as string[], // new - gallery images
     description: "",
     delivery: "Today",
   });
@@ -220,6 +222,15 @@ const Admin = () => {
     toast({ title: "Product deleted successfully" });
   };
 
+  // helper to read File -> dataURL
+  const readFileAsDataUrl = (file: File): Promise<string> =>
+    new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onload = () => res(String(fr.result));
+      fr.onerror = rej;
+      fr.readAsDataURL(file);
+    });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const discount = `${Math.round(
@@ -234,6 +245,14 @@ const Admin = () => {
 
     const payload = {
       ...formData,
+      // keep legacy 'image' for code that still expects it
+      image: formData.mainImage || formData.image,
+      mainImage: formData.mainImage || formData.image,
+      // ensure mainImage is included first in images array, then gallery images
+      images: [
+        formData.mainImage || formData.image,
+        ...((formData.images || []) as string[]).filter(Boolean)
+      ],
       category: categoryName,
       subcategory: subcategoryName,
       categorySlug: formData.category || undefined,
@@ -264,6 +283,8 @@ const Admin = () => {
       category: "",
       subcategory: "",
       image: "🎁",
+      mainImage: "",
+      images: [],
       description: "",
       delivery: "Today",
     });
@@ -379,6 +400,8 @@ const Admin = () => {
                         category: "",
                         subcategory: "",
                         image: "🎁",
+                        mainImage: "",    // added
+                        images: [],       // added
                         description: "",
                         delivery: "Today",
                       });
@@ -396,6 +419,104 @@ const Admin = () => {
                   </DialogHeader>
 
                   <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Main Image (file or url) */}
+                    <div>
+                      <Label>Main Image (file or URL)</Label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="block mb-2"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const dataUrl = await readFileAsDataUrl(file);
+                          setFormData({ ...formData, mainImage: dataUrl });
+                        }}
+                      />
+                      <Input
+                        placeholder="Or paste image URL"
+                        value={(formData as any).mainImage}
+                        onChange={(e) => setFormData({ ...formData, mainImage: e.target.value })}
+                      />
+                      {/* preview */}
+                      <div className="mt-2">
+                        {(formData as any).mainImage ? (
+                          (((formData as any).mainImage as string).startsWith("data:") ||
+                          ((formData as any).mainImage as string).startsWith("http")) ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={(formData as any).mainImage}
+                              alt="main-preview"
+                              className="w-24 h-24 object-cover rounded-md border"
+                            />
+                          ) : (
+                            <div className="w-24 h-24 flex items-center justify-center text-4xl bg-muted rounded-md border">
+                              {(formData as any).mainImage}
+                            </div>
+                          )
+                        ) : null}
+                      </div>
+                    </div>
+
+                    {/* Gallery images (multiple) */}
+                    <div>
+                      <Label>Gallery Images (files or URLs)</Label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="block mb-2"
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (files.length === 0) return;
+                          const dataUrls = await Promise.all(files.map(f => readFileAsDataUrl(f)));
+                          setFormData({ ...formData, images: [...(formData.images || []), ...dataUrls] });
+                        }}
+                      />
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Paste image URL and press Add"
+                          id="gallery-url-input"
+                          // local uncontrolled input not required, simple inline handler below
+                        />
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            const el = document.getElementById("gallery-url-input") as HTMLInputElement | null;
+                            const url = el?.value?.trim();
+                            if (!url) return;
+                            setFormData({ ...formData, images: [...(formData.images || []), url] });
+                            if (el) el.value = "";
+                          }}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                      {/* show preview / remove */}
+                      <div className="flex gap-2 mt-2 flex-wrap">
+                        {(formData.images || []).map((src: string, idx: number) => (
+                          <div key={idx} className="relative">
+                            <div className="w-20 h-20 bg-muted rounded-md overflow-hidden flex items-center justify-center">
+                              {src.startsWith('data:') || src.startsWith('http') ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={src} alt={`img-${idx}`} className="object-cover w-full h-full" />
+                              ) : (
+                                <span className="text-3xl">{src}</span>
+                              )}
+                            </div>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="absolute -top-2 -right-2"
+                              onClick={() => setFormData({ ...formData, images: (formData.images || []).filter((_, i) => i !== idx) })}
+                            >
+                              ✕
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Category select */}
                     <div>
                       <Label>Category</Label>
@@ -494,8 +615,20 @@ const Admin = () => {
                     key={product.id}
                     className="flex items-center gap-4 p-4 border rounded-xl"
                   >
-                    <div className="w-20 h-20 bg-muted rounded-xl flex items-center justify-center">
-                      <span className="text-3xl">{product.image}</span>
+                    <div className="w-20 h-20 bg-muted rounded-xl flex items-center justify-center overflow-hidden">
+                      {(((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith("data:") ||
+                      (((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith("http") ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={(product as any).mainImage || (product as any).images?.[0] || product.image}
+                          alt={product.name}
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <span className="text-3xl">
+                          {(product as any).mainImage || (product as any).images?.[0] || product.image}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex-1">
@@ -522,6 +655,8 @@ const Admin = () => {
                             category: (product as any).categorySlug ?? product.category ?? "",
                             subcategory: (product as any).subcategorySlug ?? product.subcategory ?? "",
                             image: product.image,
+                            mainImage: (product as any).mainImage ?? product.image,
+                            images: (product as any).images ?? [(product as any).mainImage ?? product.image],
                             description: product.description,
                             delivery: product.delivery,
                           });

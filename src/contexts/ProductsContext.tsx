@@ -24,7 +24,9 @@ export interface Product {
   discount: string;
   rating: number;
   reviews: number;
-  image: string;
+  image: string; // legacy emoji fallback
+  mainImage?: string; // new: main image URL / dataURL
+  images?: string[]; // new: gallery images (URLs / dataURLs)
   delivery: string;
   category: string;
   subcategory: string;
@@ -100,6 +102,12 @@ const DEFAULT_PRODUCTS: Product[] = [
     { id: '20', name: 'Dumbbell Set 10kg', price: 2499, originalPrice: 3499, discount: '29% off', rating: 4.4, reviews: 1987, image: '🏋️', delivery: 'Tomorrow', category: 'Sports & Fitness', subcategory: 'Exercise Equipment', inStock: true, badge: 'SALE 50%' },
 ];
 
+// normalize defaults to include mainImage/images so we don't update every item
+const INITIAL_PRODUCTS: Product[] = DEFAULT_PRODUCTS.map(p => ({
+  ...p,
+  mainImage: (p as any).mainImage ?? p.image,
+  images: (p as any).images ?? [ (p as any).image ],
+}));
 
 export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const categories: Category[] = [
@@ -252,7 +260,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   
   // 1. Initialize state by reading from localStorage or falling back to default
-  const [products, setProducts] = useState<Product[]>(() => getInitialProducts(DEFAULT_PRODUCTS));
+  const [products, setProducts] = useState<Product[]>(() => getInitialProducts(INITIAL_PRODUCTS));
 
   // 2. Use useEffect to save products to localStorage whenever the state changes
   useEffect(() => {
