@@ -15,6 +15,7 @@ import SignUp from "./pages/SignUp";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
+
 const App = () => (
   <TooltipProvider>
     <Toaster />
@@ -30,6 +31,8 @@ const App = () => (
 
         {/* Categories */}
         {/* Supports: /category/:category  AND /category/:category/:subcategory */}
+        <Route path="/category" element={<Category />} />  // ✅ new
+
         <Route path="/category/:category" element={<Category />} />
         <Route path="/category/:category/:subcategory" element={<Category />} />
 

@@ -40,7 +40,7 @@ const SignIn = () => {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 text-3xl font-bold text-accent mb-2">
             <Gift className="h-8 w-8" />
-            <span>fnp</span>
+            <span>Livique</span>
           </Link>
           <h1 className="text-2xl font-bold mb-2">Welcome Back</h1>
           <p className="text-muted-foreground">Sign in to your account</p>
