@@ -30,11 +30,11 @@ const Category = () => {
 
   if (category && subcategory) {
     // Subcategory page
-    displayProducts = getProductsBySubcategory(subcategory.replace(/-/g, " "));
+    displayProducts = getProductsBySubcategory(subcategory);
     breadcrumb = subcategory.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
   } else if (category) {
     // Category page
-    displayProducts = getProductsByCategory(category.replace(/-/g, " "));
+    displayProducts = getProductsByCategory(category);
     breadcrumb = category.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
   } else {
     // Default

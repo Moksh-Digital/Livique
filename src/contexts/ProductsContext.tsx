@@ -264,17 +264,37 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [products]); // Dependency array ensures this runs on mount and when 'products' changes
 
 
-  const getProductsByCategory = (category: string) => {
-    return products.filter(
-      (product) => product.category.toLowerCase() === category.toLowerCase()
-    );
-  };
+  // helper to normalize a string to slug form (same rules admin uses)
+  const toSlug = (s?: string) =>
+    (s || "")
+      .toString()
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^\w\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-");
 
-  const getProductsBySubcategory = (subcategory: string) => {
-    return products.filter(
-      (product) => product.subcategory.toLowerCase() === subcategory.toLowerCase()
-    );
-  };
+  const getProductsByCategory = (categorySlug: string) => {
+    if (!categorySlug) return [];
+    const slug = categorySlug.toLowerCase();
+    return products.filter((product) => {
+      const pSlug = (product as any).categorySlug
+        ? String((product as any).categorySlug).toLowerCase()
+        : toSlug(product.category);
+      return pSlug === slug;
+    });
+  };
+
+  const getProductsBySubcategory = (subcategorySlug: string) => {
+    if (!subcategorySlug) return [];
+    const slug = subcategorySlug.toLowerCase();
+    return products.filter((product) => {
+      const pSubSlug = (product as any).subcategorySlug
+        ? String((product as any).subcategorySlug).toLowerCase()
+        : toSlug(product.subcategory);
+      return pSubSlug === slug;
+    });
+  };
 
   const getProductById = (id: string) => {
     return products.find((product) => product.id === id);
