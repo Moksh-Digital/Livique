@@ -1,202 +1,68 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+// Define the localStorage key
+const LOCAL_STORAGE_KEY = 'livique_admin_products';
+
+// Helper function to get initial products from localStorage
+const getInitialProducts = (defaultProducts: Product[]): Product[] => {
+  try {
+    const savedProducts = localStorage.getItem(LOCAL_STORAGE_KEY);
+    // If data exists, parse it. Otherwise, return the default array.
+    return savedProducts ? JSON.parse(savedProducts) : defaultProducts;
+  } catch (error) {
+    console.error("Error reading from localStorage, using default products:", error);
+    return defaultProducts;
+  }
+};
+
 
 export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice: number;
-  discount: string;
-  rating: number;
-  reviews: number;
-  image: string;
-  delivery: string;
-  category: string;
-  subcategory: string;
-  inStock: boolean;
-  badge?: string;
-  description?: string;
+  id: string;
+  name: string;
+  price: number;
+  originalPrice: number;
+  discount: string;
+  rating: number;
+  reviews: number;
+  image: string;
+  delivery: string;
+  category: string;
+  subcategory: string;
+  inStock: boolean;
+  badge?: string;
+  description?: string;
 }
 
 export interface SubCategory {
-  name: string;
-  slug: string;
+  name: string;
+  slug: string;
 }
 
 export interface Category {
-  name: string;
-  slug: string;
-  icon: string;
-  subcategories: SubCategory[];
+  name: string;
+  slug: string;
+  icon: string;
+  subcategories: SubCategory[];
 }
 
 interface ProductsContextType {
-  products: Product[];
-  categories: Category[];
-  getProductsByCategory: (category: string) => Product[];
-  getProductsBySubcategory: (subcategory: string) => Product[];
-  getProductById: (id: string) => Product | undefined;
+  products: Product[];
+  categories: Category[];
+  getProductsByCategory: (category: string) => Product[];
+  getProductsBySubcategory: (subcategory: string) => Product[];
+  getProductById: (id: string) => Product | undefined;
 
-  // ✅ Add these
-  addProduct: (product: Product) => void;
-  updateProduct: (id: string, updatedProduct: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
+  // ✅ Add these
+  addProduct: (product: Product) => void;
+  updateProduct: (id: string, updatedProduct: Partial<Product>) => void;
+  deleteProduct: (id: string) => void;
 }
 
 
 const ProductsContext = createContext<ProductsContextType | undefined>(undefined);
 
-export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const categories: Category[] = [
-    {
-      name: 'Electronics',
-      slug: 'electronics',
-      icon: '📱',
-      subcategories: [
-        { name: 'Mobile Phones', slug: 'mobile-phones' },
-        { name: 'Laptops', slug: 'laptops' },
-        { name: 'Tablets', slug: 'tablets' },
-        { name: 'Televisions', slug: 'televisions' },
-        { name: 'Cameras', slug: 'cameras' },
-        { name: 'Headphones', slug: 'headphones' },
-        { name: 'Speakers', slug: 'speakers' },
-        { name: 'Smart Watches', slug: 'smart-watches' },
-        { name: 'Power Banks', slug: 'power-banks' },
-        { name: 'Gaming Consoles', slug: 'gaming-consoles' },
-      ],
-    },
-    {
-      name: 'Fashion',
-      slug: 'fashion',
-      icon: '👕',
-      subcategories: [
-        { name: 'Men Clothing', slug: 'men-clothing' },
-        { name: 'Women Clothing', slug: 'women-clothing' },
-        { name: 'Kids Clothing', slug: 'kids-clothing' },
-        { name: 'Men Footwear', slug: 'men-footwear' },
-        { name: 'Women Footwear', slug: 'women-footwear' },
-        { name: 'Watches', slug: 'watches' },
-        { name: 'Sunglasses', slug: 'sunglasses' },
-        { name: 'Bags & Luggage', slug: 'bags-luggage' },
-        { name: 'Jewellery', slug: 'jewellery' },
-        { name: 'Accessories', slug: 'accessories' },
-      ],
-    },
-    {
-      name: 'Home & Furniture',
-      slug: 'home-furniture',
-      icon: '🛋️',
-      subcategories: [
-        { name: 'Furniture', slug: 'furniture' },
-        { name: 'Home Decor', slug: 'home-decor' },
-        { name: 'Kitchen & Dining', slug: 'kitchen-dining' },
-        { name: 'Bed & Bath', slug: 'bed-bath' },
-        { name: 'Garden & Outdoor', slug: 'garden-outdoor' },
-        { name: 'Home Improvement', slug: 'home-improvement' },
-        { name: 'Lighting', slug: 'lighting' },
-        { name: 'Storage', slug: 'storage' },
-      ],
-    },
-    {
-      name: 'Beauty & Personal Care',
-      slug: 'beauty-personal-care',
-      icon: '💄',
-      subcategories: [
-        { name: 'Makeup', slug: 'makeup' },
-        { name: 'Skin Care', slug: 'skin-care' },
-        { name: 'Hair Care', slug: 'hair-care' },
-        { name: 'Fragrances', slug: 'fragrances' },
-        { name: 'Bath & Body', slug: 'bath-body' },
-        { name: 'Men Grooming', slug: 'men-grooming' },
-        { name: 'Beauty Tools', slug: 'beauty-tools' },
-      ],
-    },
-    {
-      name: 'Books & Stationery',
-      slug: 'books-stationery',
-      icon: '📚',
-      subcategories: [
-        { name: 'Books', slug: 'books' },
-        { name: 'Pens', slug: 'pens' },
-        { name: 'Pencils', slug: 'pencils' },
-        { name: 'Notebooks', slug: 'notebooks' },
-        { name: 'Sketch Books', slug: 'sketch-books' },
-        { name: 'Erasers', slug: 'erasers' },
-        { name: 'School Supplies', slug: 'school-supplies' },
-        { name: 'Art Supplies', slug: 'art-supplies' },
-        { name: 'Office Supplies', slug: 'office-supplies' },
-      ],
-    },
-    {
-      name: 'Sports & Fitness',
-      slug: 'sports-fitness',
-      icon: '⚽',
-      subcategories: [
-        { name: 'Exercise Equipment', slug: 'exercise-equipment' },
-        { name: 'Yoga', slug: 'yoga' },
-        { name: 'Sports Shoes', slug: 'sports-shoes' },
-        { name: 'Cricket', slug: 'cricket' },
-        { name: 'Football', slug: 'football' },
-        { name: 'Badminton', slug: 'badminton' },
-        { name: 'Swimming', slug: 'swimming' },
-        { name: 'Cycling', slug: 'cycling' },
-      ],
-    },
-    {
-      name: 'Toys & Baby Products',
-      slug: 'toys-baby',
-      icon: '🧸',
-      subcategories: [
-        { name: 'Toys', slug: 'toys' },
-        { name: 'Baby Care', slug: 'baby-care' },
-        { name: 'Baby Fashion', slug: 'baby-fashion' },
-        { name: 'Diapers', slug: 'diapers' },
-        { name: 'Baby Feeding', slug: 'baby-feeding' },
-        { name: 'Baby Gear', slug: 'baby-gear' },
-      ],
-    },
-    {
-      name: 'Grocery & Food',
-      slug: 'grocery-food',
-      icon: '🛒',
-      subcategories: [
-        { name: 'Fruits & Vegetables', slug: 'fruits-vegetables' },
-        { name: 'Dairy Products', slug: 'dairy-products' },
-        { name: 'Beverages', slug: 'beverages' },
-        { name: 'Snacks', slug: 'snacks' },
-        { name: 'Cooking Essentials', slug: 'cooking-essentials' },
-        { name: 'Organic', slug: 'organic' },
-      ],
-    },
-    {
-      name: 'Appliances',
-      slug: 'appliances',
-      icon: '🔌',
-      subcategories: [
-        { name: 'Air Conditioners', slug: 'air-conditioners' },
-        { name: 'Refrigerators', slug: 'refrigerators' },
-        { name: 'Washing Machines', slug: 'washing-machines' },
-        { name: 'Microwave Ovens', slug: 'microwave-ovens' },
-        { name: 'Vacuum Cleaners', slug: 'vacuum-cleaners' },
-        { name: 'Kitchen Appliances', slug: 'kitchen-appliances' },
-      ],
-    },
-    {
-      name: 'Automotive',
-      slug: 'automotive',
-      icon: '🚗',
-      subcategories: [
-        { name: 'Car Accessories', slug: 'car-accessories' },
-        { name: 'Bike Accessories', slug: 'bike-accessories' },
-        { name: 'Car Electronics', slug: 'car-electronics' },
-        { name: 'Helmets', slug: 'helmets' },
-        { name: 'Car Care', slug: 'car-care' },
-      ],
-    },
-  ];
-
-  
-
-  const [products, setProducts] = useState<Product[]>([
+// Define your default product list (used for the initial state if localStorage is empty)
+const DEFAULT_PRODUCTS: Product[] = [
     // Electronics - Mobile Phones
     { id: '1', name: 'iPhone 15 Pro Max', price: 134900, originalPrice: 159900, discount: '16% off', rating: 4.8, reviews: 2543, image: '📱', delivery: 'Tomorrow', category: 'Electronics', subcategory: 'Mobile Phones', inStock: true, badge: 'SALE 50%' },
     { id: '2', name: 'Samsung Galaxy S24 Ultra', price: 124999, originalPrice: 139999, discount: '11% off', rating: 4.7, reviews: 1876, image: '📱', delivery: 'Today', category: 'Electronics', subcategory: 'Mobile Phones', inStock: true, badge: 'SALE 50%' },
@@ -232,63 +98,225 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Sports & Fitness
     { id: '19', name: 'Yoga Mat Premium', price: 1299, originalPrice: 1999, discount: '35% off', rating: 4.5, reviews: 3210, image: '🧘', delivery: 'Today', category: 'Sports & Fitness', subcategory: 'Yoga', inStock: true },
     { id: '20', name: 'Dumbbell Set 10kg', price: 2499, originalPrice: 3499, discount: '29% off', rating: 4.4, reviews: 1987, image: '🏋️', delivery: 'Tomorrow', category: 'Sports & Fitness', subcategory: 'Exercise Equipment', inStock: true, badge: 'SALE 50%' },
-  ]);
+];
 
-  const getProductsByCategory = (category: string) => {
-    return products.filter(
-      (product) => product.category.toLowerCase() === category.toLowerCase()
-    );
+
+export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const categories: Category[] = [
+    {
+      name: 'Electronics',
+      slug: 'electronics',
+      icon: '📱',
+      subcategories: [
+        { name: 'Mobile Phones', slug: 'mobile-phones' },
+        { name: 'Laptops', slug: 'laptops' },
+        { name: 'Tablets', slug: 'tablets' },
+        { name: 'Televisions', slug: 'televisions' },
+        { name: 'Cameras', slug: 'cameras' },
+        { name: 'Headphones', slug: 'headphones' },
+        { name: 'Speakers', slug: 'speakers' },
+        { name: 'Smart Watches', slug: 'smart-watches' },
+        { name: 'Power Banks', slug: 'power-banks' },
+        { name: 'Gaming Consoles', slug: 'gaming-consoles' },
+      ],
+    },
+    {
+      name: 'Fashion',
+      slug: 'fashion',
+      icon: '👕',
+      subcategories: [
+        { name: 'Men Clothing', slug: 'men-clothing' },
+        { name: 'Women Clothing', slug: 'women-clothing' },
+        { name: 'Kids Clothing', slug: 'kids-clothing' },
+        { name: 'Men Footwear', slug: 'men-footwear' },
+        { name: 'Women Footwear', slug: 'women-footwear' },
+        { name: 'Watches', slug: 'watches' },
+        { name: 'Sunglasses', slug: 'sunglasses' },
+        { name: 'Bags & Luggage', slug: 'bags-luggage' },
+        { name: 'Jewellery', slug: 'jewellery' },
+        { name: 'Accessories', slug: 'accessories' },
+      ],
+    },
+    {
+      name: 'Home & Furniture',
+      slug: 'home-furniture',
+      icon: '🛋️',
+      subcategories: [
+        { name: 'Furniture', slug: 'furniture' },
+        { name: 'Home Decor', slug: 'home-decor' },
+        { name: 'Kitchen & Dining', slug: 'kitchen-dining' },
+        { name: 'Bed & Bath', slug: 'bed-bath' },
+        { name: 'Garden & Outdoor', slug: 'garden-outdoor' },
+        { name: 'Home Improvement', slug: 'home-improvement' },
+        { name: 'Lighting', slug: 'lighting' },
+        { name: 'Storage', slug: 'storage' },
+      ],
+    },
+    {
+      name: 'Beauty & Personal Care',
+      slug: 'beauty-personal-care',
+      icon: '💄',
+      subcategories: [
+        { name: 'Makeup', slug: 'makeup' },
+        { name: 'Skin Care', slug: 'skin-care' },
+        { name: 'Hair Care', slug: 'hair-care' },
+        { name: 'Fragrances', slug: 'fragrances' },
+        { name: 'Bath & Body', slug: 'bath-body' },
+        { name: 'Men Grooming', slug: 'men-grooming' },
+        { name: 'Beauty Tools', slug: 'beauty-tools' },
+      ],
+    },
+    {
+      name: 'Books & Stationery',
+      slug: 'books-stationery',
+      icon: '📚',
+      subcategories: [
+        { name: 'Books', slug: 'books' },
+        { name: 'Pens', slug: 'pens' },
+        { name: 'Pencils', slug: 'pencils' },
+        { name: 'Notebooks', slug: 'notebooks' },
+        { name: 'Sketch Books', slug: 'sketch-books' },
+        { name: 'Erasers', slug: 'erasers' },
+        { name: 'School Supplies', slug: 'school-supplies' },
+        { name: 'Art Supplies', slug: 'art-supplies' },
+        { name: 'Office Supplies', slug: 'office-supplies' },
+      ],
+    },
+    {
+      name: 'Sports & Fitness',
+      slug: 'sports-fitness',
+      icon: '⚽',
+      subcategories: [
+        { name: 'Exercise Equipment', slug: 'exercise-equipment' },
+        { name: 'Yoga', slug: 'yoga' },
+        { name: 'Sports Shoes', slug: 'sports-shoes' },
+        { name: 'Cricket', slug: 'cricket' },
+        { name: 'Football', slug: 'football' },
+        { name: 'Badminton', slug: 'badminton' },
+        { name: 'Swimming', slug: 'swimming' },
+        { name: 'Cycling', slug: 'cycling' },
+      ],
+    },
+    {
+      name: 'Toys & Baby Products',
+      slug: 'toys-baby',
+      icon: '🧸',
+      subcategories: [
+        { name: 'Toys', slug: 'toys' },
+        { name: 'Baby Care', slug: 'baby-care' },
+        { name: 'Baby Fashion', slug: 'baby-fashion' },
+        { name: 'Diapers', slug: 'diapers' },
+        { name: 'Baby Feeding', slug: 'baby-feeding' },
+        { name: 'Baby Gear', slug: 'baby-gear' },
+      ],
+    },
+    {
+      name: 'Grocery & Food',
+      slug: 'grocery-food',
+      icon: '🛒',
+      subcategories: [
+        { name: 'Fruits & Vegetables', slug: 'fruits-vegetables' },
+        { name: 'Dairy Products', slug: 'dairy-products' },
+        { name: 'Beverages', slug: 'beverages' },
+        { name: 'Snacks', slug: 'snacks' },
+        { name: 'Cooking Essentials', slug: 'cooking-essentials' },
+        { name: 'Organic', slug: 'organic' },
+      ],
+    },
+    {
+      name: 'Appliances',
+      slug: 'appliances',
+      icon: '🔌',
+      subcategories: [
+        { name: 'Air Conditioners', slug: 'air-conditioners' },
+        { name: 'Refrigerators', slug: 'refrigerators' },
+        { name: 'Washing Machines', slug: 'washing-machines' },
+        { name: 'Microwave Ovens', slug: 'microwave-ovens' },
+        { name: 'Vacuum Cleaners', slug: 'vacuum-cleaners' },
+        { name: 'Kitchen Appliances', slug: 'kitchen-appliances' },
+      ],
+    },
+    {
+      name: 'Automotive',
+      slug: 'automotive',
+      icon: '🚗',
+      subcategories: [
+        { name: 'Car Accessories', slug: 'car-accessories' },
+        { name: 'Bike Accessories', slug: 'bike-accessories' },
+        { name: 'Car Electronics', slug: 'car-electronics' },
+        { name: 'Helmets', slug: 'helmets' },
+        { name: 'Car Care', slug: 'car-care' },
+      ],
+    },
+  ];
+
+  
+  // 1. Initialize state by reading from localStorage or falling back to default
+  const [products, setProducts] = useState<Product[]>(() => getInitialProducts(DEFAULT_PRODUCTS));
+
+  // 2. Use useEffect to save products to localStorage whenever the state changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(products));
+    } catch (error) {
+      console.error("Error writing to localStorage:", error);
+    }
+  }, [products]); // Dependency array ensures this runs on mount and when 'products' changes
+
+
+  const getProductsByCategory = (category: string) => {
+    return products.filter(
+      (product) => product.category.toLowerCase() === category.toLowerCase()
+    );
+  };
+
+  const getProductsBySubcategory = (subcategory: string) => {
+    return products.filter(
+      (product) => product.subcategory.toLowerCase() === subcategory.toLowerCase()
+    );
+  };
+
+  const getProductById = (id: string) => {
+    return products.find((product) => product.id === id);
+  };
+
+  const addProduct = (product: Product) => {
+    setProducts((prev) => [...prev, product]);
   };
 
-  const getProductsBySubcategory = (subcategory: string) => {
-    return products.filter(
-      (product) => product.subcategory.toLowerCase() === subcategory.toLowerCase()
-    );
+  const updateProduct = (id: string, updatedProduct: Partial<Product>) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...updatedProduct } : p))
+    );
   };
 
-  const getProductById = (id: string) => {
-    return products.find((product) => product.id === id);
+  const deleteProduct = (id: string) => {
+    setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const addProduct = (product: Product) => {
-  setProducts((prev) => [...prev, product]);
-};
 
-const updateProduct = (id: string, updatedProduct: Partial<Product>) => {
-  setProducts((prev) =>
-    prev.map((p) => (p.id === id ? { ...p, ...updatedProduct } : p))
-  );
-};
-
-const deleteProduct = (id: string) => {
-  setProducts((prev) => prev.filter((p) => p.id !== id));
-};
-
-
-  return (
-<ProductsContext.Provider
-  value={{
-    products,
-    categories,
-    getProductsByCategory,
-    getProductsBySubcategory,
-    getProductById,
-    addProduct,
-    updateProduct,
-    deleteProduct,
-  }}
->
-  {children}
-</ProductsContext.Provider>
-
-    
-  );
+  return (
+    <ProductsContext.Provider
+      value={{
+        products,
+        categories,
+        getProductsByCategory,
+        getProductsBySubcategory,
+        getProductById,
+        addProduct,
+        updateProduct,
+        deleteProduct,
+      }}
+    >
+      {children}
+    </ProductsContext.Provider>
+  );
 };
 
 export const useProducts = () => {
-  const context = useContext(ProductsContext);
-  if (context === undefined) {
-    throw new Error('useProducts must be used within a ProductsProvider');
-  }
-  return context;
+  const context = useContext(ProductsContext);
+  if (context === undefined) {
+    throw new Error('useProducts must be used within a ProductsProvider');
+  }
+  return context;
 };

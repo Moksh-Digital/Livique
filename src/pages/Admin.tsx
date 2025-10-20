@@ -232,25 +232,24 @@ const Admin = () => {
     const selectedSub = selectedCategory?.subcategories.find(s => s.slug === formData.subcategory);
     const subcategoryName = selectedSub ? selectedSub.label : formData.subcategory;
 
+    const payload = {
+      ...formData,
+      category: categoryName,
+      subcategory: subcategoryName,
+      categorySlug: formData.category || undefined,
+      subcategorySlug: formData.subcategory || undefined,
+      discount,
+      rating: 4.8,
+      reviews: 100,
+    };
+
     if (editingProduct?.id != null) {
-      updateProduct(editingProduct.id, {
-        ...formData,
-        category: categoryName,
-        subcategory: subcategoryName,
-        discount,
-        rating: 4.8,
-        reviews: 100,
-      });
+      updateProduct(editingProduct.id, payload);
       toast({ title: "Product updated successfully" });
     } else {
       addProduct({
-        ...formData,
+        ...payload,
         id: Date.now().toString(),
-        category: categoryName,
-        subcategory: subcategoryName,
-        discount,
-        rating: 4.8,
-        reviews: 100,
         inStock: true,
       });
       toast({ title: "Product added successfully" });
@@ -518,9 +517,10 @@ const Admin = () => {
                           setFormData({
                             name: product.name,
                             price: product.price,
-                            originalPrice: product.originalPrice,
-                            category: product.category,
-                            subcategory: product.subcategory,
+                            originalPrice: product.originalPrice ?? 0,
+                            // use slug fields for form selects (fall back to existing label)
+                            category: (product as any).categorySlug ?? product.category ?? "",
+                            subcategory: (product as any).subcategorySlug ?? product.subcategory ?? "",
                             image: product.image,
                             description: product.description,
                             delivery: product.delivery,
