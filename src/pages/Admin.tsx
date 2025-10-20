@@ -419,6 +419,91 @@ const Admin = () => {
                   </DialogHeader>
 
                   <form onSubmit={handleSubmit} className="space-y-4">
+
+                    
+
+                    {/* other inputs */}
+                    {[
+                      ["Name", "name"],
+                      ["Price", "price"],
+                      ["Original Price", "originalPrice"],
+                      ["Description", "description"],
+                    ].map(([label, key]) => (
+                      <div key={key}>
+                        <Label>{label}</Label>
+                        <Input
+                          type={
+                            key === "price" || key === "originalPrice"
+                              ? "number"
+                              : "text"
+                          }
+                          value={(formData as any)[key]}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              [key]:
+                                key === "price" || key === "originalPrice"
+                                  ? Number(e.target.value)
+                                  : e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                    ))}
+                    {/* Category select */}
+                    <div>
+                      <Label>Category</Label>
+                      <select
+                        value={formData.category}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            category: e.target.value,
+                            // reset subcategory when category changes
+                            subcategory: "",
+                          })
+                        }
+                        required
+                        className="w-full px-3 py-2 border rounded"
+                      >
+                        <option value="">Select category</option>
+                        {CATEGORY_OPTIONS.map((opt) => (
+                          <option key={opt.slug} value={opt.slug}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Subcategory select (shown only if selected category has subcategories) */}
+                    {(() => {
+                      const selCat = CATEGORY_OPTIONS.find(c => c.slug === formData.category);
+                      if (!selCat || selCat.subcategories.length === 0) return null;
+                      return (
+                        <div>
+                          <Label>Subcategory</Label>
+                          <select
+                            value={formData.subcategory}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                subcategory: e.target.value,
+                              })
+                            }
+                            required
+                            className="w-full px-3 py-2 border rounded"
+                          >
+                            <option value="">Select subcategory</option>
+                            {selCat.subcategories.map((sub) => (
+                              <option key={sub.slug} value={sub.slug}>
+                                {sub.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      );
+                    })()}
                     {/* Main Image (file or url) */}
                     <div>
                       <Label>Main Image (file or URL)</Label>
@@ -516,90 +601,6 @@ const Admin = () => {
                         ))}
                       </div>
                     </div>
-
-                    {/* Category select */}
-                    <div>
-                      <Label>Category</Label>
-                      <select
-                        value={formData.category}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            category: e.target.value,
-                            // reset subcategory when category changes
-                            subcategory: "",
-                          })
-                        }
-                        required
-                        className="w-full px-3 py-2 border rounded"
-                      >
-                        <option value="">Select category</option>
-                        {CATEGORY_OPTIONS.map((opt) => (
-                          <option key={opt.slug} value={opt.slug}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Subcategory select (shown only if selected category has subcategories) */}
-                    {(() => {
-                      const selCat = CATEGORY_OPTIONS.find(c => c.slug === formData.category);
-                      if (!selCat || selCat.subcategories.length === 0) return null;
-                      return (
-                        <div>
-                          <Label>Subcategory</Label>
-                          <select
-                            value={formData.subcategory}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                subcategory: e.target.value,
-                              })
-                            }
-                            required
-                            className="w-full px-3 py-2 border rounded"
-                          >
-                            <option value="">Select subcategory</option>
-                            {selCat.subcategories.map((sub) => (
-                              <option key={sub.slug} value={sub.slug}>
-                                {sub.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      );
-                    })()}
-
-                    {/* other inputs */}
-                    {[
-                      ["Name", "name"],
-                      ["Price", "price"],
-                      ["Original Price", "originalPrice"],
-                      ["Description", "description"],
-                    ].map(([label, key]) => (
-                      <div key={key}>
-                        <Label>{label}</Label>
-                        <Input
-                          type={
-                            key === "price" || key === "originalPrice"
-                              ? "number"
-                              : "text"
-                          }
-                          value={(formData as any)[key]}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              [key]:
-                                key === "price" || key === "originalPrice"
-                                  ? Number(e.target.value)
-                                  : e.target.value,
-                            })
-                          }
-                          required
-                        />
-                      </div>
-                    ))}
                     <Button type="submit" className="w-full">
                       Save
                     </Button>
