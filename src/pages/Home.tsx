@@ -126,6 +126,128 @@ const Home = () => {
             min-height: 400px;
           }
         }
+
+        /* Subtle hover system: smaller lift & zoom, stronger shadow depth */
+        .page-card {
+          transition: transform 220ms cubic-bezier(.2,.9,.25,1), box-shadow 220ms ease;
+          will-change: transform;
+          cursor: pointer;
+          transform: translateZ(0);
+        }
+        /* small lift, tiny scale — don't move up too much */
+        .page-card:hover {
+          transform: translateY(-4px) scale(1.008);
+          box-shadow: 0 14px 34px rgba(15,23,42,0.10);
+        }
+        .page-card:active {
+          transform: translateY(-2px) scale(1.003);
+          box-shadow: 0 8px 18px rgba(15,23,42,0.12);
+        }
+
+        /* images get a gentle zoom only */
+        .page-card img {
+          transition: transform 420ms cubic-bezier(.2,.8,.2,1), filter 220ms ease;
+          display: block;
+          width: 100%;
+          height: auto;
+          backface-visibility: hidden;
+          transform-origin: center;
+        }
+        .page-card:hover img {
+          transform: scale(1.03);
+          filter: brightness(.96);
+        }
+
+        /* Banner overlay depth */
+        .banner-card {
+          position: relative;
+          overflow: hidden;
+        }
+        .banner-card .banner-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.42));
+          opacity: 1;
+          transition: opacity 300ms ease, transform 300ms ease;
+          pointer-events: none;
+        }
+        .banner-card:hover .banner-overlay {
+          transform: translateY(-2px);
+          opacity: 1;
+        }
+
+        /* Slightly less aggressive diwali poster zoom */
+        .diwali-poster:hover img {
+          transform: scale(1.02);
+          filter: saturate(1.03);
+        }
+
+        /* Primary button: micro motion, gradient shift and arrow reveal */
+        .primary-btn {
+          transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease, background-position 300ms ease;
+          background-image: linear-gradient(90deg,#ff4d94,#ff0066);
+          background-size: 200% 100%;
+          background-position: 0% 50%;
+          border: none;
+          color: #fff !important;
+          border-radius: 10px;
+          padding: 10px 14px;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .primary-btn:hover {
+          transform: translateY(-2px) scale(1.01);
+          box-shadow: 0 8px 22px rgba(255,0,119,0.16);
+          filter: brightness(1.03);
+          background-position: 100% 50%;
+        }
+        .primary-btn:active {
+          transform: translateY(0) scale(0.999);
+          box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        }
+        /* add subtle arrow that slides in on hover */
+        .primary-btn::after {
+          content: "→";
+          display: inline-block;
+          margin-left: 6px;
+          opacity: 0;
+          transform: translateX(-6px);
+          transition: transform 180ms ease, opacity 180ms ease;
+          font-weight: 700;
+        }
+        .primary-btn:hover::after {
+          opacity: 1;
+          transform: translateX(0);
+        }
+
+        /* Accessibility focus */
+        .page-card:focus-visible,
+        .primary-btn:focus-visible {
+          outline: 3px solid rgba(255,0,119,0.14);
+          outline-offset: 4px;
+        }
+
+        /* Small label polish */
+        .badge-bounce {
+          transition: transform 220ms ease;
+        }
+        .page-card:hover .badge-bounce {
+          transform: translateY(-2px);
+        }
+
+        /* Pressed feel for interactive cards */
+        .page-card:active .badge-bounce { transform: translateY(-1px); }
+
+        /* prefer reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+          .page-card, .page-card img, .primary-btn, .primary-btn::after {
+            transition: none !important;
+            transform: none !important;
+          }
+        }
+
+        a { text-decoration: none; color: inherit; }
       `}</style>
       <Header />
 
@@ -154,7 +276,11 @@ const Home = () => {
               desc: "Celebrate your bond with festive delights!",
             },
           ].map((banner, idx) => (
-            <Card key={idx} style={{ position: "relative", overflow: "hidden", borderRadius: "20px" }}>
+            <Card
+              key={idx}
+              className="page-card banner-card"
+              style={{ position: "relative", overflow: "hidden", borderRadius: "20px" }}
+            >
               <img
                 src={banner.src || "/placeholder.svg"}
                 alt="Banner"
@@ -167,11 +293,14 @@ const Home = () => {
                   opacity: 1,
                 }}
               />
+              <div className="banner-overlay" />
               <div style={{ position: "relative", zIndex: 10, padding: "2rem", color: "#fff" }}>
                 <p style={{ fontSize: "0.9rem", fontWeight: 600, marginBottom: "0.5rem" }}>{banner.date}</p>
                 <h2 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "0.5rem" }}>{banner.title}</h2>
                 <p style={{ fontSize: "0.9rem", marginBottom: "1rem" }}>{banner.desc}</p>
-                <Button style={{ backgroundColor: "#ff0077", color: "#fff" }}>ORDER NOW</Button>
+                <Button className="primary-btn" style={{ color: "#fff" }}>
+                  ORDER NOW
+                </Button>
               </div>
             </Card>
           ))}
@@ -189,7 +318,7 @@ const Home = () => {
           {categories.map((cat) => (
             <div key={cat.id} style={{ textAlign: "center" }}>
               <Link to={`/category/${cat.name.toLowerCase().replace(/\s/g, "-")}`}>
-                <Card style={{ position: "relative", borderRadius: "20px", overflow: "hidden" }}>
+                <Card className="page-card" style={{ position: "relative", borderRadius: "20px", overflow: "hidden" }}>
                   <img
                     src={cat.image || "/placeholder.svg"}
                     alt={cat.name}
@@ -197,6 +326,7 @@ const Home = () => {
                   />
                   {cat.date && (
                     <span
+                      className="badge-bounce"
                       style={{
                         position: "absolute",
                         top: "8px",
@@ -214,6 +344,7 @@ const Home = () => {
                   )}
                   {cat.badge && (
                     <span
+                      className="badge-bounce"
                       style={{
                         position: "absolute",
                         top: "8px",
@@ -250,7 +381,7 @@ const Home = () => {
           >
             {/* Main Poster Card */}
             <Card
-              className="diwali-poster"
+              className="diwali-poster page-card"
               style={{
                 position: "relative",
                 borderRadius: "24px",
@@ -283,6 +414,7 @@ const Home = () => {
               {diwaliCategories.map((cat, idx) => (
                 <Link key={idx} to={`/category/diwali-${cat.name.toLowerCase().replace(/\s/g, "-")}`}>
                   <Card
+                    className="page-card"
                     style={{
                       borderRadius: "16px",
                       overflow: "hidden",
@@ -329,7 +461,7 @@ const Home = () => {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "16px" }}>
             {birthdayCategories.map((cat, idx) => (
               <Link key={idx} to={`/category/birthday-${cat.name.toLowerCase()}`}>
-                <Card style={{ borderRadius: "20px", overflow: "hidden" }}>
+                <Card className="page-card" style={{ borderRadius: "20px", overflow: "hidden" }}>
                   <img
                     src={cat.image || "/placeholder.svg"}
                     alt={cat.name}
@@ -348,7 +480,7 @@ const Home = () => {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "16px" }}>
             {[1, 2, 3, 4, 5].map((item) => (
               <Link key={item} to="/products">
-                <Card style={{ borderRadius: "20px", overflow: "hidden" }}>
+                <Card className="page-card" style={{ borderRadius: "20px", overflow: "hidden" }}>
                   <img
                     src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863176/Screenshot_2025-10-19_134348_zfa066.png"
                     alt="Gift"
