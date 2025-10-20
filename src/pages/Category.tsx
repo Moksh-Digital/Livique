@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { Star, ChevronDown, Filter } from "lucide-react";
+import { Star, ChevronDown, Filter, Smartphone, Shirt, Home, Heart, BookOpen, Dumbbell, Shapes, ShoppingCart, Cpu, Truck } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -52,6 +52,28 @@ const Category = () => {
     cat.slug === category || cat.subcategories.some(sub => sub.slug === subcategory)
   );
 
+  // helper to return an icon component for a given category slug
+  const getIconForSlug = (slug: string) => {
+    const map: Record<string, JSX.Element> = {
+      "electronics": <Smartphone className="h-4 w-4 mr-2" aria-hidden />,
+      "fashion": <Shirt className="h-4 w-4 mr-2" aria-hidden />,
+      "home & furniture": <Home className="h-4 w-4 mr-2" aria-hidden />,
+      "home-furniture": <Home className="h-4 w-4 mr-2" aria-hidden />,
+      "beauty & personal care": <Heart className="h-4 w-4 mr-2" aria-hidden />,
+      "beauty-personal-care": <Heart className="h-4 w-4 mr-2" aria-hidden />,
+      "books & stationery": <BookOpen className="h-4 w-4 mr-2" aria-hidden />,
+      "books-stationery": <BookOpen className="h-4 w-4 mr-2" aria-hidden />,
+      "sports & fitness": <Dumbbell className="h-4 w-4 mr-2" aria-hidden />,
+      "sports-fitness": <Dumbbell className="h-4 w-4 mr-2" aria-hidden />,
+      "toys & baby products": <Shapes className="h-4 w-4 mr-2" aria-hidden />,
+      "grocery & food": <ShoppingCart className="h-4 w-4 mr-2" aria-hidden />,
+      "grocery-food": <ShoppingCart className="h-4 w-4 mr-2" aria-hidden />,
+      "appliances": <Cpu className="h-4 w-4 mr-2" aria-hidden />,
+      "automotive": <Truck className="h-4 w-4 mr-2" aria-hidden />,
+    };
+    return map[slug.toLowerCase()] ?? <span className="w-4 h-4 mr-2" />;
+  };
+
   // Sidebar for filters
   const FilterSidebar = () => (
     <div className="space-y-6">
@@ -63,9 +85,10 @@ const Category = () => {
             <div key={cat.slug}>
               <Link 
                 to={`/category/${cat.slug}`}
-                className="block text-sm py-1 hover:text-primary transition-colors"
+                className="block text-sm py-1 hover:text-primary transition-colors flex items-center"
               >
-                {cat.icon} {cat.name}
+                {getIconForSlug(cat.slug)}
+                {cat.name}
               </Link>
             </div>
           ))}
