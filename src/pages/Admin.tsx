@@ -26,6 +26,168 @@ import { useProducts } from "@/contexts/ProductsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
+// category / subcategory data (slugs precomputed)
+const CATEGORY_OPTIONS = [
+  { label: "Diwali Gifts", slug: "diwali-gifts", subcategories: [] },
+  { label: "Birthday Gifts", slug: "birthday-gifts", subcategories: [] },
+  { label: "Bhai Dooj", slug: "bhai-dooj", subcategories: [] },
+  { label: "Flowers", slug: "flowers", subcategories: [] },
+  { label: "Same Day", slug: "same-day", subcategories: [] },
+  { label: "Hatke Gifts", slug: "hatke-gifts", subcategories: [] },
+  { label: "Home Decor", slug: "home-decor", subcategories: [] },
+  { label: "Anniversary", slug: "anniversary", subcategories: [] },
+  { label: "Gift Hampers", slug: "gift-hampers", subcategories: [] },
+  { label: "Sweets", slug: "sweets", subcategories: [] },
+  { label: "Dry Fruits", slug: "dry-fruits", subcategories: [] },
+  { label: "Chocolates", slug: "chocolates", subcategories: [] },
+  { label: "Diyas", slug: "diyas", subcategories: [] },
+  { label: "Cakes", slug: "cakes", subcategories: [] },
+  { label: "Personalized", slug: "personalized", subcategories: [] },
+  { label: "Experiences", slug: "experiences", subcategories: [] },
+
+  // Electronics with subcategories
+  {
+    label: "Electronics",
+    slug: "electronics",
+    subcategories: [
+      { label: "Mobile Phones", slug: "mobile-phones" },
+      { label: "Laptops", slug: "laptops" },
+      { label: "Tablets", slug: "tablets" },
+      { label: "Televisions", slug: "televisions" },
+      { label: "Cameras", slug: "cameras" },
+      { label: "Headphones", slug: "headphones" },
+      { label: "Speakers", slug: "speakers" },
+      { label: "Smart Watches", slug: "smart-watches" },
+      { label: "Power Banks", slug: "power-banks" },
+      { label: "Gaming Consoles", slug: "gaming-consoles" },
+    ],
+  },
+
+  // Fashion
+  {
+    label: "Fashion",
+    slug: "fashion",
+    subcategories: [
+      { label: "Men Clothing", slug: "men-clothing" },
+      { label: "Women Clothing", slug: "women-clothing" },
+      { label: "Kids Clothing", slug: "kids-clothing" },
+      { label: "Men Footwear", slug: "men-footwear" },
+      { label: "Women Footwear", slug: "women-footwear" },
+      { label: "Watches", slug: "watches" },
+      { label: "Sunglasses", slug: "sunglasses" },
+      { label: "Bags & Luggage", slug: "bags-luggage" },
+      { label: "Jewellery", slug: "jewellery" },
+      { label: "Accessories", slug: "accessories" },
+    ],
+  },
+
+  // Home and furniture
+  {
+    label: "Home and furniture",
+    slug: "home-furniture",
+    subcategories: [
+      { label: "Furniture", slug: "furniture" },
+      { label: "Home Decor", slug: "home-decor-f" },
+      { label: "Kitchen & Dining", slug: "kitchen-dining" },
+      { label: "Bed & Bath", slug: "bed-bath" },
+      { label: "Garden & Outdoor", slug: "garden-outdoor" },
+      { label: "Home Improvement", slug: "home-improvement" },
+      { label: "Lighting", slug: "lighting" },
+      { label: "Storage", slug: "storage" },
+    ],
+  },
+
+  // Beauty and personal care
+  {
+    label: "Beauty and personal care",
+    slug: "beauty-personal-care",
+    subcategories: [
+      { label: "Makeup", slug: "makeup" },
+      { label: "Skin Care", slug: "skin-care" },
+      { label: "Hair Care", slug: "hair-care" },
+      { label: "Fragrances", slug: "fragrances" },
+      { label: "Bath & Body", slug: "bath-body" },
+      { label: "Men Grooming", slug: "men-grooming" },
+      { label: "Beauty Tools", slug: "beauty-tools" },
+    ],
+  },
+
+  // Books and stationary
+  {
+    label: "Books and stationary",
+    slug: "books-stationery",
+    subcategories: [
+      { label: "Books", slug: "books" },
+      { label: "Pens", slug: "pens" },
+      { label: "Pencils", slug: "pencils" },
+      { label: "Notebooks", slug: "notebooks" },
+      { label: "Sketch Books", slug: "sketch-books" },
+      { label: "Erasers", slug: "erasers" },
+      { label: "School Supplies", slug: "school-supplies" },
+      { label: "Art Supplies", slug: "art-supplies" },
+      { label: "Office Supplies", slug: "office-supplies" },
+    ],
+  },
+
+  // Sports and fitness
+  {
+    label: "Sports and fitness",
+    slug: "sports-fitness",
+    subcategories: [
+      { label: "Exercise Equipment", slug: "exercise-equipment" },
+      { label: "Yoga", slug: "yoga" },
+      { label: "Sports Shoes", slug: "sports-shoes" },
+      { label: "Cricket", slug: "cricket" },
+      { label: "Football", slug: "football" },
+      { label: "Badminton", slug: "badminton" },
+      { label: "Swimming", slug: "swimming" },
+      { label: "Cycling", slug: "cycling" },
+    ],
+  },
+
+  // Toys & baby products
+  {
+    label: "Toys & baby products",
+    slug: "toys-baby-products",
+    subcategories: [
+      { label: "Toys", slug: "toys" },
+      { label: "Baby Care", slug: "baby-care" },
+      { label: "Baby Fashion", slug: "baby-fashion" },
+      { label: "Diapers", slug: "diapers" },
+      { label: "Baby Feeding", slug: "baby-feeding" },
+      { label: "Baby Gear", slug: "baby-gear" },
+    ],
+  },
+
+  // Grocery and food
+  {
+    label: "Grocery and food",
+    slug: "grocery-food",
+    subcategories: [
+      { label: "Fruits & Vegetables", slug: "fruits-vegetables" },
+      { label: "Dairy Products", slug: "dairy-products" },
+      { label: "Beverages", slug: "beverages" },
+      { label: "Snacks", slug: "snacks" },
+      { label: "Cooking Essentials", slug: "cooking-essentials" },
+      { label: "Organic", slug: "organic" },
+    ],
+  },
+
+  // Appliances
+  {
+    label: "Appliances",
+    slug: "appliances",
+    subcategories: [
+      { label: "Air Conditioners", slug: "air-conditioners" },
+      { label: "Refrigerators", slug: "refrigerators" },
+      { label: "Washing Machines", slug: "washing-machines" },
+      { label: "Microwave Ovens", slug: "microwave-ovens" },
+      { label: "Vacuum Cleaners", slug: "vacuum-cleaners" },
+      { label: "Kitchen Appliances", slug: "kitchen-appliances" },
+    ],
+  },
+];
+
 const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -39,7 +201,9 @@ const Admin = () => {
     name: "",
     price: 0,
     originalPrice: 0,
+    // store slugs for routing; readable names will be resolved on submit
     category: "",
+    subcategory: "",
     image: "🎁",
     description: "",
     delivery: "Today",
@@ -62,28 +226,35 @@ const Admin = () => {
       (1 - formData.price / formData.originalPrice) * 100
     )}% OFF`;
 
-if (editingProduct?.id != null) {
-  // safely check if editingProduct exists and has id
-  updateProduct(editingProduct.id, {
-    ...formData,
-    discount,
-    rating: 4.8,
-    reviews: 100,
-  });
-  toast({ title: "Product updated successfully" });
-} else {
-  addProduct({
-    ...formData,
-    id: Date.now().toString(), // ✅ convert number to string
-    discount,
-    rating: 4.8,
-    reviews: 100,
-    subcategory: "", // set default or from formData if you have it
-    inStock: true ,
-  });
-  toast({ title: "Product added successfully" });
-}
+    // resolve readable names from slugs (fallback to raw slug)
+    const selectedCategory = CATEGORY_OPTIONS.find(c => c.slug === formData.category);
+    const categoryName = selectedCategory ? selectedCategory.label : formData.category;
+    const selectedSub = selectedCategory?.subcategories.find(s => s.slug === formData.subcategory);
+    const subcategoryName = selectedSub ? selectedSub.label : formData.subcategory;
 
+    if (editingProduct?.id != null) {
+      updateProduct(editingProduct.id, {
+        ...formData,
+        category: categoryName,
+        subcategory: subcategoryName,
+        discount,
+        rating: 4.8,
+        reviews: 100,
+      });
+      toast({ title: "Product updated successfully" });
+    } else {
+      addProduct({
+        ...formData,
+        id: Date.now().toString(),
+        category: categoryName,
+        subcategory: subcategoryName,
+        discount,
+        rating: 4.8,
+        reviews: 100,
+        inStock: true,
+      });
+      toast({ title: "Product added successfully" });
+    }
 
     setIsDialogOpen(false);
     setEditingProduct(null);
@@ -92,6 +263,7 @@ if (editingProduct?.id != null) {
       price: 0,
       originalPrice: 0,
       category: "",
+      subcategory: "",
       image: "🎁",
       description: "",
       delivery: "Today",
@@ -151,6 +323,7 @@ if (editingProduct?.id != null) {
           <TabsContent value="dashboard">
             <div className="grid md:grid-cols-4 gap-6 mb-8">
               {[
+
                 { icon: <Package />, label: "Total Products", value: products.length },
                 { icon: <ShoppingBag />, label: "Total Orders", value: 1247 },
                 { icon: <Users />, label: "Total Users", value: 3456 },
@@ -164,6 +337,7 @@ if (editingProduct?.id != null) {
                   <p className="text-3xl font-bold">{item.value}</p>
                 </Card>
               ))}
+
             </div>
 
             <Card className="p-6 rounded-2xl">
@@ -204,6 +378,7 @@ if (editingProduct?.id != null) {
                         price: 0,
                         originalPrice: 0,
                         category: "",
+                        subcategory: "",
                         image: "🎁",
                         description: "",
                         delivery: "Today",
@@ -222,11 +397,65 @@ if (editingProduct?.id != null) {
                   </DialogHeader>
 
                   <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Category select */}
+                    <div>
+                      <Label>Category</Label>
+                      <select
+                        value={formData.category}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            category: e.target.value,
+                            // reset subcategory when category changes
+                            subcategory: "",
+                          })
+                        }
+                        required
+                        className="w-full px-3 py-2 border rounded"
+                      >
+                        <option value="">Select category</option>
+                        {CATEGORY_OPTIONS.map((opt) => (
+                          <option key={opt.slug} value={opt.slug}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Subcategory select (shown only if selected category has subcategories) */}
+                    {(() => {
+                      const selCat = CATEGORY_OPTIONS.find(c => c.slug === formData.category);
+                      if (!selCat || selCat.subcategories.length === 0) return null;
+                      return (
+                        <div>
+                          <Label>Subcategory</Label>
+                          <select
+                            value={formData.subcategory}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                subcategory: e.target.value,
+                              })
+                            }
+                            required
+                            className="w-full px-3 py-2 border rounded"
+                          >
+                            <option value="">Select subcategory</option>
+                            {selCat.subcategories.map((sub) => (
+                              <option key={sub.slug} value={sub.slug}>
+                                {sub.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      );
+                    })()}
+
+                    {/* other inputs */}
                     {[
                       ["Name", "name"],
                       ["Price", "price"],
                       ["Original Price", "originalPrice"],
-                      ["Category", "category"],
                       ["Description", "description"],
                     ].map(([label, key]) => (
                       <div key={key}>
@@ -291,6 +520,7 @@ if (editingProduct?.id != null) {
                             price: product.price,
                             originalPrice: product.originalPrice,
                             category: product.category,
+                            subcategory: product.subcategory,
                             image: product.image,
                             description: product.description,
                             delivery: product.delivery,
@@ -300,15 +530,14 @@ if (editingProduct?.id != null) {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-<Button
-  variant="outline"
-  size="icon"
-  className="text-destructive"
-  onClick={() => handleDelete(product.id.toString())} // ✅ convert to string
->
-  <Trash2 className="h-4 w-4" />
-</Button>
-
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-destructive"
+                        onClick={() => handleDelete(product.id.toString())} // ✅ convert to string
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 ))}
