@@ -70,8 +70,6 @@ const SignIn = () => {
     e.preventDefault();
     setLoading(true);
 
-    let success = false; // Flag to control final navigation
-
     try {
         const response = await fetch(`${API_BASE_URL}/verify-signin-otp`, {
             method: 'POST',
@@ -82,23 +80,23 @@ const SignIn = () => {
         const data = await response.json();
 
         if (response.ok && data.success) { 
-            // Store user data in localStorage
-            const userData = {
-                id: `user-${Date.now()}`, // Generate a unique ID
-                email: data.email,
-                name: data.name,
-                role: 'user' as const
-            };
+            // Use AuthContext signIn method to properly update user state
+            const success = await signIn(email, password);
             
-            localStorage.setItem('currentUser', JSON.stringify(userData));
-            
-            toast({
-                title: "Welcome Back!",
-                description: `Successfully signed in as ${data.name}.`
-            });
-            
-            // Set flag to true to redirect after cleanup
-            success = true; 
+            if (success) {
+                toast({
+                    title: "Welcome Back!",
+                    description: `Successfully signed in as ${data.name}.`
+                });
+                
+                navigate("/"); // Redirect to home
+            } else {
+                toast({
+                    title: "Sign In Failed",
+                    description: "Failed to update user session.",
+                    variant: "destructive"
+                });
+            }
             
         } else {
             toast({
@@ -116,12 +114,6 @@ const SignIn = () => {
         });
     } finally {
         setLoading(false);
-        
-        // --- GUARANTEED REDIRECTION ---
-        // We use the flag to ensure redirection only happens on successful API call
-        if (success) {
-            navigate("/"); // This line must execute to redirect the user
-        }
     }
 };
 

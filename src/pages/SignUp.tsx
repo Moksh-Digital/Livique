@@ -23,6 +23,7 @@ const SignUp = () => {
   // Step 2 State: OTP
   const [otp, setOtp] = useState("");
 
+  const { signUp } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -80,8 +81,6 @@ const SignUp = () => {
     e.preventDefault();
     setLoading(true);
 
-    let success = false; // Flag to control final navigation
-
     try {
         const response = await fetch(`${API_BASE_URL}/verify-otp`, {
             method: 'POST',
@@ -92,23 +91,23 @@ const SignUp = () => {
         const data = await response.json();
 
         if (response.ok && data.success) { 
-            // Store user data in localStorage
-            const userData = {
-                id: `user-${Date.now()}`, // Generate a unique ID
-                email: data.email,
-                name: data.name,
-                role: 'user' as const
-            };
+            // Use AuthContext signUp method to properly update user state
+            const success = await signUp(email, password, name);
             
-            localStorage.setItem('currentUser', JSON.stringify(userData));
-            
-            toast({
-                title: "Welcome!",
-                description: `Successfully signed up and logged in as ${data.name}.`
-            });
-            
-            // Set flag to true to redirect after cleanup
-            success = true; 
+            if (success) {
+                toast({
+                    title: "Welcome!",
+                    description: `Successfully signed up and logged in as ${data.name}.`
+                });
+                
+                navigate("/"); // Redirect to home
+            } else {
+                toast({
+                    title: "Sign Up Failed",
+                    description: "Failed to create user account.",
+                    variant: "destructive"
+                });
+            }
             
         } else {
             toast({
@@ -126,12 +125,6 @@ const SignUp = () => {
         });
     } finally {
         setLoading(false);
-        
-        // --- GUARANTEED REDIRECTION ---
-        // We use the flag to ensure redirection only happens on successful API call
-        if (success) {
-            navigate("/"); // This line must execute to redirect the user
-        }
     }
 };
 
