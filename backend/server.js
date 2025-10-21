@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js'; // <-- NEW: Import the DB connection function
 import userRoutes from './routes/userRoutes.js';
-
+import productRoutes from "./routes/productRoutes.js"; // 👈 Add .js at end when using imports
 // Load environment variables
 dotenv.config();
 
@@ -13,6 +13,10 @@ connectDB(); // <-- NEW: Call the function to connect to MongoDB
 // -----------------------------------------------------------------
 
 const app = express();
+
+// Middleware to parse JSON in request body
+app.use(express.json({ limit: '50mb' })); // Increase limit for large images (base64)
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // -----------------------------------------------------------------
 // 1. CONFIGURE CORS MIDDLEWARE
@@ -49,6 +53,7 @@ app.get('/', (req, res) => {
 
 // Mount Routes
 app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
 
 // --- Error Handling Middleware ---
 

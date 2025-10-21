@@ -9,6 +9,7 @@ import {
   Edit,
   Trash2,
   Gift,
+  LogIn,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -192,7 +193,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading, signIn } = useAuth(); // ✅ Added signIn function and loading state
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [editingProduct, setEditingProduct] = useState<any>(null);
@@ -201,28 +202,53 @@ const Admin = () => {
     name: "",
     price: 0,
     originalPrice: 0,
-    // store slugs for routing; readable names will be resolved on submit
     category: "",
     subcategory: "",
     image: "🎁",
-    mainImage: "",   // new - main image url/data
-    images: [] as string[], // new - gallery images
+    mainImage: "",
+    images: [] as string[],
     description: "",
     delivery: "Today",
   });
+  
+  // State for the INLINE LOGIN FORM
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
 
-  // ✅ Prevents infinite redirects and handles role check safely
-  useEffect(() => {
-    if (!user) return;
-    if (user.role !== "admin") navigate("/");
-  }, [user, navigate]);
+
+  // No longer needed if we rely purely on the user/role check below
+  // useEffect(() => {
+  //   if (!user) return;
+  //   if (user.role !== "admin") navigate("/");
+  // }, [user, navigate]);
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+        // 🚨 IMPORTANT: Replace this with your actual signIn function logic.
+        // This is a placeholder that assumes your signIn function takes email/password.
+        await signIn(loginEmail, loginPassword); 
+        
+        // Assuming signIn is successful and sets the user object in context.
+        // The component will automatically re-render and show the dashboard.
+        toast({ title: "Welcome back!", description: "You are logged in as admin." });
+
+    } catch (error) {
+        // Display an error message if login fails (e.g., wrong credentials)
+        toast({ 
+            title: "Login Failed", 
+            description: "Invalid email or password. Only admins can access this panel.", 
+            variant: "destructive" 
+        });
+    }
+  };
 
   const handleDelete = (id: string) => {
     deleteProduct(id.toString());
     toast({ title: "Product deleted successfully" });
   };
 
-  // helper to read File -> dataURL
   const readFileAsDataUrl = (file: File): Promise<string> =>
     new Promise((res, rej) => {
       const fr = new FileReader();
@@ -231,65 +257,169 @@ const Admin = () => {
       fr.readAsDataURL(file);
     });
 
-  const handleSubmit = (e: React.FormEvent) => {
+// Admin.tsx (inside the Admin component)
+// ... (keep all your existing imports, states, and functions)
+
+// ...
+// IMPORTANT: Update your handleSubmit function
+const handleSubmit = async (e: React.FormEvent) => { // Made it async
     e.preventDefault();
+    
+    // --- Data Preparation (Same as your original logic) ---
     const discount = `${Math.round(
-      (1 - formData.price / formData.originalPrice) * 100
+        (1 - formData.price / formData.originalPrice) * 100
     )}% OFF`;
 
-    // resolve readable names from slugs (fallback to raw slug)
     const selectedCategory = CATEGORY_OPTIONS.find(c => c.slug === formData.category);
     const categoryName = selectedCategory ? selectedCategory.label : formData.category;
     const selectedSub = selectedCategory?.subcategories.find(s => s.slug === formData.subcategory);
     const subcategoryName = selectedSub ? selectedSub.label : formData.subcategory;
-
+    
+    // The payload for the API call
     const payload = {
-      ...formData,
-      // keep legacy 'image' for code that still expects it
-      image: formData.mainImage || formData.image,
-      mainImage: formData.mainImage || formData.image,
-      // ensure mainImage is included first in images array, then gallery images
-      images: [
-        formData.mainImage || formData.image,
-        ...((formData.images || []) as string[]).filter(Boolean)
-      ],
-      category: categoryName,
-      subcategory: subcategoryName,
-      categorySlug: formData.category || undefined,
-      subcategorySlug: formData.subcategory || undefined,
-      discount,
-      rating: 4.8,
-      reviews: 100,
+        name: formData.name,
+        price: formData.price,
+        originalPrice: formData.originalPrice,
+        category: categoryName, // Send the full category name
+        categorySlug: formData.category, // Send the slug
+        subcategory: subcategoryName, // Send the full subcategory name
+        subcategorySlug: formData.subcategory, // Send the slug
+        // Ensure mainImage is the first element of images for consistency, then flatten
+        mainImage: formData.mainImage || formData.image,
+        images: [
+            formData.mainImage || formData.image,
+            ...((formData.images || []) as string[]).filter(Boolean).filter(img => img !== (formData.mainImage || formData.image))
+        ],
+        description: formData.description,
+        delivery: formData.delivery,
+        discount, // Include calculated discount
+        rating: 4.8,
+        reviews: 100,
     };
-
+    
+    // --- API Call Logic (The new part) ---
     if (editingProduct?.id != null) {
-      updateProduct(editingProduct.id, payload);
-      toast({ title: "Product updated successfully" });
+        // If editing an existing product
+        // 🚨 TODO: Implement PUT/PATCH API call for product update later
+        updateProduct(editingProduct.id, payload);
+        toast({ title: "Product updated successfully (Local only)" });
     } else {
-      addProduct({
-        ...payload,
-        id: Date.now().toString(),
-        inStock: true,
-      });
-      toast({ title: "Product added successfully" });
+        // 🚀 New Product Creation API Call
+        try {
+const res = await fetch('http://localhost:5000/api/products', {                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 🚨 TODO: Add Authorization header here once your authMiddleware is set up
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+            
+            if (!res.ok) {
+                // Handle API errors (e.g., validation failed)
+                throw new Error(data.message || 'Failed to add product.');
+            }
+
+            // Success: Add the newly created product (with MongoDB _id) to your context/state
+            // Assuming your backend returns the created product with a MongoDB '_id'
+            addProduct({
+                ...data, // This 'data' object should contain the new product from MongoDB
+                id: data._id, // Use the MongoDB _id as the local id
+            });
+            
+            toast({ title: "Product added successfully!" });
+            
+        } catch (error: any) {
+            console.error("Product upload failed:", error);
+            toast({ 
+                title: "Upload Failed", 
+                description: error.message || "Could not connect to the backend.", 
+                variant: "destructive" 
+            });
+            return; // Stop execution on failure
+        }
     }
 
+    // --- Cleanup Form (After successful submission) ---
     setIsDialogOpen(false);
     setEditingProduct(null);
     setFormData({
-      name: "",
-      price: 0,
-      originalPrice: 0,
-      category: "",
-      subcategory: "",
-      image: "🎁",
-      mainImage: "",
-      images: [],
-      description: "",
-      delivery: "Today",
+        name: "",
+        price: 0,
+        originalPrice: 0,
+        category: "",
+        subcategory: "",
+        image: "🎁",
+        mainImage: "",
+        images: [],
+        description: "",
+        delivery: "Today",
     });
-  };
+};
 
+// ... (rest of the Admin component)
+
+  // 1. Loading State Check
+  if (loading) {
+    return (
+        <div className="min-h-screen flex items-center justify-center">
+            <p className="text-xl">Loading authentication data...</p>
+        </div>
+    );
+  }
+
+  // 2. Authorization Check: If not logged in OR logged in but not an admin, show the login form
+  if (!user || user.role !== "admin") {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <Card className="w-full max-w-md p-8 shadow-2xl rounded-xl">
+                <div className="text-center mb-6">
+                    <Gift className="h-10 w-10 text-accent mx-auto mb-2" />
+                    <h1 className="text-3xl font-bold">Admin Login</h1>
+                    <p className="text-muted-foreground">Enter credentials to access the Livique dashboard.</p>
+                </div>
+                
+                <form onSubmit={handleLoginSubmit} className="space-y-5">
+                    <div>
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                            id="email"
+                            type="email"
+                            placeholder="admin@example.com"
+                            value={loginEmail}
+                            onChange={(e) => setLoginEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                            id="password"
+                            type="password"
+                            placeholder="••••••••"
+                            value={loginPassword}
+                            onChange={(e) => setLoginPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <Button type="submit" className="w-full gap-2">
+                        <LogIn className="h-5 w-5" /> Access Dashboard
+                    </Button>
+                </form>
+
+                <div className="mt-6 text-center">
+                    <Link to="/" className="text-sm text-accent hover:underline">
+                        Go back to store
+                    </Link>
+                </div>
+            </Card>
+        </div>
+    );
+  }
+
+
+  // 3. Render the full Admin Dashboard (only runs if user is authenticated and is admin)
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
