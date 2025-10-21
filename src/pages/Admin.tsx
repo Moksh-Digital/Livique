@@ -211,6 +211,27 @@ const Admin = () => {
     delivery: "Today",
     deliveryCharge: 0, 
   });
+
+  useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/products");
+      const data = await res.json();
+      if (res.ok) {
+        // Assuming addProduct pushes into context/state
+        // You might want to create a setProducts() in context instead
+        data.forEach((p: any) => addProduct({ ...p, id: p._id }));
+      } else {
+        console.error("Failed to fetch products:", data.message);
+      }
+    } catch (err) {
+      console.error("Error fetching products:", err);
+    }
+  };
+
+  fetchProducts();
+}, []);
+
   
   // State for the INLINE LOGIN FORM
   const [loginEmail, setLoginEmail] = useState("");
