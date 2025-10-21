@@ -1,11 +1,16 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors'; // <-- NEW IMPORT
-// Removed: import connectDB from './config/db.js';
+import cors from 'cors';
+import connectDB from './config/db.js'; // <-- NEW: Import the DB connection function
 import userRoutes from './routes/userRoutes.js';
 
 // Load environment variables
 dotenv.config();
+
+// -----------------------------------------------------------------
+// NEW: CONNECT TO DATABASE
+connectDB(); // <-- NEW: Call the function to connect to MongoDB
+// -----------------------------------------------------------------
 
 const app = express();
 
@@ -38,7 +43,8 @@ app.use(express.json());
 
 // Root route (API health check)
 app.get('/', (req, res) => {
-    res.send('OTP API is running! (In-Memory Mode)');
+    // UPDATED MESSAGE to reflect MongoDB usage
+    res.send('OTP API is running! (MongoDB Connected)');
 });
 
 // Mount Routes
