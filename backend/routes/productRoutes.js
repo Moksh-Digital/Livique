@@ -1,11 +1,20 @@
 // backend/routes/productRoutes.js
 import express from 'express';
-import { createProduct } from '../controllers/productController.js'; // Note the .js and named import
+import {
+  createProduct,
+  getProducts,
+  getProductById
+} from '../controllers/productController.js';
 
 const router = express.Router();
 
-// Route to create a new product
-router.post('/', createProduct); 
+// Order matters: place ID route before "/"
+router.get('/:id', getProductById);
 
+// All products
+router.get('/', getProducts);
 
-export default router; // Use export default for server.js to import
+// Create new product
+router.post('/', createProduct);
+
+export default router;

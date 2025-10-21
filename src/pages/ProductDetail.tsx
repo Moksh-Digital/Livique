@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,10 +15,59 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { toast } = useToast();
 
+  // ---------------- STATES ----------------
+  const [product, setProduct] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [deliveryOption, setDeliveryOption] = useState<"hand" | "courier">("hand");
 
-  const product = getProductById(id || "");
+  // ---------------- FETCH PRODUCT ----------------
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const found = getProductById(id || "");
+        if (found) {
+          setProduct(found);
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`http://localhost:5000/api/products/${id}`);
+        if (!res.ok) throw new Error("Product not found");
+        const data = await res.json();
+        setProduct(data);
+      } catch (err) {
+        console.error("Failed to load product:", err);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [id, getProductById]);
+
+  // ---------------- IMAGE LOGIC ----------------
+  const images = useMemo(() => {
+    if (!product) return [];
+    const ordered = [product.mainImage, ...(product.images || []), product.image].filter(Boolean) as string[];
+    const unique = Array.from(new Set(ordered));
+    return unique.slice(0, 4);
+  }, [product]);
+
+  // Reset selected image if list changes
+  useEffect(() => {
+    if (selectedImage >= images.length) setSelectedImage(0);
+  }, [images, selectedImage]);
+
+  // ---------------- CONDITIONAL UI ----------------
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading product...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -34,24 +83,15 @@ const ProductDetail = () => {
     );
   }
 
-  // ✅ Delivery charge logic from DB
-  const handDeliveryCharge = product.deliveryCharge ?? 599; // dynamic from DB
-  const courierDeliveryCharge = 449; // fixed alternate charge
-
-  // ✅ Image setup
-  const ordered = [product.mainImage, ...(product.images || []), product.image].filter(Boolean) as string[];
-  const unique = Array.from(new Set(ordered));
-  const images = unique.slice(0, 4);
-
-  useEffect(() => {
-    if (selectedImage >= images.length) setSelectedImage(0);
-  }, [images, selectedImage]);
+  // ---------------- MAIN DATA ----------------
+  const handDeliveryCharge = product.deliveryCharge ?? 599;
+  const courierDeliveryCharge = 449;
 
   const handleAddToCart = () => {
     const selectedCharge = deliveryOption === "hand" ? handDeliveryCharge : courierDeliveryCharge;
 
     addToCart({
-      id: product.id,
+      id: product._id || product.id,
       name: product.name,
       price: product.price,
       image: product.mainImage || (product.images && product.images[0]) || product.image,
@@ -70,6 +110,7 @@ const ProductDetail = () => {
     navigate("/cart");
   };
 
+  // ---------------- RENDER ----------------
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -80,13 +121,11 @@ const ProductDetail = () => {
           <div>
             <Card className="mb-4 rounded-2xl overflow-hidden">
               <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                {(() => {
-                  const display = images[selectedImage] ?? images[0] ?? product.mainImage;
-                  return (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={display} alt={product.name} className="object-contain w-full h-full" />
-                  );
-                })()}
+                <img
+                  src={images[selectedImage] ?? images[0] ?? product.mainImage}
+                  alt={product.name}
+                  className="object-contain w-full h-full"
+                />
               </div>
             </Card>
 
@@ -101,7 +140,6 @@ const ProductDetail = () => {
                   onClick={() => setSelectedImage(idx)}
                 >
                   <div className="aspect-square bg-muted/50 flex items-center justify-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt={`thumb-${idx}`} className="object-contain w-full h-full" />
                   </div>
                 </Card>
@@ -115,10 +153,12 @@ const ProductDetail = () => {
 
             <div className="flex items-center gap-3 mb-6">
               <span className="text-3xl font-bold">₹{product.price.toLocaleString()}</span>
-              <span className="text-muted-foreground line-through">
-                ₹{product.originalPrice?.toLocaleString()}
-              </span>
-              <span className="text-green-600 font-semibold">{product.discount}</span>
+              {product.originalPrice && (
+                <span className="text-muted-foreground line-through">
+                  ₹{product.originalPrice.toLocaleString()}
+                </span>
+              )}
+              {product.discount && <span className="text-green-600 font-semibold">{product.discount}</span>}
             </div>
 
             <div className="flex items-center gap-2 mb-6">

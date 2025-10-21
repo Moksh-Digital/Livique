@@ -1,6 +1,21 @@
 import { useParams, Link } from "react-router-dom";
-import { Star, ChevronDown, Filter, Smartphone, Shirt, Home, Heart, BookOpen, Dumbbell, Shapes, ShoppingCart, Cpu, Truck } from "lucide-react";
-import { useState } from "react";
+import {
+  Star,
+  ChevronDown,
+  Filter,
+  Smartphone,
+  Shirt,
+  Home,
+  Heart,
+  BookOpen,
+  Dumbbell,
+  Shapes,
+  ShoppingCart,
+  Cpu,
+  Truck,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useProducts } from "@/contexts/ProductsContext";
@@ -18,63 +33,87 @@ import {
 
 const Category = () => {
   const { category, subcategory } = useParams();
-  const { products, categories, getProductsByCategory, getProductsBySubcategory } = useProducts();
-  
+  const { categories } = useProducts();
+
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [priceRange, setPriceRange] = useState([0, 300000]);
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Determine which products to display
-  let displayProducts: any[] = [];
+  // 🧭 Breadcrumb Logic
   let breadcrumb = "All Products";
-
-  if (category && subcategory) {
-    // Subcategory page
-    displayProducts = getProductsBySubcategory(subcategory);
-    breadcrumb = subcategory.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  if (subcategory) {
+    breadcrumb = subcategory
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
   } else if (category) {
-    // Category page
-    displayProducts = getProductsByCategory(category);
-    breadcrumb = category.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-  } else {
-    // Default
-    displayProducts = products;
+    breadcrumb = category
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
   }
 
-  // Apply filters
-  displayProducts = displayProducts.filter(product => {
-    const priceMatch = product.price >= priceRange[0] && product.price <= priceRange[1];
-    const ratingMatch = selectedRatings.length === 0 || selectedRatings.some(r => product.rating >= r);
+  // 🧩 Fetch products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        let url = "http://localhost:5000/api/products";
+        if (subcategory) url += `?subcategory=${subcategory}`;
+        else if (category) url += `?category=${category}`;
+
+        const { data } = await axios.get(url);
+        setProducts(data);
+        console.log("Fetched products:", data);
+
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load products. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [category, subcategory]);
+
+  // 🧮 Filter products
+  let displayProducts = products.filter((product: any) => {
+    const priceMatch =
+      product.price >= priceRange[0] && product.price <= priceRange[1];
+    const ratingMatch =
+      selectedRatings.length === 0 ||
+      selectedRatings.some((r) => product.rating >= r);
     return priceMatch && ratingMatch;
   });
 
-  const currentCategory = categories.find(cat => 
-    cat.slug === category || cat.subcategories.some(sub => sub.slug === subcategory)
+  const currentCategory = categories.find(
+    (cat) =>
+      cat.slug === category ||
+      cat.subcategories.some((sub) => sub.slug === subcategory)
   );
 
-  // helper to return an icon component for a given category slug
+  // 🎨 Icon Map
   const getIconForSlug = (slug: string) => {
     const map: Record<string, JSX.Element> = {
-      "electronics": <Smartphone className="h-4 w-4 mr-2" aria-hidden />,
-      "fashion": <Shirt className="h-4 w-4 mr-2" aria-hidden />,
-      "home & furniture": <Home className="h-4 w-4 mr-2" aria-hidden />,
-      "home-furniture": <Home className="h-4 w-4 mr-2" aria-hidden />,
-      "beauty & personal care": <Heart className="h-4 w-4 mr-2" aria-hidden />,
-      "beauty-personal-care": <Heart className="h-4 w-4 mr-2" aria-hidden />,
-      "books & stationery": <BookOpen className="h-4 w-4 mr-2" aria-hidden />,
-      "books-stationery": <BookOpen className="h-4 w-4 mr-2" aria-hidden />,
-      "sports & fitness": <Dumbbell className="h-4 w-4 mr-2" aria-hidden />,
-      "sports-fitness": <Dumbbell className="h-4 w-4 mr-2" aria-hidden />,
-      "toys & baby products": <Shapes className="h-4 w-4 mr-2" aria-hidden />,
-      "grocery & food": <ShoppingCart className="h-4 w-4 mr-2" aria-hidden />,
-      "grocery-food": <ShoppingCart className="h-4 w-4 mr-2" aria-hidden />,
-      "appliances": <Cpu className="h-4 w-4 mr-2" aria-hidden />,
-      "automotive": <Truck className="h-4 w-4 mr-2" aria-hidden />,
+      electronics: <Smartphone className="h-4 w-4 mr-2" />,
+      fashion: <Shirt className="h-4 w-4 mr-2" />,
+      "home-furniture": <Home className="h-4 w-4 mr-2" />,
+      "beauty-personal-care": <Heart className="h-4 w-4 mr-2" />,
+      "books-stationery": <BookOpen className="h-4 w-4 mr-2" />,
+      "sports-fitness": <Dumbbell className="h-4 w-4 mr-2" />,
+      "toys-baby-products": <Shapes className="h-4 w-4 mr-2" />,
+      "grocery-food": <ShoppingCart className="h-4 w-4 mr-2" />,
+      appliances: <Cpu className="h-4 w-4 mr-2" />,
+      automotive: <Truck className="h-4 w-4 mr-2" />,
     };
     return map[slug.toLowerCase()] ?? <span className="w-4 h-4 mr-2" />;
   };
 
-  // Sidebar for filters
+  // 🧱 Filter Sidebar Component
   const FilterSidebar = () => (
     <div className="space-y-6">
       {/* Categories */}
@@ -83,9 +122,9 @@ const Category = () => {
         <div className="space-y-2">
           {categories.map((cat) => (
             <div key={cat.slug}>
-              <Link 
+              <Link
                 to={`/category/${cat.slug}`}
-                className="block text-sm py-1 hover:text-primary transition-colors flex items-center"
+                className="block text-sm py-1 hover:text-primary flex items-center"
               >
                 {getIconForSlug(cat.slug)}
                 {cat.name}
@@ -104,7 +143,7 @@ const Category = () => {
               <Link
                 key={sub.slug}
                 to={`/category/${currentCategory.slug}/${sub.slug}`}
-                className="block text-sm py-1 hover:text-primary transition-colors"
+                className="block text-sm py-1 hover:text-primary"
               >
                 {sub.name}
               </Link>
@@ -142,11 +181,12 @@ const Category = () => {
                 id={`rating-${rating}`}
                 checked={selectedRatings.includes(rating)}
                 onCheckedChange={(checked) => {
-                  if (checked) {
+                  if (checked)
                     setSelectedRatings([...selectedRatings, rating]);
-                  } else {
-                    setSelectedRatings(selectedRatings.filter(r => r !== rating));
-                  }
+                  else
+                    setSelectedRatings(
+                      selectedRatings.filter((r) => r !== rating)
+                    );
                 }}
               />
               <Label
@@ -164,19 +204,45 @@ const Category = () => {
     </div>
   );
 
+  // 🔄 Loading & Error States
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading products...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {error}
+      </div>
+    );
+  }
+
+  // 🧩 Main UI
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="max-w-[1400px] mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <div className="text-sm text-muted-foreground mb-4">
-          <Link to="/" className="hover:text-foreground">Home</Link>
+          <Link to="/" className="hover:text-foreground">
+            Home
+          </Link>
           {category && (
             <>
               {" / "}
-              <Link to={`/category/${category}`} className="hover:text-foreground">
-                {category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+              <Link
+                to={`/category/${category}`}
+                className="hover:text-foreground"
+              >
+                {category
+                  .split("-")
+                  .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                  .join(" ")}
               </Link>
             </>
           )}
@@ -194,7 +260,9 @@ const Category = () => {
             <div className="sticky top-24 space-y-6 border rounded-lg p-4 bg-card">
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold">Filters</h2>
-                {(selectedRatings.length > 0 || priceRange[0] > 0 || priceRange[1] < 300000) && (
+                {(selectedRatings.length > 0 ||
+                  priceRange[0] > 0 ||
+                  priceRange[1] < 300000) && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -218,15 +286,14 @@ const Category = () => {
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
               <div>
                 <h1 className="text-3xl font-bold mb-2">{breadcrumb}</h1>
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="text-muted-foreground">
-                    Showing {displayProducts.length} {displayProducts.length === 1 ? 'Product' : 'Products'}
-                  </span>
+                <div className="text-sm text-muted-foreground">
+                  Showing {displayProducts.length}{" "}
+                  {displayProducts.length === 1 ? "Product" : "Products"}
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Mobile Filter */}
+                {/* Mobile Filters */}
                 <Sheet open={showFilters} onOpenChange={setShowFilters}>
                   <SheetTrigger asChild>
                     <Button variant="outline" size="sm" className="lg:hidden">
@@ -245,79 +312,79 @@ const Category = () => {
                 </Sheet>
 
                 <Button variant="outline" size="sm">
-                  Sort by: Recommended <ChevronDown className="h-4 w-4 ml-1" />
+                  Sort by: Recommended
+                  <ChevronDown className="h-4 w-4 ml-1" />
                 </Button>
               </div>
             </div>
 
-            {/* Subcategory cards (only on category page) */}
-            {currentCategory && !subcategory && currentCategory.subcategories.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
-                {currentCategory.subcategories.map((sub) => (
-                  <Link
-                    key={sub.slug}
-                    to={`/category/${currentCategory.slug}/${sub.slug}`}
-                    className="block border rounded-lg hover:shadow-md transition p-4 text-center bg-card"
-                  >
-                    <h3 className="font-semibold">{sub.name}</h3>
-                  </Link>
-                ))}
-              </div>
-            )}
+            {/* Subcategory Cards */}
+            {currentCategory &&
+              !subcategory &&
+              currentCategory.subcategories.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
+                  {currentCategory.subcategories.map((sub) => (
+                    <Link
+                      key={sub.slug}
+                      to={`/category/${currentCategory.slug}/${sub.slug}`}
+                      className="block border rounded-lg hover:shadow-md p-4 text-center bg-card transition"
+                    >
+                      <h3 className="font-semibold">{sub.name}</h3>
+                    </Link>
+                  ))}
+                </div>
+              )}
 
             {/* Product Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {displayProducts.map((product) => (
-                <Link key={product.id} to={`/product/${product.id}`}>
-                  <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full rounded-xl group">
-                    <div className="relative aspect-square bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center overflow-hidden">
-                      {product.badge && (
-                         <div className="absolute top-2 left-2 bg-success text-success-foreground px-2 py-1 rounded-md text-xs font-semibold z-10">
-                           {product.badge}
-                         </div>
-                       )}
-                      {(((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith('data:') ||
-                      (((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith('http') ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={(product as any).mainImage || (product as any).images?.[0] || product.image}
-                          alt={product.name}
-                          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
-                        />
-                      ) : (
-                        <span className="text-6xl group-hover:scale-110 transition-transform duration-300">
-                          {(product as any).mainImage || (product as any).images?.[0] || product.image}
-                        </span>
-                      )}
-                     </div>
-                    
+              {displayProducts.map((product: any) => (
+                <Link key={product._id} to={`/product/${product._id}`}>
+                  <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 rounded-xl group">
+                    <div className="relative aspect-square bg-muted flex items-center justify-center overflow-hidden">
+                      <img
+                        src={
+                          product.mainImage ||
+                          product.images?.[0] ||
+                          "/placeholder.png"
+                        }
+                        alt={product.name}
+                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
+                      />
+                    </div>
+
                     <div className="p-3">
                       <h3 className="text-sm font-medium mb-2 line-clamp-2 min-h-[40px]">
                         {product.name}
                       </h3>
-                      
+
                       <div className="flex items-center gap-1 mb-2">
                         <div className="flex items-center gap-1 px-2 py-0.5 bg-success/10 rounded">
-                          <span className="text-xs font-semibold">{product.rating}</span>
+                          <span className="text-xs font-semibold">
+                            {product.rating}
+                          </span>
                           <Star className="h-3 w-3 fill-success text-success" />
                         </div>
                         <span className="text-xs text-muted-foreground">
-                          ({product.reviews.toLocaleString()})
+                          ({product.reviews})
                         </span>
                       </div>
-                      
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span className="font-bold text-lg">₹{product.price.toLocaleString()}</span>
-                        <span className="text-muted-foreground line-through text-xs">
-                          ₹{product.originalPrice.toLocaleString()}
+
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-bold text-lg">
+                          ₹{product.price.toLocaleString()}
                         </span>
-                        <span className="text-xs text-success font-semibold">
-                          {product.discount}
-                        </span>
+                        {product.originalPrice && (
+                          <span className="text-muted-foreground line-through text-xs">
+                            ₹{product.originalPrice.toLocaleString()}
+                          </span>
+                        )}
                       </div>
-                      
+
                       <p className="text-xs text-muted-foreground">
-                        Delivery: <span className="font-semibold text-foreground">{product.delivery}</span>
+                        Delivery:{" "}
+                        <span className="font-semibold text-foreground">
+                          {product.delivery || "Standard"}
+                        </span>
                       </p>
                     </div>
                   </Card>
@@ -328,7 +395,9 @@ const Category = () => {
             {/* No Products */}
             {displayProducts.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-muted-foreground text-lg">No products found matching your filters</p>
+                <p className="text-muted-foreground text-lg">
+                  No products found matching your filters
+                </p>
                 <Button
                   variant="outline"
                   className="mt-4"
