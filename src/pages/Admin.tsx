@@ -209,6 +209,7 @@ const Admin = () => {
     images: [] as string[],
     description: "",
     delivery: "Today",
+    deliveryCharge: 0, 
   });
   
   // State for the INLINE LOGIN FORM
@@ -277,25 +278,27 @@ const handleSubmit = async (e: React.FormEvent) => { // Made it async
     
     // The payload for the API call
     const payload = {
-        name: formData.name,
-        price: formData.price,
-        originalPrice: formData.originalPrice,
-        category: categoryName, // Send the full category name
-        categorySlug: formData.category, // Send the slug
-        subcategory: subcategoryName, // Send the full subcategory name
-        subcategorySlug: formData.subcategory, // Send the slug
-        // Ensure mainImage is the first element of images for consistency, then flatten
-        mainImage: formData.mainImage || formData.image,
-        images: [
-            formData.mainImage || formData.image,
-            ...((formData.images || []) as string[]).filter(Boolean).filter(img => img !== (formData.mainImage || formData.image))
-        ],
-        description: formData.description,
-        delivery: formData.delivery,
-        discount, // Include calculated discount
-        rating: 4.8,
-        reviews: 100,
-    };
+        name: formData.name,
+        price: formData.price,
+        originalPrice: formData.originalPrice,
+        category: categoryName, // Send the full category name
+        categorySlug: formData.category, // Send the slug
+        subcategory: subcategoryName, // Send the full subcategory name
+        subcategorySlug: formData.subcategory, // Send the slug
+        // Ensure mainImage is the first element of images for consistency, then flatten
+        mainImage: formData.mainImage || formData.image,
+        images: [
+            formData.mainImage || formData.image,
+            ...((formData.images || []) as string[]).filter(Boolean).filter(img => img !== (formData.mainImage || formData.image))
+        ],
+        description: formData.description,
+        delivery: formData.delivery,
+        // 🚀 NEW: Add deliveryCharge to payload
+        deliveryCharge: formData.deliveryCharge, 
+        discount, // Include calculated discount
+        rating: 4.8,
+        reviews: 100,
+    };
     
     // --- API Call Logic (The new part) ---
     if (editingProduct?.id != null) {
@@ -341,6 +344,9 @@ const res = await fetch('http://localhost:5000/api/products', {                m
         }
     }
 
+
+    
+
     // --- Cleanup Form (After successful submission) ---
     setIsDialogOpen(false);
     setEditingProduct(null);
@@ -355,6 +361,7 @@ const res = await fetch('http://localhost:5000/api/products', {                m
         images: [],
         description: "",
         delivery: "Today",
+        deliveryCharge: 0,
     });
 };
 
@@ -534,6 +541,7 @@ const res = await fetch('http://localhost:5000/api/products', {                m
                         images: [],       // added
                         description: "",
                         delivery: "Today",
+                        deliveryCharge: 0,
                       });
                     }}
                   >
@@ -605,6 +613,22 @@ const res = await fetch('http://localhost:5000/api/products', {                m
                         ))}
                       </select>
                     </div>
+
+                    <div>
+      <Label>Delivery Charge (₹)</Label>
+      <Input
+        type="number"
+        value={formData.deliveryCharge}
+        onChange={(e) =>
+          setFormData({
+            ...formData,
+            deliveryCharge: Number(e.target.value), // Convert to number
+          })
+        }
+        placeholder="0"
+        min="0"
+      />
+    </div>
 
                     {/* Subcategory select (shown only if selected category has subcategories) */}
                     {(() => {
@@ -790,6 +814,7 @@ const res = await fetch('http://localhost:5000/api/products', {                m
                             images: (product as any).images ?? [(product as any).mainImage ?? product.image],
                             description: product.description,
                             delivery: product.delivery,
+                            deliveryCharge: (product as any).deliveryCharge ?? 0,
                           });
                           setIsDialogOpen(true);
                         }}

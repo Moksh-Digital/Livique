@@ -3,6 +3,7 @@ import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
+import StepsTracker from "@/components/StepsTracker";
 
 const OrderConfirmation = () => {
   const location = useLocation();
@@ -12,6 +13,8 @@ const OrderConfirmation = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
+              <StepsTracker currentStep={3} />  {/* 👈 Add this */}
+
         <div className="max-w-2xl mx-auto px-4 py-12 text-center">
           <p>No order information found</p>
           <Link to="/">

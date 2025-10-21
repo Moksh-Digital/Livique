@@ -31,6 +31,8 @@ export interface Product {
   mainImage?: string; // new: main image URL / dataURL
   images?: string[]; // new: gallery images (URLs / dataURLs)
   delivery: string;
+  // 🚀 NEW FIELD: deliveryCharge
+  deliveryCharge?: number;
   category: string;
   subcategory: string;
   inStock: boolean;

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
+import StepsTracker from "@/components/StepsTracker";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -14,14 +15,22 @@ const Payment = () => {
   const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState("cod");
 
-  const deliveryCharges = 599;
-  const total = getTotalPrice() + deliveryCharges;
+  // ✅ Calculate total delivery dynamically (same as Cart.tsx)
+  const totalDeliveryCharges = cart.reduce(
+    (acc, item) => acc + (item.deliveryCharge || 0),
+    0
+  );
+
+  const subtotal = getTotalPrice();
+  const total = subtotal + totalDeliveryCharges;
 
   const handlePlaceOrder = () => {
     const address = JSON.parse(localStorage.getItem("shippingAddress") || "{}");
     const order = {
       id: `ORD${Date.now()}`,
       items: cart,
+      subtotal,
+      deliveryCharges: totalDeliveryCharges,
       total,
       paymentMethod,
       address,
@@ -44,12 +53,14 @@ const Payment = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+            <StepsTracker currentStep={2} />   {/* 👈 Add this line */}
+
 
       <main className="max-w-5xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Payment Options</h1>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Section */}
+          {/* ---------------- PAYMENT METHODS ---------------- */}
           <div className="lg:col-span-2">
             <Card className="p-6 rounded-2xl">
               <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
@@ -90,7 +101,7 @@ const Payment = () => {
             </Card>
           </div>
 
-          {/* Order Summary */}
+          {/* ---------------- ORDER SUMMARY ---------------- */}
           <div>
             <Card className="p-6 rounded-2xl sticky top-24">
               <h2 className="text-xl font-bold mb-4">Order Summary</h2>
@@ -99,14 +110,14 @@ const Payment = () => {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-semibold">
-                    ₹{getTotalPrice().toLocaleString()}
+                    ₹{subtotal.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Delivery Charges</span>
                   <span className="font-semibold">
-                    ₹{deliveryCharges.toLocaleString()}
+                    ₹{totalDeliveryCharges.toLocaleString()}
                   </span>
                 </div>
 
