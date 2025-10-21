@@ -253,122 +253,162 @@ const Home = () => {
 
       <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "24px" }}>
         {/* Hero Banners */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: "16px",
-            marginBottom: "32px",
-          }}
-        >
-          {/* Banner Cards with full opacity */}
-          {[
-            {
-              src: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwlai_rqgu8e.jpg",
-              title: "Celebrate Dil Ki Diwali",
-              date: "20TH - 21ST OCTOBER",
-              desc: "Festive blessings and sweet delights!",
-            },
-            {
-              src: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwali2_qdaxy2.jpg",
-              title: "Bhai Jaisa, Dooja Nahi",
-              date: "23RD OCTOBER | BHAI DOOJ",
-              desc: "Celebrate your bond with festive delights!",
-            },
-          ].map((banner, idx) => (
-            <Card
-              key={idx}
-              className="page-card banner-card"
-              style={{ position: "relative", overflow: "hidden", borderRadius: "20px" }}
-            >
-              <img
-                src={banner.src || "/placeholder.svg"}
-                alt="Banner"
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  opacity: 1,
-                }}
-              />
-              <div className="banner-overlay" />
-              <div style={{ position: "relative", zIndex: 10, padding: "2rem", color: "#fff" }}>
-                <p style={{ fontSize: "0.9rem", fontWeight: 600, marginBottom: "0.5rem" }}>{banner.date}</p>
-                <h2 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "0.5rem" }}>{banner.title}</h2>
-                <p style={{ fontSize: "0.9rem", marginBottom: "1rem" }}>{banner.desc}</p>
-                <Button className="primary-btn" style={{ color: "#fff" }}>
-                  ORDER NOW
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
+        {/* Hero Banners */}
+<div
+  className="
+    grid grid-cols-1 md:grid-cols-2 gap-4 mb-8
+  "
+>
+  {/* ✅ Banner 1: Always visible */}
+  <Card
+    className="page-card banner-card"
+    style={{ position: "relative", overflow: "hidden", borderRadius: "20px" }}
+  >
+    <img
+      src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwlai_rqgu8e.jpg"
+      alt="Celebrate Dil Ki Diwali"
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        opacity: 1,
+      }}
+    />
+    <div className="banner-overlay" />
+    <div style={{ position: "relative", zIndex: 10, padding: "2rem", color: "#fff" }}>
+      <p className="text-sm font-semibold mb-1">20TH - 21ST OCTOBER</p>
+      <h2 className="text-2xl font-bold mb-1">Celebrate Dil Ki Diwali</h2>
+      <p className="text-sm mb-3">Festive blessings and sweet delights!</p>
+      <Button className="primary-btn text-white">ORDER NOW</Button>
+    </div>
+  </Card>
+
+  {/* ✅ Banner 2: Hidden only on mobile */}
+  <Card
+    className="hidden md:block page-card banner-card"
+    style={{ position: "relative", overflow: "hidden", borderRadius: "20px" }}
+  >
+    <img
+      src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwali2_qdaxy2.jpg"
+      alt="Bhai Jaisa, Dooja Nahi"
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        opacity: 1,
+      }}
+    />
+    <div className="banner-overlay" />
+    <div style={{ position: "relative", zIndex: 10, padding: "2rem", color: "#fff" }}>
+      <p className="text-sm font-semibold mb-1">23RD OCTOBER | BHAI DOOJ</p>
+      <h2 className="text-2xl font-bold mb-1">Bhai Jaisa, Dooja Nahi</h2>
+      <p className="text-sm mb-3">Celebrate your bond with festive delights!</p>
+      <Button className="primary-btn text-white">ORDER NOW</Button>
+    </div>
+  </Card>
+</div>
+
 
         {/* Quick Categories */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-            gap: "16px",
-            marginBottom: "48px",
-          }}
-        >
-          {categories.map((cat) => (
-            <div key={cat.id} style={{ textAlign: "center" }}>
-              <Link to={`/category/${cat.name.toLowerCase().replace(/\s/g, "-")}`}>
-                <Card className="page-card" style={{ position: "relative", borderRadius: "20px", overflow: "hidden" }}>
-                  <img
-                    src={cat.image || "/placeholder.svg"}
-                    alt={cat.name}
-                    style={{ width: "100%", height: "150px", objectFit: "cover" }}
-                  />
-                  {cat.date && (
-                    <span
-                      className="badge-bounce"
-                      style={{
-                        position: "absolute",
-                        top: "8px",
-                        left: "8px",
-                        backgroundColor: "#ff0077",
-                        color: "#fff",
-                        padding: "2px 6px",
-                        borderRadius: "12px",
-                        fontSize: "10px",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {cat.date}
-                    </span>
-                  )}
-                  {cat.badge && (
-                    <span
-                      className="badge-bounce"
-                      style={{
-                        position: "absolute",
-                        top: "8px",
-                        right: "8px",
-                        backgroundColor: "#FFD700",
-                        color: "#000",
-                        padding: "2px 6px",
-                        fontSize: "10px",
-                        fontWeight: "600",
-                        borderRadius: "6px",
-                      }}
-                    >
-                      {cat.badge}
-                    </span>
-                  )}
-                  <div style={{ padding: "8px", fontWeight: "600", fontSize: "0.9rem" }}>{cat.name}</div>
-                </Card>
-              </Link>
-            </div>
-          ))}
-        </div>
+     <div className="w-full">
+  {/* ✅ Mobile view: 2 rows, horizontal scroll */}
+  <div
+    className="
+      grid grid-rows-2 grid-flow-col gap-3 overflow-x-auto p-2
+      scroll-smooth snap-x snap-mandatory
+      md:hidden
+    "
+  >
+    {categories.map((cat) => (
+      <div
+        key={cat.id}
+        className="text-center w-[120px] flex-shrink-0 snap-start"
+      >
+        <Link to={`/category/${cat.name.toLowerCase().replace(/\s/g, "-")}`}>
+          <div className="relative rounded-2xl overflow-hidden shadow border border-gray-200">
+            <img
+              src={cat.image || "/placeholder.svg"}
+              alt={cat.name}
+              className="w-full h-[100px] object-cover"
+            />
+
+            {cat.date && (
+              <span className="absolute top-1 left-1 bg-pink-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                {cat.date}
+              </span>
+            )}
+
+            {cat.badge && (
+              <span className="absolute top-1 right-1 bg-yellow-400 text-black text-[10px] font-semibold px-1.5 py-0.5 rounded-md">
+                {cat.badge}
+              </span>
+            )}
+          </div>
+
+          <div className="text-[12px] font-semibold mt-1">{cat.name}</div>
+        </Link>
+      </div>
+    ))}
+  </div>
+
+  {/* ✅ Desktop view: same as original */}
+  <div
+    className="
+      hidden md:grid
+      grid-cols-[repeat(auto-fit,minmax(120px,1fr))]
+      gap-4 mb-12
+    "
+  >
+    {categories.map((cat) => (
+      <div key={cat.id} className="text-center">
+        <Link to={`/category/${cat.name.toLowerCase().replace(/\s/g, "-")}`}>
+          <div className="relative rounded-2xl overflow-hidden shadow border border-gray-200">
+            <img
+              src={cat.image || "/placeholder.svg"}
+              alt={cat.name}
+              className="w-full h-[150px] object-cover"
+            />
+
+            {cat.date && (
+              <span className="absolute top-1 left-1 bg-pink-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                {cat.date}
+              </span>
+            )}
+
+            {cat.badge && (
+              <span className="absolute top-1 right-1 bg-yellow-400 text-black text-[10px] font-semibold px-1.5 py-0.5 rounded-md">
+                {cat.badge}
+              </span>
+            )}
+          </div>
+
+          <div className="text-[14px] font-semibold mt-1">{cat.name}</div>
+        </Link>
+      </div>
+    ))}
+  </div>
+
+  {/* ✅ Optional: Hide scrollbar on mobile */}
+  <style>
+    {`
+      .overflow-x-auto::-webkit-scrollbar {
+        display: none;
+      }
+      .overflow-x-auto {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    `}
+  </style>
+</div>
+
 
         {/* Diwali Surprises Section - RESPONSIVE FIX */}
-        <section style={{ marginBottom: "48px" }}>
+        {/* <section style={{ marginBottom: "48px" }}>
           <h2 style={{ fontSize: "1.75rem", fontWeight: 700, marginBottom: "1.5rem" }}>Diwali Surprises</h2>
 
           <div
@@ -378,9 +418,9 @@ const Home = () => {
               gridTemplateColumns: "1fr 2fr",
               gap: "16px",
             }}
-          >
+          > */}
             {/* Main Poster Card */}
-            <Card
+            {/* <Card
               className="diwali-poster page-card"
               style={{
                 position: "relative",
@@ -399,10 +439,10 @@ const Home = () => {
                   objectFit: "cover",
                 }}
               />
-            </Card>
+            </Card> */}
 
             {/* Right Side Small Square Boxes - 2 Columns with 3 boxes each */}
-            <div
+            {/* <div
               className="diwali-boxes-grid"
               style={{
                 display: "grid",
@@ -453,7 +493,7 @@ const Home = () => {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Birthday Gifts Section */}
         <section style={{ marginBottom: "48px" }}>

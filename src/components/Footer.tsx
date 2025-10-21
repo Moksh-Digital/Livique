@@ -67,7 +67,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-primary-foreground/10 text-center text-sm opacity-80">
-          <p>&copy; 2025 fnp. All Rights Reserved.</p>
+          <p>&copy; 2025 Livique. All Rights Reserved.</p>
         </div>
       </div>
     </footer>

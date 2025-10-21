@@ -28,7 +28,7 @@ const Header = () => {
   return (
     <>
       {/* Top Header */}
-      <header className="sticky top-0 z-50 bg-background border-b">
+      <header className="sticky top-0 z-50 bg-background border-b " >
         <div className="max-w-[1400px] mx-auto px-4">
           <div className="flex items-center justify-between h-16 gap-4">
             {/* Logo */}
@@ -37,15 +37,15 @@ const Header = () => {
                 to="/"
                 className="flex items-center gap-1 text-2xl font-bold text-accent"
               >
-                <Gift className="h-6 w-6" />
-                <span>Livique</span>
+                {/* <Gift className="h-6 w-6" /> */}
+                {/* <span>Livique</span> */}
               </Link>
 
               <div className="hidden md:flex items-center gap-2 text-sm">
                 <img
-                  src="https://flagcdn.com/w20/in.png"
+                  src="Logo.jpg"
                   alt="India"
-                  className="h-4"
+                  className="h-16 w-16"
                 />
                 <div className="flex flex-col">
                   <span className="text-xs text-muted-foreground">
