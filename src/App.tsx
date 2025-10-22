@@ -14,6 +14,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import ProfilePage from "./pages/ProfilePage";
 
 
 const App = () => (
@@ -46,6 +47,9 @@ const App = () => (
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
 
+        {/* Profile Route - ADDED */}
+        <Route path="/profile" element={<ProfilePage />} />
+
         {/* Admin */}
         <Route path="/admin" element={<Admin />} />
 
@@ -56,5 +60,5 @@ const App = () => (
     </BrowserRouter>
   </TooltipProvider>
 );
-
+ 
 export default App;

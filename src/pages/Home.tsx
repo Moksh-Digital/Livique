@@ -210,7 +210,8 @@ const Home = () => {
         }
       `}</style>
       <Header />
-
+      {/* Show profile if logged in */}
+{/* {localStorage.getItem("token") && <ProfilePage />} */}
       <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "24px" }}>
         {/* Hero Banners */}
         {/* Hero Banners */}
@@ -425,6 +426,7 @@ const Home = () => {
         </section>
       </main>
       <Footer />
+      {/* Profile Section: only show if user is logged in */}
     </div>
   )
 }

@@ -15,11 +15,11 @@ const router = express.Router();
 router.route('/send-otp').post(sendOtp); 
 router.route('/verify-otp').post(verifyOtpAndRegister); 
 router.route('/send-signin-otp').post(sendSigninOtp);
-router.route('/verify-signin-otp').post(verifySigninOtp);
-router.post('/login', authUser); 
+router.route('/verify-signin-otp').post(verifySigninOtp); // now returns JWT
+router.post('/login', authUser); // optional legacy
 
 // Private/Protected Route
-router.route('/profile').get(protect, getUserProfile);
+router.get("/profile", protect, getUserProfile);
 
 
 export default router;

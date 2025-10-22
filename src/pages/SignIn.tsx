@@ -82,6 +82,7 @@ const SignIn = () => {
         if (response.ok && data.success) { 
             // Use AuthContext signIn method to properly update user state
             const success = await signIn(email, password);
+            localStorage.setItem("token", data.token);
             
             if (success) {
                 toast({

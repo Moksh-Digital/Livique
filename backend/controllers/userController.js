@@ -1,6 +1,7 @@
 import User from '../models/userModel.js'; // Import the MongoDB User model
 import sendEmail from '../utils/sendEmail.js';
 import bcrypt from 'bcryptjs'; // Used for comparing passwords on signin
+import generateToken from "../utils/generateToken.js";
 
 // Helper function to generate a 6-digit OTP
 const generateOTP = () => {
@@ -190,40 +191,45 @@ const sendSigninOtp = async (req, res) => {
 // @route   POST /api/users/verify-signin-otp
 // @access  Public
 const verifySigninOtp = async (req, res) => {
-    const { email, otp } = req.body;
+  const { email, otp } = req.body;
 
-    try {
-        const user = await User.findOne({ email });
+  try {
+    const user = await User.findOne({ email });
 
-        if (!user || !user.isVerified) {
-            return res.status(400).json({ message: 'User not found or account not verified.' });
-        }
-
-        // Check OTP and expiration
-        if (user.signinOtp !== otp) {
-            return res.status(401).json({ message: 'Invalid OTP code.' });
-        }
-        if (user.signinOtpExpires < Date.now()) {
-            return res.status(401).json({ message: 'OTP expired. Please request a new one.' });
-        }
-
-        // OTP is valid: Clear signin OTP and return user data
-        user.signinOtp = undefined;
-        user.signinOtpExpires = undefined;
-        await user.save();
-
-        // Success response
-        res.status(200).json({
-            success: true,
-            name: user.name,
-            email: user.email,
-            message: 'Sign in successful.',
-        });
-    } catch (error) {
-        console.error("Database or Server Error:", error);
-        res.status(500).json({ message: 'An error occurred during OTP sign in verification.' });
+    if (!user || !user.isVerified) {
+      return res.status(400).json({ message: "User not found or not verified." });
     }
+
+    // Check OTP and expiration
+    if (user.signinOtp !== otp) {
+      return res.status(401).json({ message: "Invalid OTP code." });
+    }
+    if (user.signinOtpExpires < Date.now()) {
+      return res.status(401).json({ message: "OTP expired. Please request a new one." });
+    }
+
+    // OTP valid
+    user.signinOtp = undefined;
+    user.signinOtpExpires = undefined;
+    await user.save();
+
+    // ✅ Generate JWT token
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      name: user.name,
+      email: user.email,
+      token, // Send token to frontend
+      message: "Sign in successful.",
+    });
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ message: "Error during OTP sign in." });
+  }
 };
+
+
 
 // @desc    Authenticate user & get token (Login) - Legacy endpoint (kept for completeness)
 // @route   POST /api/users/login
@@ -254,10 +260,23 @@ const authUser = async (req, res) => {
 
 
 // Placeholder for protected route
-const getUserProfile = (req, res) => {
-    // In a real application, req.user would be set by the 'protect' middleware after JWT verification
-    res.json({ message: 'User profile data (using MongoDB, requires JWT protect middleware to work fully)' });
+// const getUserProfile = (req, res) => {
+//     // In a real application, req.user would be set by the 'protect' middleware after JWT verification
+//     res.json({ message: 'User profile data (using MongoDB, requires JWT protect middleware to work fully)' });
+// };
+const getUserProfile = async (req, res) => {
+  try {
+    // req.user is already set by middleware
+    res.json({
+      name: req.user.name,
+      email: req.user.email,
+      verified: req.user.isVerified,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching profile" });
+  }
 };
+
 
 export {
     sendOtp,

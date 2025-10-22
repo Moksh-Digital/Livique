@@ -25,6 +25,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ProfilePage from "src/pages/ProfilePage";
 
 const Header = () => {
   const { getTotalItems } = useCart();
@@ -143,7 +144,7 @@ const Header = () => {
                     </div>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center">
+                      <Link to= "/profile" className="flex items-center">
                         <UserCircle className="mr-2 h-4 w-4" />
                         <span>Profile</span>
                       </Link>

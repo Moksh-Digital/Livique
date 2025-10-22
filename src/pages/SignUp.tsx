@@ -93,6 +93,7 @@ const SignUp = () => {
         if (response.ok && data.success) { 
             // Use AuthContext signUp method to properly update user state
             const success = await signUp(email, password, name);
+            localStorage.setItem("token", data.token);
             
             if (success) {
                 toast({
