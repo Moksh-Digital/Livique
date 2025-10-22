@@ -3,22 +3,11 @@ import {
   Star,
   ChevronDown,
   Filter,
-  Smartphone,
-  Shirt,
-  Home,
-  Heart,
-  BookOpen,
-  Dumbbell,
-  Shapes,
-  ShoppingCart,
-  Cpu,
-  Truck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useProducts } from "@/contexts/ProductsContext";
 import Header from "@/components/Header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -30,10 +19,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { getCategoryBySlug } from "@/data/categories";
 
 const Category = () => {
   const { category, subcategory } = useParams();
-  const { categories } = useProducts();
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,6 +33,7 @@ const Category = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   // 🧭 Breadcrumb Logic
+  const currentCategory = getCategoryBySlug(category || "");
   let breadcrumb = "All Products";
   if (subcategory) {
     breadcrumb = subcategory
@@ -51,7 +41,7 @@ const Category = () => {
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
   } else if (category) {
-    breadcrumb = category
+    breadcrumb = currentCategory?.name || category
       .split("-")
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
@@ -63,12 +53,21 @@ const Category = () => {
       try {
         setLoading(true);
         let url = "http://localhost:5000/api/products";
-        if (subcategory) url += `?subcategory=${subcategory}`;
-        else if (category) url += `?category=${category}`;
+        
+        // If we have both category and subcategory, it's a subcategory view
+        if (subcategory) {
+          url += `?category=${category}&subcategory=${subcategory}`;
+        } else if (category) {
+          // Main category view - show all products from this category and its subcategories
+          url += `?category=${category}`;
+        }
 
+        console.log("🔍 Fetching from URL:", url);
         const { data } = await axios.get(url);
         setProducts(data);
         console.log("Fetched products:", data);
+        console.log("🔍 Category:", category, "Subcategory:", subcategory);
+        console.log("🔍 Current category data:", currentCategory);
 
       } catch (err) {
         console.error(err);
@@ -90,50 +89,9 @@ const Category = () => {
     return priceMatch && ratingMatch;
   });
 
-  const currentCategory = categories.find(
-    (cat) =>
-      cat.slug === category ||
-      cat.subcategories.some((sub) => sub.slug === subcategory)
-  );
-
-  // 🎨 Icon Map
-  const getIconForSlug = (slug: string) => {
-    const map: Record<string, JSX.Element> = {
-      electronics: <Smartphone className="h-4 w-4 mr-2" />,
-      fashion: <Shirt className="h-4 w-4 mr-2" />,
-      "home-furniture": <Home className="h-4 w-4 mr-2" />,
-      "beauty-personal-care": <Heart className="h-4 w-4 mr-2" />,
-      "books-stationery": <BookOpen className="h-4 w-4 mr-2" />,
-      "sports-fitness": <Dumbbell className="h-4 w-4 mr-2" />,
-      "toys-baby-products": <Shapes className="h-4 w-4 mr-2" />,
-      "grocery-food": <ShoppingCart className="h-4 w-4 mr-2" />,
-      appliances: <Cpu className="h-4 w-4 mr-2" />,
-      automotive: <Truck className="h-4 w-4 mr-2" />,
-    };
-    return map[slug.toLowerCase()] ?? <span className="w-4 h-4 mr-2" />;
-  };
-
   // 🧱 Filter Sidebar Component
   const FilterSidebar = () => (
     <div className="space-y-6">
-      {/* Categories */}
-      <div>
-        <h3 className="font-semibold mb-3 text-sm">Categories</h3>
-        <div className="space-y-2">
-          {categories.map((cat) => (
-            <div key={cat.slug}>
-              <Link
-                to={`/category/${cat.slug}`}
-                className="block text-sm py-1 hover:text-primary flex items-center"
-              >
-                {getIconForSlug(cat.slug)}
-                {cat.name}
-              </Link>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Subcategories */}
       {currentCategory && currentCategory.subcategories.length > 0 && (
         <div>
@@ -143,7 +101,9 @@ const Category = () => {
               <Link
                 key={sub.slug}
                 to={`/category/${currentCategory.slug}/${sub.slug}`}
-                className="block text-sm py-1 hover:text-primary"
+                className={`block text-sm py-1 hover:text-primary ${
+                  subcategory === sub.slug ? "text-primary font-semibold" : ""
+                }`}
               >
                 {sub.name}
               </Link>
@@ -318,22 +278,6 @@ const Category = () => {
               </div>
             </div>
 
-            {/* Subcategory Cards */}
-            {currentCategory &&
-              !subcategory &&
-              currentCategory.subcategories.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
-                  {currentCategory.subcategories.map((sub) => (
-                    <Link
-                      key={sub.slug}
-                      to={`/category/${currentCategory.slug}/${sub.slug}`}
-                      className="block border rounded-lg hover:shadow-md p-4 text-center bg-card transition"
-                    >
-                      <h3 className="font-semibold">{sub.name}</h3>
-                    </Link>
-                  ))}
-                </div>
-              )}
 
             {/* Product Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">

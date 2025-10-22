@@ -3,58 +3,9 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
+import { CATEGORIES } from "@/data/categories"
 
 const Home = () => {
-  const categories = [
-    {
-      id: 1,
-      name: "Diwali Gifts",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwlai_rqgu8e.jpg",
-      date: "20th Oct",
-    },
-    {
-      id: 2,
-      name: "Birthday Gifts",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863137/Screenshot_2025-10-19_134903_wljjgp.png",
-    },
-    {
-      id: 3,
-      name: "Bhai Dooj",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwali2_qdaxy2.jpg",
-      date: "23rd Oct",
-    },
-    {
-      id: 4,
-      name: "Flowers",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863136/Screenshot_2025-10-19_134440_e48sou.png",
-    },
-    {
-      id: 5,
-      name: "Same Day...",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863146/Screenshot_2025-10-19_135647_hjtbob.png",
-    },
-    {
-      id: 6,
-      name: "FNP Luxe",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863176/Screenshot_2025-10-19_134405_e8qlnl.png",
-      badge: "SELECT CITIES ONLY",
-    },
-    {
-      id: 7,
-      name: "Hatke Gifts",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863176/Screenshot_2025-10-19_134348_zfa066.png",
-    },
-    {
-      id: 8,
-      name: "Home Decor",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863144/Screenshot_2025-10-19_135449_n30nqt.png",
-    },
-    {
-      id: 9,
-      name: "Anniversary",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863137/Screenshot_2025-10-19_135136_xz56f7.png",
-    },
-  ]
 
   const diwaliCategories = [
     {
@@ -248,6 +199,15 @@ const Home = () => {
         }
 
         a { text-decoration: none; color: inherit; }
+        
+        /* Hide scrollbar for horizontal scroll */
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       `}</style>
       <Header />
 
@@ -313,98 +273,29 @@ const Home = () => {
 </div>
 
 
-        {/* Quick Categories */}
-     <div className="w-full">
-  {/* ✅ Mobile view: 2 rows, horizontal scroll */}
-  <div
-    className="
-      grid grid-rows-2 grid-flow-col gap-3 overflow-x-auto p-2
-      scroll-smooth snap-x snap-mandatory
-      md:hidden
-    "
-  >
-    {categories.map((cat) => (
-      <div
-        key={cat.id}
-        className="text-center w-[120px] flex-shrink-0 snap-start"
-      >
-        <Link to={`/category/${cat.name.toLowerCase().replace(/\s/g, "-")}`}>
-          <div className="relative rounded-2xl overflow-hidden shadow border border-gray-200">
-            <img
-              src={cat.image || "/placeholder.svg"}
-              alt={cat.name}
-              className="w-full h-[100px] object-cover"
-            />
-
-            {cat.date && (
-              <span className="absolute top-1 left-1 bg-pink-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
-                {cat.date}
-              </span>
-            )}
-
-            {cat.badge && (
-              <span className="absolute top-1 right-1 bg-yellow-400 text-black text-[10px] font-semibold px-1.5 py-0.5 rounded-md">
-                {cat.badge}
-              </span>
-            )}
+        {/* Categories Section */}
+        <section className="mb-12">
+          <h2 className="text-3xl font-bold mb-8 text-center">Shop by Categories</h2>
+          
+          {/* Grid layout for all screen sizes */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+            {CATEGORIES.map((cat) => (
+              <div key={cat.id} className="text-center">
+                <Link to={`/category/${cat.slug}`}>
+                  <div className="relative rounded-2xl overflow-hidden shadow border border-gray-200 page-card aspect-square">
+                    <img
+                      src={cat.image || "/placeholder.svg"}
+                      alt={cat.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  </div>
+                  <div className="text-[12px] sm:text-[14px] font-semibold mt-2 text-center leading-tight">{cat.name}</div>
+                </Link>
+              </div>
+            ))}
           </div>
-
-          <div className="text-[12px] font-semibold mt-1">{cat.name}</div>
-        </Link>
-      </div>
-    ))}
-  </div>
-
-  {/* ✅ Desktop view: same as original */}
-  <div
-    className="
-      hidden md:grid
-      grid-cols-[repeat(auto-fit,minmax(120px,1fr))]
-      gap-4 mb-12
-    "
-  >
-    {categories.map((cat) => (
-      <div key={cat.id} className="text-center">
-        <Link to={`/category/${cat.name.toLowerCase().replace(/\s/g, "-")}`}>
-          <div className="relative rounded-2xl overflow-hidden shadow border border-gray-200">
-            <img
-              src={cat.image || "/placeholder.svg"}
-              alt={cat.name}
-              className="w-full h-[150px] object-cover"
-            />
-
-            {cat.date && (
-              <span className="absolute top-1 left-1 bg-pink-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
-                {cat.date}
-              </span>
-            )}
-
-            {cat.badge && (
-              <span className="absolute top-1 right-1 bg-yellow-400 text-black text-[10px] font-semibold px-1.5 py-0.5 rounded-md">
-                {cat.badge}
-              </span>
-            )}
-          </div>
-
-          <div className="text-[14px] font-semibold mt-1">{cat.name}</div>
-        </Link>
-      </div>
-    ))}
-  </div>
-
-  {/* ✅ Optional: Hide scrollbar on mobile */}
-  <style>
-    {`
-      .overflow-x-auto::-webkit-scrollbar {
-        display: none;
-      }
-      .overflow-x-auto {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-    `}
-  </style>
-</div>
+        </section>
 
 
         {/* Diwali Surprises Section - RESPONSIVE FIX */}

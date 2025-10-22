@@ -26,168 +26,17 @@ import {
 import { useProducts } from "@/contexts/ProductsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { CATEGORIES } from "@/data/categories";
 
-// category / subcategory data (slugs precomputed)
-const CATEGORY_OPTIONS = [
-  { label: "Diwali Gifts", slug: "diwali-gifts", subcategories: [] },
-  { label: "Birthday Gifts", slug: "birthday-gifts", subcategories: [] },
-  { label: "Bhai Dooj", slug: "bhai-dooj", subcategories: [] },
-  { label: "Flowers", slug: "flowers", subcategories: [] },
-  { label: "Same Day", slug: "same-day", subcategories: [] },
-  { label: "Hatke Gifts", slug: "hatke-gifts", subcategories: [] },
-  { label: "Home Decor", slug: "home-decor", subcategories: [] },
-  { label: "Anniversary", slug: "anniversary", subcategories: [] },
-  { label: "Gift Hampers", slug: "gift-hampers", subcategories: [] },
-  { label: "Sweets", slug: "sweets", subcategories: [] },
-  { label: "Dry Fruits", slug: "dry-fruits", subcategories: [] },
-  { label: "Chocolates", slug: "chocolates", subcategories: [] },
-  { label: "Diyas", slug: "diyas", subcategories: [] },
-  { label: "Cakes", slug: "cakes", subcategories: [] },
-  { label: "Personalized", slug: "personalized", subcategories: [] },
-  { label: "Experiences", slug: "experiences", subcategories: [] },
-
-  // Electronics with subcategories
-  {
-    label: "Electronics",
-    slug: "electronics",
-    subcategories: [
-      { label: "Mobile Phones", slug: "mobile-phones" },
-      { label: "Laptops", slug: "laptops" },
-      { label: "Tablets", slug: "tablets" },
-      { label: "Televisions", slug: "televisions" },
-      { label: "Cameras", slug: "cameras" },
-      { label: "Headphones", slug: "headphones" },
-      { label: "Speakers", slug: "speakers" },
-      { label: "Smart Watches", slug: "smart-watches" },
-      { label: "Power Banks", slug: "power-banks" },
-      { label: "Gaming Consoles", slug: "gaming-consoles" },
-    ],
-  },
-
-  // Fashion
-  {
-    label: "Fashion",
-    slug: "fashion",
-    subcategories: [
-      { label: "Men Clothing", slug: "men-clothing" },
-      { label: "Women Clothing", slug: "women-clothing" },
-      { label: "Kids Clothing", slug: "kids-clothing" },
-      { label: "Men Footwear", slug: "men-footwear" },
-      { label: "Women Footwear", slug: "women-footwear" },
-      { label: "Watches", slug: "watches" },
-      { label: "Sunglasses", slug: "sunglasses" },
-      { label: "Bags & Luggage", slug: "bags-luggage" },
-      { label: "Jewellery", slug: "jewellery" },
-      { label: "Accessories", slug: "accessories" },
-    ],
-  },
-
-  // Home and furniture
-  {
-    label: "Home and furniture",
-    slug: "home-furniture",
-    subcategories: [
-      { label: "Furniture", slug: "furniture" },
-      { label: "Home Decor", slug: "home-decor-f" },
-      { label: "Kitchen & Dining", slug: "kitchen-dining" },
-      { label: "Bed & Bath", slug: "bed-bath" },
-      { label: "Garden & Outdoor", slug: "garden-outdoor" },
-      { label: "Home Improvement", slug: "home-improvement" },
-      { label: "Lighting", slug: "lighting" },
-      { label: "Storage", slug: "storage" },
-    ],
-  },
-
-  // Beauty and personal care
-  {
-    label: "Beauty and personal care",
-    slug: "beauty-personal-care",
-    subcategories: [
-      { label: "Makeup", slug: "makeup" },
-      { label: "Skin Care", slug: "skin-care" },
-      { label: "Hair Care", slug: "hair-care" },
-      { label: "Fragrances", slug: "fragrances" },
-      { label: "Bath & Body", slug: "bath-body" },
-      { label: "Men Grooming", slug: "men-grooming" },
-      { label: "Beauty Tools", slug: "beauty-tools" },
-    ],
-  },
-
-  // Books and stationary
-  {
-    label: "Books and stationary",
-    slug: "books-stationery",
-    subcategories: [
-      { label: "Books", slug: "books" },
-      { label: "Pens", slug: "pens" },
-      { label: "Pencils", slug: "pencils" },
-      { label: "Notebooks", slug: "notebooks" },
-      { label: "Sketch Books", slug: "sketch-books" },
-      { label: "Erasers", slug: "erasers" },
-      { label: "School Supplies", slug: "school-supplies" },
-      { label: "Art Supplies", slug: "art-supplies" },
-      { label: "Office Supplies", slug: "office-supplies" },
-    ],
-  },
-
-  // Sports and fitness
-  {
-    label: "Sports and fitness",
-    slug: "sports-fitness",
-    subcategories: [
-      { label: "Exercise Equipment", slug: "exercise-equipment" },
-      { label: "Yoga", slug: "yoga" },
-      { label: "Sports Shoes", slug: "sports-shoes" },
-      { label: "Cricket", slug: "cricket" },
-      { label: "Football", slug: "football" },
-      { label: "Badminton", slug: "badminton" },
-      { label: "Swimming", slug: "swimming" },
-      { label: "Cycling", slug: "cycling" },
-    ],
-  },
-
-  // Toys & baby products
-  {
-    label: "Toys & baby products",
-    slug: "toys-baby-products",
-    subcategories: [
-      { label: "Toys", slug: "toys" },
-      { label: "Baby Care", slug: "baby-care" },
-      { label: "Baby Fashion", slug: "baby-fashion" },
-      { label: "Diapers", slug: "diapers" },
-      { label: "Baby Feeding", slug: "baby-feeding" },
-      { label: "Baby Gear", slug: "baby-gear" },
-    ],
-  },
-
-  // Grocery and food
-  {
-    label: "Grocery and food",
-    slug: "grocery-food",
-    subcategories: [
-      { label: "Fruits & Vegetables", slug: "fruits-vegetables" },
-      { label: "Dairy Products", slug: "dairy-products" },
-      { label: "Beverages", slug: "beverages" },
-      { label: "Snacks", slug: "snacks" },
-      { label: "Cooking Essentials", slug: "cooking-essentials" },
-      { label: "Organic", slug: "organic" },
-    ],
-  },
-
-  // Appliances
-  {
-    label: "Appliances",
-    slug: "appliances",
-    subcategories: [
-      { label: "Air Conditioners", slug: "air-conditioners" },
-      { label: "Refrigerators", slug: "refrigerators" },
-      { label: "Washing Machines", slug: "washing-machines" },
-      { label: "Microwave Ovens", slug: "microwave-ovens" },
-      { label: "Vacuum Cleaners", slug: "vacuum-cleaners" },
-      { label: "Kitchen Appliances", slug: "kitchen-appliances" },
-    ],
-  },
-];
+// Convert CATEGORIES to the format expected by the admin form
+const CATEGORY_OPTIONS = CATEGORIES.map(cat => ({
+  label: cat.name,
+  slug: cat.slug,
+  subcategories: cat.subcategories.map(sub => ({
+    label: sub.name,
+    slug: sub.slug
+  }))
+}));
 
 const Admin = () => {
   const navigate = useNavigate();
