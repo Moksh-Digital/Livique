@@ -29,14 +29,14 @@ import { useToast } from "@/hooks/use-toast";
 import { CATEGORIES } from "@/data/categories";
 
 // Convert CATEGORIES to the format expected by the admin form
-const CATEGORY_OPTIONS = CATEGORIES.map(cat => ({
-  label: cat.name,
-  slug: cat.slug,
-  subcategories: cat.subcategories.map(sub => ({
-    label: sub.name,
-    slug: sub.slug
-  }))
-}));
+// const CATEGORY_OPTIONS = CATEGORIES.map(cat => ({
+//   label: cat.name,
+//   slug: cat.slug,
+//   subcategories: cat.subcategories.map(sub => ({
+//     label: sub.name,
+//     slug: sub.slug
+//   }))
+// }));
 
 // category / subcategory data (slugs precomputed)
 const CATEGORY_OPTIONS = [
