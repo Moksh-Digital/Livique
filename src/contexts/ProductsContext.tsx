@@ -73,8 +73,27 @@ const ProductsContext = createContext<ProductsContextType | undefined>(undefined
 // If you copy/paste this file, ensure those mock data blocks are gone!
 
 export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // ⭐️ REPLACED CATEGORIES ARRAY WITH THE ONE FROM ADMIN COMPONENT ⭐️
   const categories: Category[] = [
-    // Your existing large categories array remains here...
+    // --- Gift/Top Level Categories (from Admin.tsx) ---
+    { name: "Diwali Gifts", slug: "diwali-gifts", icon: "🪔", subcategories: [] },
+    { name: "Birthday Gifts", slug: "birthday-gifts", icon: "🎂", subcategories: [] },
+    { name: "Bhai Dooj", slug: "bhai-dooj", icon: "🎁", subcategories: [] },
+    { name: "Flowers", slug: "flowers", icon: "🌸", subcategories: [] },
+    { name: "Same Day", slug: "same-day", icon: "⚡", subcategories: [] },
+    { name: "Hatke Gifts", slug: "hatke-gifts", icon: "😎", subcategories: [] },
+    { name: "Home Decor", slug: "home-decor", icon: "🖼️", subcategories: [] },
+    { name: "Anniversary", slug: "anniversary", icon: "💍", subcategories: [] },
+    { name: "Gift Hampers", slug: "gift-hampers", icon: "🧺", subcategories: [] },
+    { name: "Sweets", slug: "sweets", icon: "🍬", subcategories: [] },
+    { name: "Dry Fruits", slug: "dry-fruits", icon: "🌰", subcategories: [] },
+    { name: "Chocolates", slug: "chocolates", icon: "🍫", subcategories: [] },
+    { name: "Diyas", slug: "diyas", icon: "🕯️", subcategories: [] },
+    { name: "Cakes", slug: "cakes", icon: "🍰", subcategories: [] },
+    { name: "Personalized", slug: "personalized", icon: "🏷️", subcategories: [] },
+    { name: "Experiences", slug: "experiences", icon: "🎢", subcategories: [] },
+
+    // --- Standard Ecommerce Categories (from Admin.tsx, labels adjusted to match Category interface name/slug format) ---
     {
       name: 'Electronics',
       slug: 'electronics',
@@ -115,7 +134,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       icon: '🛋️',
       subcategories: [
         { name: 'Furniture', slug: 'furniture' },
-        { name: 'Home Decor', slug: 'home-decor' },
+        { name: 'Home Decor', slug: 'home-decor-f' }, // Using 'home-decor-f' from Admin.tsx
         { name: 'Kitchen & Dining', slug: 'kitchen-dining' },
         { name: 'Bed & Bath', slug: 'bed-bath' },
         { name: 'Garden & Outdoor', slug: 'garden-outdoor' },
@@ -171,7 +190,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     },
     {
       name: 'Toys & Baby Products',
-      slug: 'toys-baby',
+      slug: 'toys-baby-products', // Note: Adjusted slug for consistency
       icon: '🧸',
       subcategories: [
         { name: 'Toys', slug: 'toys' },
