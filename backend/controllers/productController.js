@@ -55,13 +55,19 @@ export const getProducts = async (req, res) => {
         let filter = {};
 
         // CATEGORY filter
-        if (category) {
-            category = category.trim().toLowerCase();
-            filter.$or = [
-                { categorySlug: { $regex: new RegExp(category, "i") } },
-                { category: { $regex: new RegExp(category, "i") } },
-            ];
-        }
+// CATEGORY filter
+if (category) {
+  category = category.trim().toLowerCase();
+
+  // replace hyphens with spaces to match human-readable categories
+  const flexibleCategory = category.replace(/-/g, "\\s*");
+
+  filter.$or = [
+    { categorySlug: { $regex: new RegExp(category, "i") } },
+    { category: { $regex: new RegExp(flexibleCategory, "i") } },
+  ];
+}
+
 
         // SUBCATEGORY filter
         if (subcategory) {
