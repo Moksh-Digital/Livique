@@ -6,6 +6,7 @@ import { CartProvider } from './contexts/CartContext';
 import { ProductsProvider } from './contexts/ProductsContext';
 import App from './App.tsx';
 import './index.css';
+import { OrdersProvider } from './contexts/OrdersContext'; // ✅ import OrdersProvider
 
 const queryClient = new QueryClient();
 
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')!).render(
       <AuthProvider>
         <CartProvider>
           <ProductsProvider>
+           <OrdersProvider> {/* ✅ wrap App here */}
             <App />
+          </OrdersProvider>
           </ProductsProvider>
         </CartProvider>
       </AuthProvider>

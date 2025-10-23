@@ -7,6 +7,7 @@ import productRoutes from "./routes/productRoutes.js"; // 👈 Add .js at end wh
 import orderRoutes from './routes/orderRoutes.js';
 import addressRoutes from "./routes/addressRoutes.js";
 
+
 // Load environment variables
 dotenv.config();
 
@@ -59,6 +60,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes); // Add this line
 app.use("/api/address", addressRoutes);
+
+app.use("/api/users", userRoutes);
+
 
 
 // --- Error Handling Middleware ---

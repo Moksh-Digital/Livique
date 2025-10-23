@@ -49,4 +49,19 @@ const getMyOrders = asyncHandler(async (req, res) => {
   res.json(orders);
 });
 
+
+export const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate("userId", "name email address") // fetch user details
+      .populate("products.productId", "name price") // optional: fetch product info
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch orders." });
+  }
+};
+
 export { addOrderItems, getMyOrders };

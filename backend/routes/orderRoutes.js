@@ -1,12 +1,26 @@
-// backend/routes/orderRoutes.js
+import express from "express";
+import { addOrderItems, getMyOrders, getAllOrders } from "../controllers/orderController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import Order from '../models/orderModel.js';
 
-import express from 'express';
+
 const router = express.Router();
-import { addOrderItems, getMyOrders } from '../controllers/orderController.js';
-import { protect } from '../middleware/authMiddleware.js'; // Your existing auth middleware
 
-// Use 'protect' middleware to ensure only logged-in users can access these routes
-router.route('/').post(protect, addOrderItems);
-router.route('/my-orders').get(protect, getMyOrders);
+// Public/Admin route: get all orders
+router.get('/', async (req, res) => {
+  try {
+    // Populate user info from the 'User' collection
+    const orders = await Order.find().populate('user', 'name email');
+
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error('Failed to fetch orders:', error);
+    res.status(500).json({ message: 'Failed to fetch orders' });
+  }
+});
+
+// Authenticated routes
+router.post("/", protect, addOrderItems);
+router.get("/my-orders", protect, getMyOrders);
 
 export default router;

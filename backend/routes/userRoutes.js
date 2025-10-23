@@ -15,6 +15,8 @@ import {
   deleteAddress,
   setDefaultAddress
 } from "../controllers/addressController.js";
+import User from "../models/userModel.js";
+
 
 const router = express.Router();
 
@@ -38,6 +40,24 @@ router.route('/addresses/:id')
 
 router.route('/addresses/:id/default')
   .put(protect, setDefaultAddress);
+
+// router.get("/", async (req, res) => {
+//   try {
+//     const users = await User.find({});
+//     res.json(users);
+//   } catch (error) {
+//     res.status(500).json({ message: "Failed to fetch users" });
+//   }
+// });
+
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find({}); // Fetch all users
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+});
 
 
 export default router;

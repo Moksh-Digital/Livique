@@ -27,6 +27,11 @@ import { useProducts } from "@/contexts/ProductsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { CATEGORIES } from "@/data/categories";
+// import { useOrders } from "@/contexts/OrdersContext";
+import { Order, useOrders } from "../contexts/OrdersContext";
+import axios from "axios";
+
+
 
 // Build category / subcategory options dynamically from CATEGORIES
 const CATEGORY_OPTIONS = CATEGORIES.map(cat => ({
@@ -40,6 +45,12 @@ const Admin = () => {
   const { toast } = useToast();
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
   const { user, signOut, loading, signIn } = useAuth(); // ✅ Added signIn function and loading state
+  const { setProducts } = useProducts(); // ✅ get the new setter
+  // const { orders, setOrders } = useOrders();
+  const [orders, setOrders] = useState<Order[]>([]); // never undefined
+  const [users, setUsers] = useState([]);
+
+
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [editingProduct, setEditingProduct] = useState<any>(null);
@@ -55,30 +66,97 @@ const Admin = () => {
     images: [] as string[],
     description: "",
     delivery: "Today",
-    deliveryCharge: 0, 
+    deliveryCharge: 0,
   });
 
+  
+
   useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/products");
-      const data = await res.json();
-      if (res.ok) {
-        // Assuming addProduct pushes into context/state
-        // You might want to create a setProducts() in context instead
-        data.forEach((p: any) => addProduct({ ...p, id: p._id }));
-      } else {
-        console.error("Failed to fetch products:", data.message);
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/products");
+        const data = await res.json();
+        if (res.ok) {
+          // Assuming addProduct pushes into context/state
+          // You might want to create a setProducts() in context instead
+          data.forEach((p: any) => addProduct({ ...p, id: p._id }));
+        } else {
+          console.error("Failed to fetch products:", data.message);
+        }
+      } catch (err) {
+        console.error("Error fetching products:", err);
       }
-    } catch (err) {
-      console.error("Error fetching products:", err);
+    };
+
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+  const fetchUsers = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:5000/api/users");
+      setUsers(data); // data should be array of user objects
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
     }
   };
-
-  fetchProducts();
+  fetchUsers();
 }, []);
 
-  
+
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/products");
+        const data = await res.json();
+
+        if (res.ok && Array.isArray(data)) {
+          // ✅ map MongoDB _id to frontend id once
+          const mappedProducts = data.map((p: any) => ({
+            ...p,
+            id: p._id,
+          }));
+
+          // ✅ overwrite all products — no duplicates ever
+          setProducts(mappedProducts);
+        } else {
+          console.error("Failed to fetch products:", data?.message || data);
+        }
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
+    };
+
+    fetchProducts();
+  }, [setProducts]);
+
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/orders");
+        const data = await res.json();
+
+        if (res.ok && Array.isArray(data)) {
+          // ✅ map MongoDB _id if needed
+          const formattedOrders = data.map((order: any) => ({
+            ...order,
+            _id: order._id,
+          }));
+
+          setOrders(formattedOrders);
+        } else {
+          console.error("Failed to fetch orders:", data.message || data);
+        }
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+      }
+    };
+
+    fetchOrders();
+  }, [setOrders]);
+
   // State for the INLINE LOGIN FORM
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -94,21 +172,21 @@ const Admin = () => {
     e.preventDefault();
 
     try {
-        // 🚨 IMPORTANT: Replace this with your actual signIn function logic.
-        // This is a placeholder that assumes your signIn function takes email/password.
-        await signIn(loginEmail, loginPassword); 
-        
-        // Assuming signIn is successful and sets the user object in context.
-        // The component will automatically re-render and show the dashboard.
-        toast({ title: "Welcome back!", description: "You are logged in as admin." });
+      // 🚨 IMPORTANT: Replace this with your actual signIn function logic.
+      // This is a placeholder that assumes your signIn function takes email/password.
+      await signIn(loginEmail, loginPassword);
+
+      // Assuming signIn is successful and sets the user object in context.
+      // The component will automatically re-render and show the dashboard.
+      toast({ title: "Welcome back!", description: "You are logged in as admin." });
 
     } catch (error) {
-        // Display an error message if login fails (e.g., wrong credentials)
-        toast({ 
-            title: "Login Failed", 
-            description: "Invalid email or password. Only admins can access this panel.", 
-            variant: "destructive" 
-        });
+      // Display an error message if login fails (e.g., wrong credentials)
+      toast({
+        title: "Login Failed",
+        description: "Invalid email or password. Only admins can access this panel.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -125,170 +203,171 @@ const Admin = () => {
       fr.readAsDataURL(file);
     });
 
-// Admin.tsx (inside the Admin component)
-// ... (keep all your existing imports, states, and functions)
+  // Admin.tsx (inside the Admin component)
+  // ... (keep all your existing imports, states, and functions)
 
-// ...
-// IMPORTANT: Update your handleSubmit function
-const handleSubmit = async (e: React.FormEvent) => { // Made it async
+  // ...
+  // IMPORTANT: Update your handleSubmit function
+  const handleSubmit = async (e: React.FormEvent) => { // Made it async
     e.preventDefault();
-    
+
     // --- Data Preparation (Same as your original logic) ---
     const discount = `${Math.round(
-        (1 - formData.price / formData.originalPrice) * 100
+      (1 - formData.price / formData.originalPrice) * 100
     )}% OFF`;
 
     const selectedCategory = CATEGORY_OPTIONS.find(c => c.slug === formData.category);
     const categoryName = selectedCategory ? selectedCategory.label : formData.category;
     const selectedSub = selectedCategory?.subcategories.find(s => s.slug === formData.subcategory);
     const subcategoryName = selectedSub ? selectedSub.label : formData.subcategory;
-    
+
     // The payload for the API call
     const payload = {
-        name: formData.name,
-        price: formData.price,
-        originalPrice: formData.originalPrice,
-        category: categoryName, // Send the full category name
-        categorySlug: formData.category, // Send the slug
-        subcategory: subcategoryName, // Send the full subcategory name
-        subcategorySlug: formData.subcategory, // Send the slug
-        // Ensure mainImage is the first element of images for consistency, then flatten
-        mainImage: formData.mainImage || formData.image,
-        images: [
-            formData.mainImage || formData.image,
-            ...((formData.images || []) as string[]).filter(Boolean).filter(img => img !== (formData.mainImage || formData.image))
-        ],
-        description: formData.description,
-        delivery: formData.delivery,
-        // 🚀 NEW: Add deliveryCharge to payload
-        deliveryCharge: formData.deliveryCharge, 
-        discount, // Include calculated discount
-        rating: 4.8,
-        reviews: 100,
-    };
-    
+      name: formData.name,
+      price: formData.price,
+      originalPrice: formData.originalPrice,
+      category: categoryName, // Send the full category name
+      categorySlug: formData.category, // Send the slug
+      subcategory: subcategoryName, // Send the full subcategory name
+      subcategorySlug: formData.subcategory, // Send the slug
+      // Ensure mainImage is the first element of images for consistency, then flatten
+      mainImage: formData.mainImage || formData.image,
+      images: [
+        formData.mainImage || formData.image,
+        ...((formData.images || []) as string[]).filter(Boolean).filter(img => img !== (formData.mainImage || formData.image))
+      ],
+      description: formData.description,
+      delivery: formData.delivery,
+      // 🚀 NEW: Add deliveryCharge to payload
+      deliveryCharge: formData.deliveryCharge,
+      discount, // Include calculated discount
+      rating: 4.8,
+      reviews: 100,
+    };
+
     // --- API Call Logic (The new part) ---
     if (editingProduct?.id != null) {
-        // If editing an existing product
-        // 🚨 TODO: Implement PUT/PATCH API call for product update later
-        updateProduct(editingProduct.id, payload);
-        toast({ title: "Product updated successfully (Local only)" });
+      // If editing an existing product
+      // 🚨 TODO: Implement PUT/PATCH API call for product update later
+      updateProduct(editingProduct.id, payload);
+      toast({ title: "Product updated successfully (Local only)" });
     } else {
-        // 🚀 New Product Creation API Call
-        try {
-const res = await fetch('http://localhost:5000/api/products', {                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // 🚨 TODO: Add Authorization header here once your authMiddleware is set up
-                },
-                body: JSON.stringify(payload),
-            });
+      // 🚀 New Product Creation API Call
+      try {
+        const res = await fetch('http://localhost:5000/api/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // 🚨 TODO: Add Authorization header here once your authMiddleware is set up
+          },
+          body: JSON.stringify(payload),
+        });
 
-            const data = await res.json();
-            
-            if (!res.ok) {
-                // Handle API errors (e.g., validation failed)
-                throw new Error(data.message || 'Failed to add product.');
-            }
+        const data = await res.json();
 
-            // Success: Add the newly created product (with MongoDB _id) to your context/state
-            // Assuming your backend returns the created product with a MongoDB '_id'
-            addProduct({
-                ...data, // This 'data' object should contain the new product from MongoDB
-                id: data._id, // Use the MongoDB _id as the local id
-            });
-            
-            toast({ title: "Product added successfully!" });
-            
-        } catch (error: any) {
-            console.error("Product upload failed:", error);
-            toast({ 
-                title: "Upload Failed", 
-                description: error.message || "Could not connect to the backend.", 
-                variant: "destructive" 
-            });
-            return; // Stop execution on failure
+        if (!res.ok) {
+          // Handle API errors (e.g., validation failed)
+          throw new Error(data.message || 'Failed to add product.');
         }
+
+        // Success: Add the newly created product (with MongoDB _id) to your context/state
+        // Assuming your backend returns the created product with a MongoDB '_id'
+        addProduct({
+          ...data, // This 'data' object should contain the new product from MongoDB
+          id: data._id, // Use the MongoDB _id as the local id
+        });
+
+        toast({ title: "Product added successfully!" });
+
+      } catch (error: any) {
+        console.error("Product upload failed:", error);
+        toast({
+          title: "Upload Failed",
+          description: error.message || "Could not connect to the backend.",
+          variant: "destructive"
+        });
+        return; // Stop execution on failure
+      }
     }
 
 
-    
+
 
     // --- Cleanup Form (After successful submission) ---
     setIsDialogOpen(false);
     setEditingProduct(null);
     setFormData({
-        name: "",
-        price: 0,
-        originalPrice: 0,
-        category: "",
-        subcategory: "",
-        image: "🎁",
-        mainImage: "",
-        images: [],
-        description: "",
-        delivery: "Today",
-        deliveryCharge: 0,
+      name: "",
+      price: 0,
+      originalPrice: 0,
+      category: "",
+      subcategory: "",
+      image: "🎁",
+      mainImage: "",
+      images: [],
+      description: "",
+      delivery: "Today",
+      deliveryCharge: 0,
     });
-};
+  };
 
-// ... (rest of the Admin component)
+  // ... (rest of the Admin component)
 
   // 1. Loading State Check
   if (loading) {
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <p className="text-xl">Loading authentication data...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl">Loading authentication data...</p>
+      </div>
     );
   }
 
   // 2. Authorization Check: If not logged in OR logged in but not an admin, show the login form
   if (!user || user.role !== "admin") {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-            <Card className="w-full max-w-md p-8 shadow-2xl rounded-xl">
-                <div className="text-center mb-6">
-                    <Gift className="h-10 w-10 text-accent mx-auto mb-2" />
-                    <h1 className="text-3xl font-bold">Admin Login</h1>
-                    <p className="text-muted-foreground">Enter credentials to access the Livique dashboard.</p>
-                </div>
-                
-                <form onSubmit={handleLoginSubmit} className="space-y-5">
-                    <div>
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            placeholder="admin@example.com"
-                            value={loginEmail}
-                            onChange={(e) => setLoginEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            placeholder="••••••••"
-                            value={loginPassword}
-                            onChange={(e) => setLoginPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <Button type="submit" className="w-full gap-2">
-                        <LogIn className="h-5 w-5" /> Access Dashboard
-                    </Button>
-                </form>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="w-full max-w-md p-8 shadow-2xl rounded-xl">
+          <div className="text-center mb-6">
+            <Gift className="h-10 w-10 text-accent mx-auto mb-2" />
+            <h1 className="text-3xl font-bold">Admin Login</h1>
+            <p className="text-muted-foreground">Enter credentials to access the Livique dashboard.</p>
+          </div>
 
-                <div className="mt-6 text-center">
-                    <Link to="/" className="text-sm text-accent hover:underline">
-                        Go back to store
-                    </Link>
-                </div>
-            </Card>
-        </div>
+          <form onSubmit={handleLoginSubmit} className="space-y-5">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full gap-2">
+              <LogIn className="h-5 w-5" /> Access Dashboard
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <Link to="/" className="text-sm text-accent hover:underline">
+              Go back to store
+            </Link>
+          </div>
+        </Card>
+      </div>
     );
   }
 
@@ -349,8 +428,8 @@ const res = await fetch('http://localhost:5000/api/products', {                m
               {[
 
                 { icon: <Package />, label: "Total Products", value: products.length },
-                { icon: <ShoppingBag />, label: "Total Orders", value: 1247 },
-                { icon: <Users />, label: "Total Users", value: 3456 },
+                { icon: <ShoppingBag />, label: "Total Orders", value: orders.length },
+                { icon: <Users />, label: "Total Users", value: users.length },
                 { icon: <BarChart3 />, label: "Revenue", value: "₹2.4L" },
               ].map((item, i) => (
                 <Card key={i} className="p-6 rounded-2xl">
@@ -366,24 +445,59 @@ const res = await fetch('http://localhost:5000/api/products', {                m
 
             <Card className="p-6 rounded-2xl">
               <h2 className="text-xl font-bold mb-4">Recent Orders</h2>
+
               <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((order) => (
-                  <div
-                    key={order}
-                    className="flex items-center justify-between p-4 border rounded-xl"
-                  >
-                    <div>
-                      <p className="font-semibold">Order #{1000 + order}</p>
-                      <p className="text-sm text-muted-foreground">Customer Name</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold">₹ 1,449</p>
-                      <p className="text-sm text-success">Completed</p>
-                    </div>
-                  </div>
-                ))}
+                {orders.length === 0 ? (
+                  <p className="text-muted-foreground">No recent orders available.</p>
+                ) : (
+                  orders
+                    .slice(0, 5) // Show only last 5 orders
+                    .map((order) => (
+                      <div
+                        key={order._id}
+                        className="p-4 border rounded-xl flex flex-col md:flex-row justify-between gap-4 hover:shadow-md transition-shadow"
+                      >
+                        {/* Left: Order & Customer Info */}
+                        <div>
+                          <p className="font-semibold">Order #{order._id.slice(-6)}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {order.user?.name || "Customer"} ({order.user?.email || "No Email"})
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {order.address.fullName}, {order.address.street}, {order.address.city}
+                          </p>
+                        </div>
+
+                        {/* Middle: Items */}
+                        <div className="text-sm text-gray-700">
+                          {order.items.map((item) => (
+                            <p key={item.id}>
+                              {item.name} × {item.quantity} = ₹{item.price * item.quantity}
+                            </p>
+                          ))}
+                        </div>
+
+                        {/* Right: Total & Status */}
+                        <div className="text-right">
+                          <p className="font-semibold text-lg">₹{order.total.toLocaleString()}</p>
+                          <span
+                            className={`text-xs font-medium px-2 py-1 rounded-full ${order.status === "Confirmed"
+                                ? "bg-green-100 text-green-800"
+                                : order.status === "Pending"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
+                          >
+                            {order.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                )}
               </div>
             </Card>
+
+
           </TabsContent>
 
           {/* Products */}
@@ -425,7 +539,7 @@ const res = await fetch('http://localhost:5000/api/products', {                m
 
                   <form onSubmit={handleSubmit} className="space-y-4">
 
-                    
+
 
                     {/* other inputs */}
                     {[
@@ -482,20 +596,20 @@ const res = await fetch('http://localhost:5000/api/products', {                m
                     </div>
 
                     <div>
-      <Label>Delivery Charge (₹)</Label>
-      <Input
-        type="number"
-        value={formData.deliveryCharge}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            deliveryCharge: Number(e.target.value), // Convert to number
-          })
-        }
-        placeholder="0"
-        min="0"
-      />
-    </div>
+                      <Label>Delivery Charge (₹)</Label>
+                      <Input
+                        type="number"
+                        value={formData.deliveryCharge}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            deliveryCharge: Number(e.target.value), // Convert to number
+                          })
+                        }
+                        placeholder="0"
+                        min="0"
+                      />
+                    </div>
 
                     {/* Subcategory select (shown only if selected category has subcategories) */}
                     {(() => {
@@ -548,7 +662,7 @@ const res = await fetch('http://localhost:5000/api/products', {                m
                       <div className="mt-2">
                         {(formData as any).mainImage ? (
                           (((formData as any).mainImage as string).startsWith("data:") ||
-                          ((formData as any).mainImage as string).startsWith("http")) ? (
+                            ((formData as any).mainImage as string).startsWith("http")) ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={(formData as any).mainImage}
@@ -583,7 +697,7 @@ const res = await fetch('http://localhost:5000/api/products', {                m
                         <Input
                           placeholder="Paste image URL and press Add"
                           id="gallery-url-input"
-                          // local uncontrolled input not required, simple inline handler below
+                        // local uncontrolled input not required, simple inline handler below
                         />
                         <Button
                           type="button"
@@ -639,7 +753,7 @@ const res = await fetch('http://localhost:5000/api/products', {                m
                   >
                     <div className="w-20 h-20 bg-muted rounded-xl flex items-center justify-center overflow-hidden">
                       {(((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith("data:") ||
-                      (((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith("http") ? (
+                        (((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith("http") ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={(product as any).mainImage || (product as any).images?.[0] || product.image}
@@ -707,52 +821,108 @@ const res = await fetch('http://localhost:5000/api/products', {                m
           <TabsContent value="orders">
             <h2 className="text-2xl font-bold mb-6">Orders Management</h2>
             <Card className="p-6 rounded-2xl">
-              <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((order) => (
-                  <div
-                    key={order}
-                    className="p-4 border rounded-xl flex flex-col gap-2"
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="font-bold">Order #{1000 + order}</p>
-                      <p className="text-success text-sm">Delivered</p>
+              {orders.length === 0 ? (
+                <p className="text-muted-foreground">No orders found.</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+                  {orders.map((order) => (
+                    <div
+                      key={order._id}
+                      className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300"
+                    >
+                      {/* Header */}
+                      <div className="flex justify-between items-center mb-4">
+                        <div>
+                          <h2 className="text-lg font-semibold">{order.user?.name || 'Unknown User'}</h2>
+                          <p className="text-sm text-gray-500">{order.user?.email || 'No Email'}</p>
+                        </div>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'Confirmed'
+                              ? 'bg-green-100 text-green-800'
+                              : order.status === 'Pending'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}
+                        >
+                          {order.status}
+                        </span>
+                      </div>
+
+                      {/* Items */}
+                      <div className="mb-4">
+                        <h3 className="font-semibold mb-2">Items:</h3>
+                        <ul className="text-sm text-gray-700">
+                          {order.items.map((item) => (
+                            <li key={item.id} className="flex justify-between mb-1">
+                              <span>{item.name} × {item.quantity}</span>
+                              <span>₹{item.price * item.quantity}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Address */}
+                      <div className="mb-4 text-sm text-gray-700">
+                        <p className="font-semibold mb-1">Shipping Address:</p>
+                        <p>
+                          {order.address.fullName}, {order.address.street}, {order.address.city}, {order.address.state} - {order.address.zipCode}
+                        </p>
+                        <p>Mobile: {order.address.mobile}</p>
+                      </div>
+
+                      {/* Payment */}
+                      <div className="text-sm text-gray-700 border-t pt-2 flex justify-between">
+                        <p>Payment: {order.paymentMethod}</p>
+                        <p className="font-semibold">Total: ₹{order.total}</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      John Doe — ₹1,449 — 12 Oct 2025
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+
+              )}
             </Card>
           </TabsContent>
 
+
+
           {/* Users */}
-          <TabsContent value="users">
-            <h2 className="text-2xl font-bold mb-6">Users Management</h2>
-            <Card className="p-6 rounded-2xl">
-              {[1, 2, 3].map((user) => (
-                <div
-                  key={user}
-                  className="flex items-center justify-between p-4 border rounded-xl mb-3"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                      <Users className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">Customer {user}</p>
-                      <p className="text-sm text-muted-foreground">
-                        customer{user}@email.com
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-sm font-semibold">
-                    Orders: {Math.floor(Math.random() * 10) + 1}
-                  </p>
-                </div>
-              ))}
-            </Card>
-          </TabsContent>
+<TabsContent value="users">
+  <h2 className="text-2xl font-bold mb-6">Users Management</h2>
+  <Card className="p-6 rounded-2xl">
+    {users.length === 0 ? (
+      <p className="text-muted-foreground">No users found.</p>
+    ) : (
+      users.map((user: any) => {
+        // Count how many orders this user has
+        const userOrderCount = orders.filter(
+          (o) => o.user && o.user._id.toString() === user._id.toString()
+        ).length;
+
+        return (
+          <div
+            key={user._id}
+            className="flex items-center justify-between p-4 border rounded-xl mb-3"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <p className="font-semibold">{user.name || "Customer"}</p>
+                <p className="text-sm text-muted-foreground">{user.email}</p>
+              </div>
+            </div>
+            <p className="text-sm font-semibold">
+              Orders: {userOrderCount}
+            </p>
+          </div>
+        );
+      })
+    )}
+  </Card>
+</TabsContent>
+
+
         </Tabs>
       </div>
     </div>
