@@ -292,3 +292,21 @@ export const getProductById = async (req, res) => {
         res.status(500).json({ message: 'Server Error fetching product' });
     }
 };
+
+
+//for searching product i have i used this  searchbar functionality
+export const searchProducts = async (req, res) => {
+  try {
+    const keyword = req.query.keyword
+      ? {
+          name: { $regex: req.query.keyword, $options: "i" }, // case-insensitive
+        }
+      : {};
+
+    const products = await Product.find({ ...keyword });
+    res.json(products);
+  } catch (error) {
+    console.error("Error searching products:", error);
+    res.status(500).json({ message: "Server error while searching" });
+  }
+};

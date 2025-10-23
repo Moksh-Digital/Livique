@@ -15,6 +15,7 @@ import SignUp from "./pages/SignUp";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
+import SearchResultsPage from "./pages/SearchResultsPage";
 
 
 const App = () => (
@@ -52,6 +53,9 @@ const App = () => (
 
         {/* Admin */}
         <Route path="/admin" element={<Admin />} />
+
+        {/* search page route*/}
+        <Route path="/search" element={<SearchResultsPage />} />
 
         {/* Other routes */}
         <Route path="/gifts" element={<ProductList />} />

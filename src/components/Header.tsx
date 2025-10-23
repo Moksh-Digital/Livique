@@ -26,14 +26,43 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfilePage from "src/pages/ProfilePage";
+// import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+// for search functionality
+// const [keyword, setKeyword] = useState("");
+// const navigate = useNavigate();
+
+// const handleSearch = async (e: React.FormEvent) => {
+//   e.preventDefault();
+//   if (!keyword.trim()) return;
+
+//   // Redirect user to a search results page (you’ll make this next)
+//   navigate(`/search?keyword=${keyword}`);
+// };
 
 const Header = () => {
+
   const { getTotalItems } = useCart();
   const totalItems = getTotalItems();
   const { user, signOut } = useAuth();
 
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
+
+
+  const [keyword, setKeyword] = useState("");
+const navigate = useNavigate();
+
+const handleSearch = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!keyword.trim()) return;
+
+  // Redirect user to a search results page (you’ll make this next)
+  navigate(`/search?keyword=${keyword}`);
+};
+
 
   return (
     <>
@@ -69,15 +98,17 @@ const Header = () => {
             </div>
 
             {/* Search Bar (Desktop only) */}
-            <div className="flex-1 max-w-2xl hidden lg:block">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search for gifts, flowers, cakes..."
-                  className="pl-10 bg-muted/50"
-                />
-              </div>
-            </div>
+<form onSubmit={handleSearch} className="relative">
+  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+  <Input
+    value={keyword}
+    onChange={(e) => setKeyword(e.target.value)}
+    placeholder="Search for gifts, flowers, cakes..."
+    className="pl-10 bg-muted/50"
+  />
+</form>
+
+
 
             {/* Right Icons */}
             <div className="flex items-center gap-2 md:gap-4">
