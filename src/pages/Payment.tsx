@@ -8,12 +8,96 @@ import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import StepsTracker from "@/components/StepsTracker";
+import axios from 'axios'; // 👈 IMPORT AXIOS
 
 const Payment = () => {
   const navigate = useNavigate();
   const { cart, clearCart, getTotalPrice } = useCart();
   const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState("cod");
+
+const handlePlaceOrder = async () => {
+  const rawAddress = JSON.parse(localStorage.getItem("shippingAddress") || "{}");
+
+  // 🧩 Map frontend fields → backend schema
+  const address = {
+    fullName: rawAddress.fullName,
+    mobile: rawAddress.mobile,
+    street: `${rawAddress.houseNo}, ${rawAddress.street}, ${rawAddress.locality}`,
+    city: rawAddress.city,
+    state: rawAddress.state,
+    zipCode: rawAddress.pincode, // ✅ converted key
+    landmark: rawAddress.landmark || "",
+    addressType: rawAddress.addressType || "home",
+  };
+
+  // 🧾 Build order data for backend
+  const orderData = {
+    items: cart.map((item) => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      image: item.image,
+      deliveryCharge: item.deliveryCharge,
+    })),
+    subtotal,
+    deliveryCharges: totalDeliveryCharges,
+    total,
+    paymentMethod,
+    address,
+  };
+
+  console.log("🧠 Sending Order Data:", orderData);
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    toast({
+      title: "Error",
+      description: "Please log in to place an order.",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    // 🚀 Send to backend
+    const { data: createdOrder } = await axios.post(
+      "http://localhost:5000/api/orders",
+      orderData,
+      config
+    );
+
+    // 🧹 Cleanup
+    clearCart();
+    localStorage.removeItem("shippingAddress");
+
+    toast({
+      title: "Order Placed Successfully!",
+      description: `Order ID: ${createdOrder._id || createdOrder.id}`,
+    });
+
+    navigate("/order-confirmation", { state: { order: createdOrder } });
+  } catch (error: any) {
+    console.error("❌ Order placement failed:", error.response?.data || error);
+
+    toast({
+      title: "Order Failed",
+      description:
+        error.response?.data?.message ||
+        "Failed to place order. Please try again.",
+      variant: "destructive",
+    });
+  }
+};
+
 
   // ✅ Calculate total delivery dynamically (same as Cart.tsx)
   const totalDeliveryCharges = cart.reduce(
@@ -24,31 +108,31 @@ const Payment = () => {
   const subtotal = getTotalPrice();
   const total = subtotal + totalDeliveryCharges;
 
-  const handlePlaceOrder = () => {
-    const address = JSON.parse(localStorage.getItem("shippingAddress") || "{}");
-    const order = {
-      id: `ORD${Date.now()}`,
-      items: cart,
-      subtotal,
-      deliveryCharges: totalDeliveryCharges,
-      total,
-      paymentMethod,
-      address,
-      date: new Date().toISOString(),
-      status: "Confirmed",
-    };
+  // const handlePlaceOrder = () => {
+  //   const address = JSON.parse(localStorage.getItem("shippingAddress") || "{}");
+  //   const order = {
+  //     id: `ORD${Date.now()}`,
+  //     items: cart,
+  //     subtotal,
+  //     deliveryCharges: totalDeliveryCharges,
+  //     total,
+  //     paymentMethod,
+  //     address,
+  //     date: new Date().toISOString(),
+  //     status: "Confirmed",
+  //   };
 
-    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-    orders.push(order);
-    localStorage.setItem("orders", JSON.stringify(orders));
+  //   const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+  //   orders.push(order);
+  //   localStorage.setItem("orders", JSON.stringify(orders));
 
-    clearCart();
-    toast({
-      title: "Order Placed Successfully!",
-      description: `Order ID: ${order.id}`,
-    });
-    navigate("/order-confirmation", { state: { order } });
-  };
+  //   clearCart();
+  //   toast({
+  //     title: "Order Placed Successfully!",
+  //     description: `Order ID: ${order.id}`,
+  //   });
+  //   navigate("/order-confirmation", { state: { order } });
+  // };
 
   return (
     <div className="min-h-screen bg-background">

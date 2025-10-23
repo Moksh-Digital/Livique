@@ -8,6 +8,13 @@ import {
     getUserProfile
 } from '../controllers/userController.js';
 import { protect } from '../middleware/authMiddleware.js'; 
+import {
+  addAddress,
+  getAddresses,
+  updateAddress,
+  deleteAddress,
+  setDefaultAddress
+} from "../controllers/addressController.js";
 
 const router = express.Router();
 
@@ -20,6 +27,17 @@ router.post('/login', authUser); // optional legacy
 
 // Private/Protected Route
 router.get("/profile", protect, getUserProfile);
+
+router.route('/addresses')
+  .get(protect, getAddresses)
+  .post(protect, addAddress);
+
+router.route('/addresses/:id')
+  .put(protect, updateAddress)
+  .delete(protect, deleteAddress);
+
+router.route('/addresses/:id/default')
+  .put(protect, setDefaultAddress);
 
 
 export default router;

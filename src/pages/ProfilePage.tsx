@@ -14,13 +14,29 @@ import {
   CreditCard,
 } from "lucide-react";
 
+// NEW INTERFACE for Order
+interface Order {
+  _id: string;
+  total: number;
+  createdAt: string;
+  status: string;
+  paymentMethod?: string;
+  paymentStatus?: string;
+  items: {
+    name: string;
+    quantity: number;
+    price: number;
+    image?: string; // optional product image
+  }[];
+}
+
+
 // 1. Define a TypeScript interface for your user data
 interface UserProfile {
   name: string;
   email: string;
   createdAt: string; // Assuming createdAt is a string (like an ISO date string)
   // Add any other fields you get from your API here
-  // e.g., avatarUrl?: string;
 }
 
 const ProfilePage = () => {
@@ -28,38 +44,102 @@ const ProfilePage = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null); // For better error handling
+  const [orders, setOrders] = useState<Order[]>([]); // 👈 STATE FOR ORDERS
+  const [addresses, setAddresses] = useState<any[]>([]);
+const [showAddressForm, setShowAddressForm] = useState(false);
+const [formData, setFormData] = useState({
+  fullName: "",
+  phone: "",
+  street: "",
+  city: "",
+  state: "",
+  pincode: "",
+});
+
+
+useEffect(() => {
+  const fetchAddresses = async () => {
+    const token = localStorage.getItem("token");
+    console.log("Fetching addresses...");
+
+    const { data } = await axios.get("http://localhost:5000/api/users/addresses", {
+      
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setAddresses(data);
+  };
+  fetchAddresses();
+}, []);
+
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem("token"); // JWT stored after login
-        if (!token) {
-          throw new Error("No authorization token found. Please log in.");
-        }
+    const fetchData = async () => {
+      const token = localStorage.getItem("token"); // JWT stored after login
+      
+      if (!token) {
+        setError("No authorization token found. Please log in.");
+        setLoading(false);
+        return;
+      }
 
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-        const { data } = await axios.get<UserProfile>( // Type the expected response
-          "http://localhost:5000/api/users/profile",
-          config
-        );
-        setUser(data);
-      } catch (err: any) { // Catch and handle errors
-        console.error("Error fetching profile:", err);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      try {
+        // Fetch User Profile and Orders concurrently using Promise.all
+        const [userResponse, ordersResponse] = await Promise.all([
+            axios.get<UserProfile>("http://localhost:5000/api/users/profile", config),
+            axios.get<Order[]>("http://localhost:5000/api/orders/my-orders", config), // 👈 API call to fetch user's orders
+        ]);
+
+        setUser(userResponse.data);
+        setOrders(ordersResponse.data); // Save fetched orders
+
+      } catch (err: any) { 
+        console.error("Error fetching profile or orders:", err);
         setError(
           err.response?.data?.message ||
             err.message ||
-            "Failed to load profile. Please try again."
+            "Failed to load profile or orders. Please check the API connection."
         );
       } finally {
-        setLoading(false); // This always runs
+        setLoading(false); 
       }
     };
-    fetchProfile();
-  }, []);
+    fetchData();
+  }, []); // Run once on component mount
+
+
+  // ---------------- ORDER STATISTICS CALCULATION ----------------
+  const totalOrders = orders.length;
+
+  // Assumes backend returns orders sorted by createdAt descending
+  const lastPurchaseDate = totalOrders > 0 
+    ? new Date(orders[0].createdAt)
+    : null;
+    
+  const lastPurchaseDisplay = lastPurchaseDate 
+    ? lastPurchaseDate.toLocaleDateString("en-US", {
+        year: "numeric", month: "short", day: "numeric"
+      })
+    : "N/A";
+    
+  // Find the most frequently purchased item name by aggregating all items across all orders
+  const allItems = orders.flatMap(order => order.items);
+  const itemCounts = allItems.reduce((acc, item) => {
+      // Use item name as key and sum up quantities
+      acc[item.name] = (acc[item.name] || 0) + item.quantity; 
+      return acc;
+  }, {} as Record<string, number>);
+  
+  const mostPurchasedItem = totalOrders > 0 ? Object.keys(itemCounts).reduce((a, b) => 
+      itemCounts[a] > itemCounts[b] ? a : b, 'N/A'
+  ) : 'N/A';
+  // ---------------- END CALCULATIONS ----------------
+
 
   // --- 3. Better Loading State ---
   if (loading) {
@@ -168,78 +248,239 @@ const ProfilePage = () => {
 
           {/* --- Column 2: Order Summary & Address --- */}
           <div className="lg:col-span-2 flex flex-col gap-8">
-            {/* Order Summary Card */}
-            <div className="bg-white rounded-2xl shadow-lg">
-              <div className="border-b border-gray-200 p-6">
-                <h3 className="text-2xl font-semibold text-gray-900">
-                  Order Summary
-                </h3>
-              </div>
-              <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Stat 1: Total Orders */}
-                <div className="bg-blue-50 p-5 rounded-lg">
-                  <Package className="h-7 w-7 text-blue-600 mb-2" />
-                  <p className="text-sm font-medium text-blue-800">
-                    Total Orders
-                  </p>
-                  <p className="text-3xl font-bold text-gray-900">5</p>
-                </div>
+            {/* Order Summary Card - NOW DYNAMICALLY POPULATED */}
+<div className="bg-white rounded-2xl shadow-lg">
+  <div className="border-b border-gray-200 p-6 flex justify-between items-center">
+    <h3 className="text-2xl font-semibold text-gray-900">My Orders</h3>
+    <span className="text-gray-600 text-sm">({orders.length} orders)</span>
+  </div>
 
-                {/* Stat 2: Last Purchase */}
-                <div className="bg-green-50 p-5 rounded-lg">
-                  <Clock className="h-7 w-7 text-green-600 mb-2" />
-                  <p className="text-sm font-medium text-green-800">
-                    Last Purchase
-                  </p>
-                  <p className="text-xl font-semibold text-gray-900 pt-3">
-                    2 days ago
-                  </p>
-                </div>
-
-                {/* Stat 3: Most Purchased */}
-                <div className="bg-yellow-50 p-5 rounded-lg">
-                  <Star className="h-7 w-7 text-yellow-600 mb-2" />
-                  <p className="text-sm font-medium text-yellow-800">
-                    Most Purchased
-                  </p>
-                  <p className="text-lg font-semibold text-gray-900 pt-3 truncate">
-                    Wireless Headphones
-                  </p>
-                </div>
-              </div>
-              <div className="border-t border-gray-200 p-6">
-                <button className="w-full text-center text-blue-600 font-semibold hover:underline">
-                  View All Orders
-                </button>
-              </div>
+  {orders.length === 0 ? (
+    <div className="p-8 text-center text-gray-600">
+      <Package className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+      <p className="text-lg font-medium">You haven’t placed any orders yet.</p>
+      <p className="text-sm text-gray-500 mt-1">
+        Start shopping to see your orders here.
+      </p>
+    </div>
+  ) : (
+    <div className="divide-y divide-gray-100">
+      {orders.map((order) => (
+        <div key={order._id} className="p-6 hover:bg-gray-50 transition-colors">
+          {/* Order Header */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
+            <div>
+              <p className="text-sm text-gray-500">
+                Order ID: <span className="text-gray-800 font-medium">{order._id}</span>
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Ordered on{" "}
+                <span className="text-gray-800 font-medium">
+                  {new Date(order.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </p>
             </div>
+            <div className="mt-3 sm:mt-0">
+              <span
+                className={`inline-block px-3 py-1 text-sm font-semibold rounded-full ${
+                  order.status === "Delivered"
+                    ? "bg-green-100 text-green-700"
+                    : order.status === "Pending"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : order.status === "Cancelled"
+                    ? "bg-red-100 text-red-700"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {order.status}
+              </span>
+            </div>
+          </div>
 
-            {/* Mock Address Card */}
-            <div className="bg-white rounded-2xl shadow-lg">
-              <div className="border-b border-gray-200 p-6 flex justify-between items-center">
-                <h3 className="text-2xl font-semibold text-gray-900">
-                  Your Addresses
-                </h3>
-                <button className="text-sm text-blue-600 font-semibold hover:underline">
-                  Manage Addresses
-                </button>
-              </div>
-              <div className="p-6">
-                <div className="border border-gray-200 rounded-lg p-5">
-                  <div className="flex items-center mb-2">
-                    <MapPin className="h-5 w-5 mr-2 text-gray-500" />
-                    <span className="font-semibold text-gray-800">
-                      Default Shipping
-                    </span>
+          {/* Ordered Items */}
+          <div className="space-y-4">
+            {order.items.map((item, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between border border-gray-200 rounded-lg p-4"
+              >
+                <div className="flex items-center gap-4">
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-16 h-16 object-cover rounded-md"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center text-gray-400 text-sm">
+                      No Image
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-gray-800 font-medium">{item.name}</p>
+                    <p className="text-gray-500 text-sm">
+                      Quantity: {item.quantity}
+                    </p>
                   </div>
-                  <p className="text-gray-600 ml-7">
-                    123 Innovation Drive,
-                    <br />
-                    Mohali, Punjab, 140507
-                  </p>
                 </div>
+                <p className="text-gray-900 font-semibold">
+                  ₹{item.price * item.quantity}
+                </p>
               </div>
+            ))}
+          </div>
+
+          {/* Footer (Total & Actions) */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-6">
+            <div>
+              <p className="text-gray-600 text-sm">Total Amount</p>
+              <p className="text-lg font-bold text-gray-900">₹{order.total}</p>
             </div>
+            <div className="flex gap-3 mt-3 sm:mt-0">
+              <button className="text-blue-600 font-semibold text-sm hover:underline">
+                View Invoice
+              </button>
+              <button className="text-gray-600 font-semibold text-sm hover:underline">
+                Track Order
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+            
+            {/* Mock Address Card */}
+<div className="bg-white rounded-2xl shadow-lg">
+  <div className="border-b border-gray-200 p-6 flex justify-between items-center">
+    <h3 className="text-2xl font-semibold text-gray-900">Your Addresses</h3>
+    <button
+      className="text-sm text-blue-600 font-semibold hover:underline"
+      onClick={() => setShowAddressForm(!showAddressForm)}
+    >
+      {showAddressForm ? "Cancel" : "Manage Addresses"}
+    </button>
+  </div>
+
+  <div className="p-6">
+    {showAddressForm ? (
+      <>
+        <h4 className="text-lg font-semibold mb-4">Add New Address</h4>
+<form
+  onSubmit={async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    // Map `phone` to `mobile` to match backend schema
+    const payload = {
+      ...formData,
+      mobile: formData.phone,
+    };
+
+    try {
+      await axios.post("http://localhost:5000/api/users/addresses", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Optionally, fetch addresses again instead of reloading
+      const { data } = await axios.get("http://localhost:5000/api/users/addresses", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAddresses(data);
+
+      setShowAddressForm(false);
+      setFormData({
+        fullName: "",
+        phone: "",
+        street: "",
+        city: "",
+        state: "",
+        pincode: "",
+      });
+    } catch (err: any) {
+      console.error("Error saving address:", err.response?.data?.message || err.message);
+    }
+  }}
+  className="space-y-3"
+>
+  <input
+    placeholder="Full Name"
+    className="border p-2 w-full rounded"
+    value={formData.fullName}
+    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+  />
+  <input
+    placeholder="Phone"
+    className="border p-2 w-full rounded"
+    value={formData.phone}
+    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+  />
+  <input
+    placeholder="Street"
+    className="border p-2 w-full rounded"
+    value={formData.street}
+    onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+  />
+  <input
+    placeholder="City"
+    className="border p-2 w-full rounded"
+    value={formData.city}
+    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+  />
+  <input
+    placeholder="State"
+    className="border p-2 w-full rounded"
+    value={formData.state}
+    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+  />
+  <input
+    placeholder="Pincode"
+    className="border p-2 w-full rounded"
+    value={formData.pincode}
+    onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+  />
+  <button className="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700">
+    Save Address
+  </button>
+</form>
+
+      </>
+    ) : (
+      addresses.length > 0 ? (
+        <div className="space-y-4">
+          {addresses.map((addr) => (
+  <div key={addr._id} className="border p-4 rounded-lg space-y-1">
+    <p className="font-semibold">{addr.fullName}</p>
+    <p>
+      {addr.houseNo ? addr.houseNo + ", " : ""}
+      {addr.street ? addr.street + ", " : ""}
+      {addr.landmark ? addr.landmark + ", " : ""}
+      {addr.locality ? addr.locality + ", " : ""}
+      {addr.city ? addr.city + ", " : ""}
+      {addr.state ? addr.state + " - " : ""}
+      {addr.pincode}
+    </p>
+    <p className="text-gray-600 text-sm">📞 {addr.mobile}</p>
+    {addr.isDefault && (
+      <span className="text-green-600 font-medium">Default Address</span>
+    )}
+  </div>
+))}
+
+        </div>
+      ) : (
+        <p className="text-gray-500">No saved addresses yet.</p>
+      )
+    )}
+  </div>
+</div>
+
           </div>
         </div>
       </div>

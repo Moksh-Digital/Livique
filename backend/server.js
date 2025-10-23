@@ -4,6 +4,9 @@ import cors from 'cors';
 import connectDB from './config/db.js'; // <-- NEW: Import the DB connection function
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from "./routes/productRoutes.js"; // 👈 Add .js at end when using imports
+import orderRoutes from './routes/orderRoutes.js';
+import addressRoutes from "./routes/addressRoutes.js";
+
 // Load environment variables
 dotenv.config();
 
@@ -54,6 +57,9 @@ app.get('/', (req, res) => {
 // Mount Routes
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes); // Add this line
+app.use("/api/address", addressRoutes);
+
 
 // --- Error Handling Middleware ---
 
