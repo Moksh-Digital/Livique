@@ -25,81 +25,105 @@ export const createProduct = async (req, res) => {
         }
 
         // Create product with proper slugs that match frontend categories
-        // Map category names to their exact slugs from frontend
+        // Map category names to their exact slugs from frontend (new taxonomy)
         const categorySlugMap = {
-            'gifts': 'gifts',
-            'food & sweets': 'food-sweets',
-            'food and sweets': 'food-sweets',
-            'home & decor': 'home-decor',
-            'home and decor': 'home-decor',
+            'accessories': 'accessories',
+            'home & lifestyle': 'home-lifestyle',
+            'home and lifestyle': 'home-lifestyle',
+            'sale & offers': 'sale-offers',
+            'sale and offers': 'sale-offers',
+            'home decor': 'home-decor-gifting',
+            'home decor & gifting': 'home-decor-gifting',
+            'home decor and gifting': 'home-decor-gifting',
+            'aesthetic gifts': 'aesthetic-gifts',
+            'beauty & self care': 'beauty-self-care',
+            'beauty and self care': 'beauty-self-care',
+            'toys': 'toys',
+            'customized gifts': 'customized-gifts',
+            'customised gifts': 'customized-gifts',
             'flowers': 'flowers',
-            'electronics': 'electronics',
-            'fashion': 'fashion',
-            'beauty & personal care': 'beauty-personal-care',
-            'beauty and personal care': 'beauty-personal-care',
-            'books & stationery': 'books-stationery',
-            'books and stationery': 'books-stationery',
-            'sports & fitness': 'sports-fitness',
-            'sports and fitness': 'sports-fitness',
-            'toys & baby products': 'toys-baby-products',
-            'toys and baby products': 'toys-baby-products',
-            'grocery & food': 'grocery-food',
-            'grocery and food': 'grocery-food',
-            'appliances': 'appliances',
-            'automotive': 'automotive'
+            'sweets & chocolates': 'sweets-chocolates',
+            'sweets and chocolates': 'sweets-chocolates',
+            'jewelry & accessories': 'jewelry-accessories',
+            'jewelry and accessories': 'jewelry-accessories'
         };
         
         const categorySlug = categorySlugMap[category.toLowerCase()] || category.toLowerCase().trim().replace(/\s+/g, "-").replace(/&/g, "").replace(/and/g, "");
         
-        // Map subcategory names to their exact slugs from frontend
+        // Map subcategory names to their exact slugs from frontend (new taxonomy)
         const subcategorySlugMap = {
-            'mobile phones': 'mobile-phones',
-            'men clothing': 'men-clothing',
-            'women clothing': 'women-clothing',
-            'kids clothing': 'kids-clothing',
-            'men footwear': 'men-footwear',
-            'women footwear': 'women-footwear',
-            'bags & luggage': 'bags-luggage',
-            'bags and luggage': 'bags-luggage',
-            'skin care': 'skin-care',
-            'hair care': 'hair-care',
-            'bath & body': 'bath-body',
-            'bath and body': 'bath-body',
-            'men grooming': 'men-grooming',
-            'beauty tools': 'beauty-tools',
-            'sketch books': 'sketch-books',
-            'school supplies': 'school-supplies',
-            'art supplies': 'art-supplies',
-            'office supplies': 'office-supplies',
-            'exercise equipment': 'exercise-equipment',
-            'sports shoes': 'sports-shoes',
-            'baby care': 'baby-care',
-            'baby fashion': 'baby-fashion',
-            'baby feeding': 'baby-feeding',
-            'baby gear': 'baby-gear',
-            'fruits & vegetables': 'fruits-vegetables',
-            'fruits and vegetables': 'fruits-vegetables',
-            'dairy products': 'dairy-products',
-            'cooking essentials': 'cooking-essentials',
-            'air conditioners': 'air-conditioners',
-            'washing machines': 'washing-machines',
-            'microwave ovens': 'microwave-ovens',
-            'vacuum cleaners': 'vacuum-cleaners',
-            'kitchen appliances': 'kitchen-appliances',
-            'car accessories': 'car-accessories',
-            'motorcycle parts': 'motorcycle-parts',
-            'home decor items': 'home-decor-items',
-            'fresh flowers': 'fresh-flowers',
+            // Accessories
+            'bags & clutches': 'bags-clutches',
+            'bags and clutches': 'bags-clutches',
+            'scarves & stoles': 'scarves-stoles',
+            'scarves and stoles': 'scarves-stoles',
+
+            // Home & Lifestyle
+            'cushions': 'cushions',
+            'candles & home fragrances': 'candles-home-fragrances',
+            'candles and home fragrances': 'candles-home-fragrances',
+
+            // Sale & Offers
+            'clearance stock': 'clearance-stock',
+            'limited time offers': 'limited-time-offers',
+
+            // Home Decor
+            'clocks': 'clocks',
+            'show pieces': 'show-pieces',
+            'scented candles': 'scented-candles',
+            'indoor plants': 'indoor-plants',
+            'table lamps': 'table-lamps',
+            'wall art': 'wall-art',
+            'posters': 'posters',
+
+            // Aesthetic Gifts
+            'candles': 'candles',
+            'diffusers': 'diffusers',
+            'crystals': 'crystals',
+            'trays': 'trays',
+
+            // Beauty & Self Care
+            'perfumes': 'perfumes',
+            'skincare kits': 'skincare-kits',
+            'bath & body gift sets': 'bath-body-gift-sets',
+            'shaving kits': 'shaving-kits',
+            'makeup hampers': 'makeup-hampers',
+            'haircare sets': 'haircare-sets',
+            'spa hampers': 'spa-hampers',
+            'fragrance candles': 'fragrance-candles',
+            'essential oil sets': 'essential-oil-sets',
+            'relaxation boxes': 'relaxation-boxes',
+
+            // Toys
+            'teddy bears': 'teddy-bears',
+            'barbie dolls': 'barbie-dolls',
+            'mini toys': 'mini-toys',
+            'toys by age': 'toys-by-age',
+            'desk toys': 'desk-toys',
+
+            // Customized Gifts
+            'customized mugs': 'customized-mugs',
+            'customised mugs': 'customized-mugs',
+            'customized shirts': 'customized-shirts',
+            'customised shirts': 'customized-shirts',
+            'engraved pens': 'engraved-pens',
+
+            // Flowers
             'flower bouquets': 'flower-bouquets',
-            'flower arrangements': 'flower-arrangements',
-            'smart watches': 'smart-watches',
-            'power banks': 'power-banks',
-            'gaming consoles': 'gaming-consoles',
-            'same day delivery': 'same-day-delivery',
-            'personalized gifts': 'personalized-gifts',
-            'gift hampers': 'gift-hampers',
-            'hatke gifts': 'hatke-gifts',
-            'dry fruits': 'dry-fruits'
+            'flower baskets': 'flower-baskets',
+
+            // Sweets & Chocolates
+            'chocolates': 'chocolates',
+            'sweets': 'sweets',
+
+            // Jewelry & Accessories
+            'bracelets': 'bracelets',
+            'pendants': 'pendants',
+            'earrings': 'earrings',
+            'wallets & belts': 'wallets-belts',
+            'wallets and belts': 'wallets-belts',
+            'handbags & clutches': 'handbags-clutches',
+            'handbags and clutches': 'handbags-clutches'
         };
         
         const subcategorySlug = subcategory ? (subcategorySlugMap[subcategory.toLowerCase()] || subcategory.toLowerCase().trim().replace(/\s+/g, "-")) : undefined;
@@ -156,21 +180,19 @@ export const getProducts = async (req, res) => {
         if (category) {
             category = category.trim().toLowerCase();
 
-            // Define category to subcategory mapping based on new structure
+            // Define category to subcategory mapping based on new gift shop structure
             const categorySubcategoryMap = {
-                'gifts': ['diwali-gifts', 'birthday-gifts', 'bhai-dooj', 'anniversary', 'gift-hampers', 'same-day-delivery', 'personalized-gifts', 'experiences', 'hatke-gifts'],
-                'food-sweets': ['sweets', 'chocolates', 'dry-fruits', 'cakes'],
-                'home-decor': ['home-decor-items', 'diyas', 'furniture', 'lighting'],
-                'flowers': ['fresh-flowers', 'flower-bouquets', 'flower-arrangements'],
-                'electronics': ['mobile-phones', 'laptops', 'tablets', 'televisions', 'cameras', 'headphones', 'speakers', 'smart-watches', 'power-banks', 'gaming-consoles'],
-                'fashion': ['men-clothing', 'women-clothing', 'kids-clothing', 'men-footwear', 'women-footwear', 'watches', 'sunglasses', 'bags-luggage', 'jewellery', 'accessories'],
-                'beauty-personal-care': ['makeup', 'skin-care', 'hair-care', 'fragrances', 'bath-body', 'men-grooming', 'beauty-tools'],
-                'books-stationery': ['books', 'pens', 'pencils', 'notebooks', 'sketch-books', 'erasers', 'school-supplies', 'art-supplies', 'office-supplies'],
-                'sports-fitness': ['exercise-equipment', 'yoga', 'sports-shoes', 'cricket', 'football', 'badminton', 'swimming', 'cycling'],
-                'toys-baby-products': ['toys', 'baby-care', 'baby-fashion', 'diapers', 'baby-feeding', 'baby-gear'],
-                'grocery-food': ['fruits-vegetables', 'dairy-products', 'beverages', 'snacks', 'cooking-essentials', 'organic'],
-                'appliances': ['air-conditioners', 'refrigerators', 'washing-machines', 'microwave-ovens', 'vacuum-cleaners', 'kitchen-appliances'],
-                'automotive': ['car-accessories', 'motorcycle-parts', 'tools', 'maintenance']
+                'accessories': ['bags-clutches', 'scarves-stoles'],
+                'home-lifestyle': ['cushions', 'candles-home-fragrances'],
+                'sale-offers': ['clearance-stock', 'limited-time-offers'],
+                'home-decor-gifting': ['clocks', 'show-pieces', 'scented-candles', 'indoor-plants', 'table-lamps', 'wall-art', 'posters'],
+                'aesthetic-gifts': ['candles', 'diffusers', 'crystals', 'trays'],
+                'beauty-self-care': ['perfumes', 'skincare-kits', 'bath-body-gift-sets', 'shaving-kits', 'makeup-hampers', 'haircare-sets', 'spa-hampers', 'fragrance-candles', 'essential-oil-sets', 'relaxation-boxes'],
+                'toys': ['teddy-bears', 'barbie-dolls', 'mini-toys', 'toys-by-age', 'desk-toys'],
+                'customized-gifts': ['customized-mugs', 'customized-shirts', 'engraved-pens'],
+                'flowers': ['flower-bouquets', 'flower-baskets'],
+                'sweets-chocolates': ['chocolates', 'sweets'],
+                'jewelry-accessories': ['bracelets', 'pendants', 'earrings', 'wallets-belts', 'handbags-clutches']
             };
 
             // Get subcategories for this category

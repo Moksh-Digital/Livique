@@ -20,7 +20,15 @@ const productSchema = mongoose.Schema(
             type: String,
             required: [true, 'Please select a category'],
         },
+        categorySlug: {
+            type: String,
+            required: false,
+        },
         subcategory: {
+            type: String,
+            required: false,
+        },
+        subcategorySlug: {
             type: String,
             required: false,
         },

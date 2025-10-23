@@ -7,49 +7,49 @@ import { CATEGORIES } from "@/data/categories"
 
 const Home = () => {
 
-  const diwaliCategories = [
+  const featuredGifts = [
     {
-      name: "Gift Hampers",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863175/Screenshot_2025-10-19_134336_kllm3w.png",
+      name: "Teddy Bears",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
     },
     {
-      name: "Sweets",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863136/Screenshot_2025-10-19_134541_fvmgyj.png",
+      name: "Customized Mugs",
+      image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400",
     },
     {
-      name: "Dry Fruits",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863136/Screenshot_2025-10-19_134629_sknntv.png",
+      name: "Flower Bouquets",
+      image: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400",
+    },
+    {
+      name: "Scented Candles",
+      image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
+    },
+    {
+      name: "Jewelry",
+      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400",
     },
     {
       name: "Chocolates",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863136/Screenshot_2025-10-19_134704_ttd0zk.png",
-    },
-    {
-      name: "Home Decor",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863144/Screenshot_2025-10-19_135551_jccq64.png",
-    },
-    {
-      name: "Diyas",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863137/Screenshot_2025-10-19_135028_om782n.png",
+      image: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400",
     },
   ]
 
-  const birthdayCategories = [
+  const homeDecorItems = [
     {
-      name: "Cakes",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863137/Screenshot_2025-10-19_134903_wljjgp.png",
+      name: "Cushions",
+      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
     },
     {
-      name: "Flowers",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863136/Screenshot_2025-10-19_134440_e48sou.png",
+      name: "Indoor Plants",
+      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400",
     },
     {
-      name: "Personalised",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863136/Screenshot_2025-10-19_134814_scppzd.png",
+      name: "Clocks & Figurines",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
     },
     {
-      name: "Experiences",
-      image: "https://res.cloudinary.com/dtbelwhff/image/upload/v1760863176/Screenshot_2025-10-19_134405_e8qlnl.png",
+      name: "Candles",
+      image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
     },
   ]
 
@@ -387,12 +387,12 @@ const Home = () => {
           </div>
         </section> */}
 
-        {/* Birthday Gifts Section */}
+        {/* Featured Gifts Section */}
         <section style={{ marginBottom: "48px" }}>
-          <h2 style={{ fontSize: "1.75rem", fontWeight: 700, marginBottom: "1.5rem" }}>Birthday Gifts That Wow</h2>
+          <h2 style={{ fontSize: "1.75rem", fontWeight: 700, marginBottom: "1.5rem" }}>Featured Gifts</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "16px" }}>
-            {birthdayCategories.map((cat, idx) => (
-              <Link key={idx} to={`/category/birthday-${cat.name.toLowerCase()}`}>
+            {featuredGifts.map((cat, idx) => (
+              <Link key={idx} to={`/category/gifts/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}>
                 <Card className="page-card" style={{ borderRadius: "20px", overflow: "hidden" }}>
                   <img
                     src={cat.image || "/placeholder.svg"}
@@ -406,19 +406,19 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Popular in Gifting */}
+        {/* Home Decor & Lifestyle */}
         <section style={{ marginBottom: "48px" }}>
-          <h2 style={{ fontSize: "1.75rem", fontWeight: 700, marginBottom: "1.5rem" }}>Popular In Gifting</h2>
+          <h2 style={{ fontSize: "1.75rem", fontWeight: 700, marginBottom: "1.5rem" }}>Home Decor & Lifestyle</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "16px" }}>
-            {[1, 2, 3, 4, 5].map((item) => (
-              <Link key={item} to="/products">
+            {homeDecorItems.map((cat, idx) => (
+              <Link key={idx} to={`/category/home-decor-gifting/${cat.name.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "")}`}>
                 <Card className="page-card" style={{ borderRadius: "20px", overflow: "hidden" }}>
                   <img
-                    src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863176/Screenshot_2025-10-19_134348_zfa066.png"
-                    alt="Gift"
+                    src={cat.image || "/placeholder.svg"}
+                    alt={cat.name}
                     style={{ width: "100%", height: "150px", objectFit: "cover" }}
                   />
-                  <div style={{ padding: "8px", textAlign: "center", fontWeight: 600 }}>Gift Item {item}</div>
+                  <div style={{ padding: "8px", textAlign: "center", fontWeight: 600 }}>{cat.name}</div>
                 </Card>
               </Link>
             ))}
