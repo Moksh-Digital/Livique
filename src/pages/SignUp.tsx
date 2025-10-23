@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext"; // Import updated AuthContext
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 
@@ -23,7 +23,8 @@ const SignUp = () => {
   // Step 2 State: OTP
   const [otp, setOtp] = useState("");
 
-  const { signUp } = useAuth();
+  // ✅ FIX 1: Import the new token-based 'signIn' function instead of the old mock 'signUp'
+  const { signIn } = useAuth(); 
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -82,52 +83,45 @@ const SignUp = () => {
     setLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE_URL}/verify-otp`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, otp }),
-        });
+      const response = await fetch(`${API_BASE_URL}/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (response.ok && data.success) { 
-            // Use AuthContext signUp method to properly update user state
-            const success = await signUp(email, password, name);
-            localStorage.setItem("token", data.token);
-            
-            if (success) {
-                toast({
-                    title: "Welcome!",
-                    description: `Successfully signed up and logged in as ${data.name}.`
-                });
-                
-                navigate("/"); // Redirect to home
-            } else {
-                toast({
-                    title: "Sign Up Failed",
-                    description: "Failed to create user account.",
-                    variant: "destructive"
-                });
-            }
-            
-        } else {
-            toast({
-                title: "Verification Failed",
-                description: data.message || "Invalid or expired OTP.",
-                variant: "destructive"
-            });
-        }
-    } catch (error) {
-        console.error("Network Error:", error);
+      if (response.ok && data.success) {
+        const jwtToken = data.token; // Get the JWT token from the backend response
+
+        // ✅ FIX 2: Use the imported 'signIn' function to establish the session with the token
+        signIn(jwtToken); 
+
         toast({
-            title: "Network Error",
-            description: "Could not connect to the server.",
-            variant: "destructive"
+          title: "Welcome!",
+          description: `Successfully signed up and logged in as ${data.name}.`
         });
+
+        navigate("/"); // Redirect to home
+
+      } else {
+        toast({
+          title: "Verification Failed",
+          description: data.message || "Invalid or expired OTP.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Network Error:", error);
+      toast({
+        title: "Network Error",
+        description: "Could not connect to the server.",
+        variant: "destructive"
+      });
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
 
   // --- RENDER FUNCTIONS ---

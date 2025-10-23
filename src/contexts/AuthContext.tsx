@@ -1,91 +1,99 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+// NOTE: Set this to your local backend URL (e.g., http://localhost:5000)
+const API_BASE_URL = "http://localhost:5000/api/users";
+
 interface User {
-  id: string;
-  email: string;
   name: string;
-  role: 'admin' | 'user';
+  email: string;
+  verified: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
-  signIn: (email: string, password: string) => Promise<boolean>;
-  signUp: (email: string, password: string, name: string) => Promise<boolean>;
+  // signIn/signUp no longer take password here, as they are handled in the component flow
+  signIn: (token: string) => void; // Function to set the token and fetch profile
   signOut: () => void;
-  loading: boolean; // <--- ✅ ADD THIS LINE
-  isAdmin: boolean;
+  loading: boolean;
+  isAdmin: boolean; // Will be determined by the backend data later, placeholder for now
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Admin credentials: admin@shop.com / admin123
-const ADMIN_EMAIL = 'admin@shop.com';
-const ADMIN_PASSWORD = 'admin123';
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
 
+  // --- Fetch User Profile using JWT ---
+  const fetchUserProfile = async (jwtToken: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/profile`, {
+        method: 'GET',
+        headers: { 
+          'Content-Type': 'application/json',
+          // THIS IS THE KEY: Sending the token to the protected route
+          'Authorization': `Bearer ${jwtToken}`, 
+        },
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        // The backend /profile route returns { name, email, verified }
+        setUser(userData as User);
+        return true;
+      }
+      
+      // If token is invalid/expired, clear it
+      console.error("JWT is invalid or expired. Clearing session.");
+      localStorage.removeItem('token');
+      setUser(null);
+      return false;
+
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      localStorage.removeItem('token');
+      setUser(null);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // --- On Component Mount: Check for existing JWT and validate it ---
   useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+      fetchUserProfile(storedToken); // Validate the stored token
+    } else {
+      setLoading(false);
     }
   }, []);
 
-  const signIn = async (email: string, password: string): Promise<boolean> => {
-    // Check admin credentials
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      const adminUser = { id: 'admin-1', email, name: 'Admin', role: 'admin' as const };
-      setUser(adminUser);
-      localStorage.setItem('currentUser', JSON.stringify(adminUser));
-      return true;
-    }
 
-    // Check regular users
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const foundUser = users.find((u: any) => u.email === email && u.password === password);
-    
-    if (foundUser) {
-      const userData = { id: foundUser.id, email: foundUser.email, name: foundUser.name, role: 'user' as const };
-      setUser(userData);
-      localStorage.setItem('currentUser', JSON.stringify(userData));
-      return true;
-    }
-    
-    return false;
-  };
-
-  const signUp = async (email: string, password: string, name: string): Promise<boolean> => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    if (users.find((u: any) => u.email === email)) {
-      return false; // User already exists
-    }
-
-    const newUser = {
-      id: `user-${Date.now()}`,
-      email,
-      password,
-      name,
-      role: 'user' as const
-    };
-
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    const userData = { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role };
-    setUser(userData);
-    localStorage.setItem('currentUser', JSON.stringify(userData));
-    return true;
+  // --- Authentication Actions ---
+  
+  // New signIn function: takes the *validated* token from the sign-in flow
+  const signIn = (jwtToken: string) => {
+    localStorage.setItem('token', jwtToken);
+    setToken(jwtToken);
+    fetchUserProfile(jwtToken);
   };
 
   const signOut = () => {
     setUser(null);
-    localStorage.removeItem('currentUser');
+    setToken(null);
+    localStorage.removeItem('token');
   };
 
+  // isAdmin is a placeholder. In a full app, the /profile response would include 'isAdmin'
+  const isAdmin = user?.email === 'admin@shop.com'; // Placeholder check
+
   return (
-    <AuthContext.Provider value={{ user, signIn, signUp, signOut, isAdmin: user?.role === 'admin' , loading: false }}>
+    <AuthContext.Provider value={{ user, signIn, signOut, isAdmin, loading }}>
       {children}
     </AuthContext.Provider>
   );

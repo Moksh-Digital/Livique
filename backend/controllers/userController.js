@@ -113,6 +113,8 @@ const verifyOtpAndRegister = async (req, res) => {
         user.otpExpires = undefined;
         await user.save();
 
+        const token = generateToken(user._id);
+        
         // Success response
         res.status(200).json({
             success: true,
