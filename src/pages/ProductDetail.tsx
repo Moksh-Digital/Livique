@@ -183,43 +183,21 @@ const ProductDetail = () => {
             </p>
 
             {/* ---------------- DELIVERY OPTIONS ---------------- */}
-            <div className="mb-6">
-              <h3 className="font-semibold mb-3">Delivery Options</h3>
+{/* ---------------- DELIVERY OPTION ---------------- */}
+<div className="mb-6">
+  <h3 className="font-semibold mb-3">Delivery</h3>
+  <Card className="p-4 rounded-xl shadow-md">
+    <div className="text-center">
+      <p className="font-semibold text-sm mb-1">
+        Delivery ₹{(product.deliveryCharge ?? 499).toLocaleString()}
+      </p>
+      <p className="text-xs text-muted-foreground">
+        Expected by {product.deliveryDate || "2 days"}
+      </p>
+    </div>
+  </Card>
+</div>
 
-              <div className="grid grid-cols-2 gap-3">
-                {/* HAND DELIVERY */}
-                <Card
-                  className={`p-4 cursor-pointer rounded-xl transition ${
-                    deliveryOption === "hand" ? "border-primary border-2 shadow-md" : ""
-                  }`}
-                  onClick={() => setDeliveryOption("hand")}
-                >
-                  <div className="text-center">
-                    <p className="font-semibold text-sm mb-1">
-                      Hand Delivery ₹{handDeliveryCharge.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Earliest by {product.delivery || "2 days"}
-                    </p>
-                  </div>
-                </Card>
-
-                {/* COURIER */}
-                <Card
-                  className={`p-4 cursor-pointer rounded-xl transition ${
-                    deliveryOption === "courier" ? "border-primary border-2 shadow-md" : ""
-                  }`}
-                  onClick={() => setDeliveryOption("courier")}
-                >
-                  <div className="text-center">
-                    <p className="font-semibold text-sm mb-1">
-                      Courier ₹{courierDeliveryCharge.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Earliest by Tomorrow</p>
-                  </div>
-                </Card>
-              </div>
-            </div>
 
             {/* ---------------- ACTION BUTTONS ---------------- */}
             <div className="grid grid-cols-2 gap-3">
