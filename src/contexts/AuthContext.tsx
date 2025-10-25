@@ -1,21 +1,21 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// NOTE: Set this to your local backend URL (e.g., http://localhost:5000)
 const API_BASE_URL = "http://localhost:5000/api/users";
 
 interface User {
   name: string;
   email: string;
   verified: boolean;
+  role?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  // signIn/signUp no longer take password here, as they are handled in the component flow
-  signIn: (token: string) => void; // Function to set the token and fetch profile
+  signIn: (jwtToken: string) => Promise<void>;
+  signInAdmin: () => void;
   signOut: () => void;
   loading: boolean;
-  isAdmin: boolean; // Will be determined by the backend data later, placeholder for now
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,80 +25,100 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
 
-  // --- Fetch User Profile using JWT ---
+  // Fetch user profile from JWT
   const fetchUserProfile = async (jwtToken: string) => {
     try {
-      setLoading(true);
       const response = await fetch(`${API_BASE_URL}/profile`, {
         method: 'GET',
         headers: { 
           'Content-Type': 'application/json',
-          // THIS IS THE KEY: Sending the token to the protected route
           'Authorization': `Bearer ${jwtToken}`, 
         },
       });
 
-      if (response.ok) {
-        const userData = await response.json();
-        // The backend /profile route returns { name, email, verified }
-        setUser(userData as User);
-        return true;
+      if (!response.ok) {
+        throw new Error('Token invalid');
       }
-      
-      // If token is invalid/expired, clear it
-      console.error("JWT is invalid or expired. Clearing session.");
-      localStorage.removeItem('token');
-      setUser(null);
-      return false;
 
+      const userData = await response.json();
+      setUser(userData as User);
     } catch (error) {
-      console.error("Error fetching user profile:", error);
+      console.error("JWT invalid or expired:", error);
       localStorage.removeItem('token');
       setUser(null);
-      return false;
+      setToken(null);
     } finally {
       setLoading(false);
     }
   };
 
+  // On mount: check for JWT or Admin
+// Inside AuthContext.tsx
 
-  // --- On Component Mount: Check for existing JWT and validate it ---
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
-      fetchUserProfile(storedToken); // Validate the stored token
-    } else {
-      setLoading(false);
-    }
-  }, []);
+useEffect(() => {
+  const storedToken = localStorage.getItem('token');
+  const adminFlag = localStorage.getItem('isAdminLoggedIn');
+
+  if (storedToken) {
+    setToken(storedToken);
+    fetchUserProfile(storedToken);
+  } else if (adminFlag === 'true') {
+    setUser({ name: 'Admin', email: 'admin@shop.com', verified: true, role: 'admin' });
+    setLoading(false);
+  } else {
+    setUser(null);
+    setLoading(false);
+  }
+}, []);
 
 
-  // --- Authentication Actions ---
-  
-  // New signIn function: takes the *validated* token from the sign-in flow
-  const signIn = (jwtToken: string) => {
+
+  // JWT sign-in
+  const signIn = async (jwtToken: string) => {
     localStorage.setItem('token', jwtToken);
     setToken(jwtToken);
-    fetchUserProfile(jwtToken);
+    setLoading(true);
+    await fetchUserProfile(jwtToken);
   };
 
+  // Admin login (hardcoded)
+// Admin login (hardcoded)
+const signInAdmin = () => {
+  localStorage.setItem('isAdminLoggedIn', 'true');
+  setUser({ name: 'Admin', email: 'admin@shop.com', verified: true, role: 'admin' });
+  setLoading(false); // important to stop loading state
+};
+
+
+
+  // Sign out
   const signOut = () => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('isAdminLoggedIn');
   };
 
-  // isAdmin is a placeholder. In a full app, the /profile response would include 'isAdmin'
-  const isAdmin = user?.email === 'admin@shop.com'; // Placeholder check
+  // Check if logged-in user is admin
+  const isAdmin = user?.email === 'admin@shop.com';
+
+  // Loading state wrapper
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signOut, isAdmin, loading }}>
+    <AuthContext.Provider value={{ user, signIn, signInAdmin, signOut, isAdmin, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within AuthProvider');

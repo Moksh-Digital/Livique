@@ -32,6 +32,22 @@ import { Order, useOrders } from "../contexts/OrdersContext";
 import axios from "axios";
 
 
+async function signIn({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) {
+  // Replace this with your actual login logic
+  // Example: checking hardcoded admin credentials
+  if (email === "admin@example.com" && password === "admin123") {
+    return { success: true, user: { email } };
+  } else {
+    throw new Error("Invalid credentials");
+  }
+}
+
 
 // Build category / subcategory options dynamically from CATEGORIES
 const CATEGORY_OPTIONS = CATEGORIES.map(cat => ({
@@ -44,11 +60,15 @@ const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
-  const { user, signOut, loading, signIn } = useAuth(); // ✅ Added signIn function and loading state
+  const { user, signOut, loading, signIn , isAdmin} = useAuth(); // ✅ Added signIn function and loading state
   const { setProducts } = useProducts(); // ✅ get the new setter
   // const { orders, setOrders } = useOrders();
   const [orders, setOrders] = useState<Order[]>([]); // never undefined
   const [users, setUsers] = useState([]);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const { signInAdmin } = useAuth();
+
+
 
 
 
@@ -71,26 +91,44 @@ const Admin = () => {
 
   
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/products");
-        const data = await res.json();
-        if (res.ok) {
-          // Assuming addProduct pushes into context/state
-          // You might want to create a setProducts() in context instead
-          data.forEach((p: any) => addProduct({ ...p, id: p._id }));
-        } else {
-          console.error("Failed to fetch products:", data.message);
-        }
-      } catch (err) {
-        console.error("Error fetching products:", err);
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const res = await fetch("http://localhost:5000/api/products");
+  //       const data = await res.json();
+  //       if (res.ok) {
+  //         // Assuming addProduct pushes into context/state
+  //         // You might want to create a setProducts() in context instead
+  //         data.forEach((p: any) => addProduct({ ...p, id: p._id }));
+  //       } else {
+  //         console.error("Failed to fetch products:", data.message);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching products:", err);
+  //     }
+  //   };
+
+  //   fetchProducts();
+  // }, []);
+
+ 
+ useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/products");
+      const data = await res.json();
+      if (res.ok && Array.isArray(data)) {
+        setProducts(data.map(p => ({ ...p, id: p._id })));
       }
-    };
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  fetchProducts();
+}, [setProducts]);
 
-    fetchProducts();
-  }, []);
 
+ 
   useEffect(() => {
   const fetchUsers = async () => {
     try {
@@ -105,31 +143,31 @@ const Admin = () => {
 
 
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/products");
-        const data = await res.json();
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const res = await fetch("http://localhost:5000/api/products");
+  //       const data = await res.json();
 
-        if (res.ok && Array.isArray(data)) {
-          // ✅ map MongoDB _id to frontend id once
-          const mappedProducts = data.map((p: any) => ({
-            ...p,
-            id: p._id,
-          }));
+  //       if (res.ok && Array.isArray(data)) {
+  //         // ✅ map MongoDB _id to frontend id once
+  //         const mappedProducts = data.map((p: any) => ({
+  //           ...p,
+  //           id: p._id,
+  //         }));
 
-          // ✅ overwrite all products — no duplicates ever
-          setProducts(mappedProducts);
-        } else {
-          console.error("Failed to fetch products:", data?.message || data);
-        }
-      } catch (err) {
-        console.error("Error fetching products:", err);
-      }
-    };
+  //         // ✅ overwrite all products — no duplicates ever
+  //         setProducts(mappedProducts);
+  //       } else {
+  //         console.error("Failed to fetch products:", data?.message || data);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching products:", err);
+  //     }
+  //   };
 
-    fetchProducts();
-  }, [setProducts]);
+  //   fetchProducts();
+  // }, [setProducts]);
 
 
   useEffect(() => {
@@ -168,27 +206,32 @@ const Admin = () => {
   //   if (user.role !== "admin") navigate("/");
   // }, [user, navigate]);
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  
 
-    try {
-      // 🚨 IMPORTANT: Replace this with your actual signIn function logic.
-      // This is a placeholder that assumes your signIn function takes email/password.
-      await signIn(loginEmail, loginPassword);
-
-      // Assuming signIn is successful and sets the user object in context.
-      // The component will automatically re-render and show the dashboard.
-      toast({ title: "Welcome back!", description: "You are logged in as admin." });
-
-    } catch (error) {
-      // Display an error message if login fails (e.g., wrong credentials)
+const handleLoginSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    if (loginEmail === "admin@shop.com" && loginPassword === "admin123") {
+      signInAdmin(); // ✅ handles state + localStorage
       toast({
-        title: "Login Failed",
-        description: "Invalid email or password. Only admins can access this panel.",
-        variant: "destructive"
+        title: "Welcome back!",
+        description: "You are logged in as admin.",
       });
+
+      // Navigate to admin dashboard
+      navigate("/"); // <-- put your admin route here
+    } else {
+      throw new Error("Invalid credentials");
     }
-  };
+  } catch (error: any) {
+    toast({
+      title: "Login Failed",
+      description: error.message || "Invalid email or password.",
+      variant: "destructive",
+    });
+  }
+};
+
 
   const handleDelete = (id: string) => {
     deleteProduct(id.toString());
@@ -323,7 +366,7 @@ const Admin = () => {
   }
 
   // 2. Authorization Check: If not logged in OR logged in but not an admin, show the login form
-  if (!user || user.role !== "admin") {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="w-full max-w-md p-8 shadow-2xl rounded-xl">

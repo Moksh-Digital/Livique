@@ -121,18 +121,18 @@ const handleSearch = async (e: React.FormEvent) => {
                 <span className="text-xs">Same Day</span>
               </Button>
 
-              {user?.role === "admin" && (
-                <Link to="/admin">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="hidden md:flex flex-col h-auto py-1 px-2"
-                  >
-                    <Gift className="h-5 w-5" />
-                    <span className="text-xs">Admin</span>
-                  </Button>
-                </Link>
-              )}
+{user?.role === "admin" && (
+  <Link to="/admin">
+    <Button
+      variant="ghost"
+      size="sm"
+      className="hidden md:flex flex-col h-auto py-1 px-2"
+    >
+      <Gift className="h-5 w-5" />
+      <span className="text-xs">Admin</span>
+    </Button>
+  </Link>
+)}
 
               {/* Cart */}
               <Link to="/cart">
@@ -244,6 +244,17 @@ const handleSearch = async (e: React.FormEvent) => {
               </Badge>
             )}
           </Link>
+
+          {/* Mobile Bottom Nav */}
+{user?.role === "admin" && (
+  <Link
+    to="/admin"
+    className="flex flex-col items-center text-xs text-muted-foreground hover:text-primary"
+  >
+    <Gift className="h-5 w-5" />
+    Admin
+  </Link>
+)}
 
           {user ? (
             <DropdownMenu>
