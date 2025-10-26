@@ -198,6 +198,15 @@ const Admin = () => {
   // State for the INLINE LOGIN FORM
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const totalRevenue = orders.reduce((acc, order) => acc + (order.total || 0), 0);
+
+
+  const formattedRevenue = totalRevenue.toLocaleString("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 0,
+});
+
 
 
   // No longer needed if we rely purely on the user/role check below
@@ -473,7 +482,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                 { icon: <Package />, label: "Total Products", value: products.length },
                 { icon: <ShoppingBag />, label: "Total Orders", value: orders.length },
                 { icon: <Users />, label: "Total Users", value: users.length },
-                { icon: <BarChart3 />, label: "Revenue", value: "₹2.4L" },
+{ icon: <BarChart3 />, label: "Revenue", value: formattedRevenue },
               ].map((item, i) => (
                 <Card key={i} className="p-6 rounded-2xl">
                   <div className="flex items-center justify-between mb-4 text-primary text-xl">
