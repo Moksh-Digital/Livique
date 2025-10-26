@@ -19,19 +19,25 @@ const Payment = () => {
 const handlePlaceOrder = async () => {
   const rawAddress = JSON.parse(localStorage.getItem("shippingAddress") || "{}");
 
-  // 🧩 Map frontend fields → backend schema
   const address = {
     fullName: rawAddress.fullName,
     mobile: rawAddress.mobile,
     street: `${rawAddress.houseNo}, ${rawAddress.street}, ${rawAddress.locality}`,
     city: rawAddress.city,
     state: rawAddress.state,
-    zipCode: rawAddress.pincode, // ✅ converted key
+    zipCode: rawAddress.pincode,
     landmark: rawAddress.landmark || "",
     addressType: rawAddress.addressType || "home",
   };
 
-  // 🧾 Build order data for backend
+  const totalDeliveryCharges = cart.reduce(
+    (acc, item) => acc + (item.deliveryCharge || 0),
+    0
+  );
+
+  const subtotal = getTotalPrice();
+  const total = subtotal + totalDeliveryCharges;
+
   const orderData = {
     items: cart.map((item) => ({
       id: item.id,
@@ -48,8 +54,6 @@ const handlePlaceOrder = async () => {
     address,
   };
 
-  console.log("🧠 Sending Order Data:", orderData);
-
   const token = localStorage.getItem("token");
   if (!token) {
     toast({
@@ -60,43 +64,141 @@ const handlePlaceOrder = async () => {
     return;
   }
 
-  try {
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    };
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
-    // 🚀 Send to backend
-    const { data: createdOrder } = await axios.post(
-      "http://localhost:5000/api/orders",
-      orderData,
-      config
+  try {
+    if (paymentMethod === "cod") {
+      // 🧾 Normal COD flow
+      const { data: createdOrder } = await axios.post(
+        "http://localhost:5000/api/orders",
+        orderData,
+        config
+      );
+
+      clearCart();
+      localStorage.removeItem("shippingAddress");
+
+      toast({
+        title: "Order Placed Successfully!",
+        description: `Order ID: ${createdOrder._id || createdOrder.id}`,
+      });
+
+      navigate("/order-confirmation", { state: { order: createdOrder } });
+    } else if (paymentMethod === "razorpay") {
+      // 💳 Razorpay flow
+      const { data } = await axios.post(
+        "http://localhost:5000/api/payment/create-order",
+        { amount: total },
+        config
+      );
+
+const options = {
+  key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+  amount: data.amount,
+  currency: data.currency,
+  name: "Livique Store",
+  description: "E-commerce Payment",
+  order_id: data.id,
+
+  handler: async (response) => {
+    const verifyRes = await axios.post(
+      "http://localhost:5000/api/payment/verify",
+      response
     );
 
-    // 🧹 Cleanup
-    clearCart();
-    localStorage.removeItem("shippingAddress");
+    if (verifyRes.data.success) {
+      // ✅ Create order in DB after successful payment
+      const { data: createdOrder } = await axios.post(
+        "http://localhost:5000/api/orders",
+        { ...orderData, paymentStatus: "Paid" },
+        config
+      );
 
-    toast({
-      title: "Order Placed Successfully!",
-      description: `Order ID: ${createdOrder._id || createdOrder.id}`,
-    });
+      clearCart();
+      localStorage.removeItem("shippingAddress");
 
-    navigate("/order-confirmation", { state: { order: createdOrder } });
+      toast({
+        title: "Payment Successful!",
+        description: `Order ID: ${createdOrder._id || createdOrder.id}`,
+      });
+
+      navigate("/order-confirmation", { state: { order: createdOrder } });
+    } else {
+      toast({
+        title: "Payment Verification Failed",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  },
+
+  prefill: {
+    name: address.fullName,
+    email: "customer@example.com",
+    contact: address.mobile,
+  },
+
+  theme: { color: "#3399cc" },
+
+  method: {
+    upi: true,
+    card: true,
+    netbanking: true,
+    wallet: true,
+  },
+
+  upi: {
+    flow: "intent",
+  },
+
+  // 👇👇👇 FORCE SHOW UPI BLOCK EVEN IN TEST MODE
+  config: {
+    display: {
+      blocks: {
+        upi: {
+          name: "Pay via UPI",
+          instruments: [
+            {
+              method: "upi",
+            },
+          ],
+        },
+      },
+      sequence: ["upi", "card", "netbanking", "wallet"],
+      preferences: {
+        show_default_blocks: true,
+      },
+    },
+  },
+};
+
+
+      const razor = new (window as any).Razorpay(options);
+      razor.open();
+    } else {
+      toast({
+        title: "Unsupported Payment Method",
+        description: "Please select a valid option.",
+        variant: "destructive",
+      });
+    }
   } catch (error: any) {
-    console.error("❌ Order placement failed:", error.response?.data || error);
-
+    console.error("❌ Order/Payment failed:", error.response?.data || error);
     toast({
       title: "Order Failed",
       description:
         error.response?.data?.message ||
-        "Failed to place order. Please try again.",
+        "Something went wrong. Please try again.",
       variant: "destructive",
     });
   }
 };
+
 
 
   // ✅ Calculate total delivery dynamically (same as Cart.tsx)

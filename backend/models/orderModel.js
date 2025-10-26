@@ -1,13 +1,12 @@
 // backend/models/orderModel.js
-
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const orderSchema = mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: 'User', // Link order to a user
+      ref: "User",
     },
     items: [
       {
@@ -20,7 +19,7 @@ const orderSchema = mongoose.Schema(
         deliveryCharge: { type: Number, default: 0 },
       },
     ],
-    address: { // Storing the shipping address details at the time of order
+    address: {
       fullName: { type: String, required: true },
       mobile: { type: String, required: true },
       street: { type: String, required: true },
@@ -32,7 +31,16 @@ const orderSchema = mongoose.Schema(
     paymentMethod: {
       type: String,
       required: true,
+      enum: ["cod", "razorpay", "card"],
     },
+    paymentStatus: {
+      type: String,
+      enum: ["Pending", "Paid", "Failed"],
+      default: "Pending",
+    },
+    razorpayOrderId: { type: String },
+    razorpayPaymentId: { type: String },
+    razorpaySignature: { type: String },
     subtotal: {
       type: Number,
       required: true,
@@ -51,7 +59,7 @@ const orderSchema = mongoose.Schema(
     status: {
       type: String,
       required: true,
-      default: 'Confirmed',
+      default: "Confirmed",
     },
   },
   {
@@ -59,6 +67,6 @@ const orderSchema = mongoose.Schema(
   }
 );
 
-const Order = mongoose.model('Order', orderSchema);
+const Order = mongoose.model("Order", orderSchema);
 
 export default Order;
