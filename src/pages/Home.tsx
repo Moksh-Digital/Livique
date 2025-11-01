@@ -530,7 +530,7 @@ const Home = () => {
         </section>
 
         {/* Final Offer Banner - Full Width */}
-        <div className="w-full mb-6">
+        <div className="w-full mb-0">
           <Card 
             className="banner-card" 
             style={{ 
