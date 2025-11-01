@@ -48,14 +48,22 @@ const Header = () => {
       <header className="sticky top-8 z-50 bg-[#FFF8F0] shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4">
           <div className="flex items-center justify-between h-16 gap-4">
-            {/* Left: Logo */}
+            {/* Left: Logo with Brand Name */}
             <div className="flex items-center gap-3">
-              <Link to="/" className="flex items-center">
+              <Link to="/" className="flex items-center gap-2">
                 <img
                   src="Logo.jpg"
                   alt="Logo"
-                  className="h-12 w-12 object-contain"
+                  className="h-10 w-10 md:h-12 md:w-12 object-contain"
                 />
+                <div className="flex flex-col leading-tight">
+                  <span className="text-lg md:text-xl font-bold text-[#8B4513] tracking-wide" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    LIVQUE
+                  </span>
+                  <span className="text-[9px] md:text-[10px] text-[#8B7355] tracking-widest uppercase">
+                    Gifts & More
+                  </span>
+                </div>
               </Link>
             </div>
 
