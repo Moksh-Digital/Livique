@@ -274,20 +274,34 @@ const Home = () => {
 
         {/* Categories Section - Compact Icons */}
         <section className="mb-8 px-4">
-          <h2 className="text-2xl font-bold mb-6 text-center">Shop by Categories</h2>
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <div className="h-[2px] w-12 bg-gradient-to-r from-transparent to-[#D4AF76]"></div>
+              <h2 className="text-2xl font-bold text-[#5D4037]">Shop by Category</h2>
+              <div className="h-[2px] w-12 bg-gradient-to-l from-transparent to-[#D4AF76]"></div>
+            </div>
+          </div>
           
-          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+<div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
             {CATEGORIES.slice(0, 8).map((cat) => (
               <div key={cat.id} className="text-center">
                 <Link to={`/category/${cat.slug}`}>
-                  <div className="relative rounded-xl overflow-hidden shadow-sm border border-gray-200 page-card aspect-square mb-2">
+                  <div 
+                    className="relative rounded-lg overflow-hidden page-card aspect-square mb-2"
+                    style={{
+                      transition: "all 0.3s ease",
+                      border: "2px solid #D0D0D0",
+                    }}
+                  >
                     <img
                       src={cat.image || "/placeholder.svg"}
                       alt={cat.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="text-[10px] md:text-[11px] font-medium text-center leading-tight px-1">{cat.name}</div>
+                  <div className="text-[10px] md:text-[11px] font-semibold text-center leading-tight px-1 text-[#5D4037]">
+                    {cat.name}
+                  </div>
                 </Link>
               </div>
             ))}
@@ -406,7 +420,8 @@ const Home = () => {
               position: "relative", 
               overflow: "hidden", 
               borderRadius: "0",
-              margin: 0
+              margin: 0,
+              height: "250px"
             }}
           >
             <img
@@ -422,7 +437,7 @@ const Home = () => {
               }}
             />
             <div className="banner-overlay" />
-            <div style={{ position: "relative", zIndex: 10, padding: "2.5rem 1.5rem", color: "#fff", textAlign: "center" }}>
+            <div style={{ position: "relative", zIndex: 10, padding: "2.5rem 1.5rem", color: "#fff", textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", height: "100%" }}>
               <h3 className="text-3xl font-bold mb-2">🚚 FREE Shipping Above ₹499!</h3>
               <p className="text-base">Shop now and save on delivery charges</p>
             </div>
