@@ -45,7 +45,7 @@ const Header = () => {
   return (
     <>
       {/* Top Header */}
-      <header className="sticky top-8 z-50 bg-[#FFF8F0] border-b border-[#E8D5C4]">
+      <header className="sticky top-8 z-50 bg-[#FFF8F0] shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4">
           <div className="flex items-center justify-between h-16 gap-4">
             {/* Left: Logo */}
