@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { CATEGORIES } from "@/data/categories"
+import PromoBanner from "@/components/Banner"
 
 const Home = () => {
 
@@ -209,6 +210,7 @@ const Home = () => {
           scrollbar-width: none;
         }
       `}</style>
+      <PromoBanner />
       <Header />
       {/* Show profile if logged in */}
 {/* {localStorage.getItem("token") && <ProfilePage />} */}
