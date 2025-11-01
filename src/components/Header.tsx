@@ -271,7 +271,7 @@ const Header = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 z-[100] md:flex items-start justify-center pt-20"
+            className="fixed inset-0 bg-black/50 z-[100] flex items-start justify-center pt-20"
             onClick={() => setShowSearch(false)}
           >
             <motion.div
@@ -284,14 +284,14 @@ const Header = () => {
             >
               {/* Search Input */}
               <form onSubmit={handleSearch} className="p-4 border-b border-[#E8D5C4]">
-                <div className="relative">
+                <div className="relative w-full">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#8B7355]" />
                   <Input
                     autoFocus
                     placeholder="Search for gifts, flowers, cakes..."
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
-                    className="pl-10 pr-10 bg-[#FFF8F0] border-[#D4AF76] focus:border-[#C19A6B] focus:ring-[#C19A6B] h-12 text-[#5D4037] placeholder:text-[#8B7355]"
+                    className="w-full pl-10 pr-10 bg-[#FFF8F0] border-[#D4AF76] focus:border-[#C19A6B] focus:ring-[#C19A6B] h-12 text-[#5D4037] placeholder:text-[#8B7355]"
                   />
                   <Button
                     type="button"
