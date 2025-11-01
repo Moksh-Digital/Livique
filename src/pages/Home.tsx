@@ -282,7 +282,7 @@ const Home = () => {
             </div>
           </div>
           
-<div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
             {CATEGORIES.slice(0, 8).map((cat) => (
               <div key={cat.id} className="text-center">
                 <Link to={`/category/${cat.slug}`}>
@@ -308,50 +308,128 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Featured Gifts Section (2-3 items) */}
-        <section className="mb-8 px-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold">Featured Gifts</h2>
-            <Link to="/category/gifts" className="text-xs md:text-sm text-[#ff0066] font-semibold hover:underline">
-              View All →
-            </Link>
+        {/* Featured Gifts Section */}
+        <section className="mb-0" style={{ backgroundColor: "#FFF8F0", padding: "2rem 0" }}>
+          <div className="mb-5 px-4" style={{ maxWidth: "1400px", margin: "0 auto" }}>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
+              <h2 className="text-xl md:text-2xl font-bold text-[#5D4037] px-4">Featured Gifts</h2>
+              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
+            </div>
+            <div className="text-center">
+              <Link to="/category/gifts" className="text-xs md:text-sm text-[#ff0066] font-semibold hover:underline">
+                View All →
+              </Link>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div 
+            className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-2" 
+            style={{ 
+              maxWidth: "1400px", 
+              margin: "0 auto",
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch"
+            }}
+          >
             {featuredGifts.map((cat, idx) => (
-              <Link key={idx} to={`/category/gifts/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}>
-                <Card className="page-card" style={{ borderRadius: "16px", overflow: "hidden" }}>
-                  <img
-                    src={cat.image || "/placeholder.svg"}
-                    alt={cat.name}
-                    style={{ width: "100%", height: "140px", objectFit: "cover" }}
-                  />
-                  <div style={{ padding: "8px", textAlign: "center", fontSize: "12px", fontWeight: 600 }}>{cat.name}</div>
+              <Link 
+                key={idx} 
+                to={`/category/gifts/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                style={{ 
+                  minWidth: "160px",
+                  maxWidth: "160px",
+                  scrollSnapAlign: "start"
+                }}
+              >
+                <Card className="page-card" style={{ borderRadius: "12px", overflow: "hidden", backgroundColor: "#FAF3E8", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+                  <div style={{ aspectRatio: "1", overflow: "hidden" }}>
+                    <img
+                      src={cat.image || "/placeholder.svg"}
+                      alt={cat.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </div>
+                  <div style={{ padding: "10px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#333" }}>{cat.name}</div>
                 </Card>
               </Link>
             ))}
           </div>
+          {/* Dots Indicator */}
+          <div className="flex justify-center gap-2 mt-3">
+            {featuredGifts.map((_, idx) => (
+              <div 
+                key={idx} 
+                style={{ 
+                  width: "8px", 
+                  height: "8px", 
+                  borderRadius: "50%", 
+                  backgroundColor: idx === 0 ? "#ff0066" : "#D0D0D0",
+                  transition: "background-color 0.3s ease"
+                }}
+              />
+            ))}
+          </div>
         </section>
 
-        {/* Home Decor Section (2-3 items) */}
-        <section className="mb-8 px-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold">Home Decor & Lifestyle</h2>
-            <Link to="/category/home-decor" className="text-xs md:text-sm text-[#ff0066] font-semibold hover:underline">
-              View All →
-            </Link>
+        {/* Home Decor Section */}
+        <section className="mb-0" style={{ backgroundColor: "#ffffff", padding: "2rem 0" }}>
+          <div className="mb-5 px-4" style={{ maxWidth: "1400px", margin: "0 auto" }}>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
+              <h2 className="text-xl md:text-2xl font-bold text-[#5D4037] px-4">Home Decor & Lifestyle</h2>
+              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
+            </div>
+            <div className="text-center">
+              <Link to="/category/home-decor" className="text-xs md:text-sm text-[#ff0066] font-semibold hover:underline">
+                View All →
+              </Link>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div 
+            className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-2" 
+            style={{ 
+              maxWidth: "1400px", 
+              margin: "0 auto",
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch"
+            }}
+          >
             {homeDecorItems.map((cat, idx) => (
-              <Link key={idx} to={`/category/home-decor-gifting/${cat.name.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "")}`}>
-                <Card className="page-card" style={{ borderRadius: "16px", overflow: "hidden" }}>
-                  <img
-                    src={cat.image || "/placeholder.svg"}
-                    alt={cat.name}
-                    style={{ width: "100%", height: "140px", objectFit: "cover" }}
-                  />
-                  <div style={{ padding: "8px", textAlign: "center", fontSize: "12px", fontWeight: 600 }}>{cat.name}</div>
+              <Link 
+                key={idx} 
+                to={`/category/home-decor-gifting/${cat.name.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "")}`}
+                style={{ 
+                  minWidth: "160px",
+                  maxWidth: "160px",
+                  scrollSnapAlign: "start"
+                }}
+              >
+                <Card className="page-card" style={{ borderRadius: "12px", overflow: "hidden", backgroundColor: "#F5EFE6", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+                  <div style={{ aspectRatio: "1", overflow: "hidden" }}>
+                    <img
+                      src={cat.image || "/placeholder.svg"}
+                      alt={cat.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </div>
+                  <div style={{ padding: "10px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#333" }}>{cat.name}</div>
                 </Card>
               </Link>
+            ))}
+          </div>
+          {/* Dots Indicator */}
+          <div className="flex justify-center gap-2 mt-3">
+            {homeDecorItems.map((_, idx) => (
+              <div 
+                key={idx} 
+                style={{ 
+                  width: "8px", 
+                  height: "8px", 
+                  borderRadius: "50%", 
+                  backgroundColor: idx === 0 ? "#ff0066" : "#D0D0D0",
+                  transition: "background-color 0.3s ease"
+                }}
+              />
             ))}
           </div>
         </section>
@@ -388,26 +466,65 @@ const Home = () => {
           </Card>
         </div>
 
-        {/* Jewelry & Accessories Section (2-3 items) */}
-        <section className="mb-8 px-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold">Jewelry & Accessories</h2>
-            <Link to="/category/jewelry" className="text-xs md:text-sm text-[#ff0066] font-semibold hover:underline">
-              View All →
-            </Link>
+        {/* Jewelry & Accessories Section */}
+        <section className="mb-0" style={{ backgroundColor: "#FFF8F0", padding: "2rem 0" }}>
+          <div className="mb-5 px-4" style={{ maxWidth: "1400px", margin: "0 auto" }}>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
+              <h2 className="text-xl md:text-2xl font-bold text-[#5D4037] px-4">Jewelry & Accessories</h2>
+              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
+            </div>
+            <div className="text-center">
+              <Link to="/category/jewelry" className="text-xs md:text-sm text-[#ff0066] font-semibold hover:underline">
+                View All →
+              </Link>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div 
+            className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-2" 
+            style={{ 
+              maxWidth: "1400px", 
+              margin: "0 auto",
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch"
+            }}
+          >
             {jewelryItems.map((cat, idx) => (
-              <Link key={idx} to={`/category/gifts/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}>
-                <Card className="page-card" style={{ borderRadius: "16px", overflow: "hidden" }}>
-                  <img
-                    src={cat.image || "/placeholder.svg"}
-                    alt={cat.name}
-                    style={{ width: "100%", height: "140px", objectFit: "cover" }}
-                  />
-                  <div style={{ padding: "8px", textAlign: "center", fontSize: "12px", fontWeight: 600 }}>{cat.name}</div>
+              <Link 
+                key={idx} 
+                to={`/category/gifts/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                style={{ 
+                  minWidth: "160px",
+                  maxWidth: "160px",
+                  scrollSnapAlign: "start"
+                }}
+              >
+                <Card className="page-card" style={{ borderRadius: "12px", overflow: "hidden", backgroundColor: "#FAF3E8", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+                  <div style={{ aspectRatio: "1", overflow: "hidden" }}>
+                    <img
+                      src={cat.image || "/placeholder.svg"}
+                      alt={cat.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </div>
+                  <div style={{ padding: "10px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#333" }}>{cat.name}</div>
                 </Card>
               </Link>
+            ))}
+          </div>
+          {/* Dots Indicator */}
+          <div className="flex justify-center gap-2 mt-3">
+            {jewelryItems.map((_, idx) => (
+              <div 
+                key={idx} 
+                style={{ 
+                  width: "8px", 
+                  height: "8px", 
+                  borderRadius: "50%", 
+                  backgroundColor: idx === 0 ? "#ff0066" : "#D0D0D0",
+                  transition: "background-color 0.3s ease"
+                }}
+              />
             ))}
           </div>
         </section>
