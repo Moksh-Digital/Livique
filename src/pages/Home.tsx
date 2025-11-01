@@ -5,8 +5,16 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { CATEGORIES } from "@/data/categories"
 import PromoBanner from "@/components/Banner"
+import { useState, useRef, useEffect } from "react"
 
 const Home = () => {
+  const [featuredActiveIndex, setFeaturedActiveIndex] = useState(0)
+  const [homeDecorActiveIndex, setHomeDecorActiveIndex] = useState(0)
+  const [jewelryActiveIndex, setJewelryActiveIndex] = useState(0)
+
+  const featuredScrollRef = useRef<HTMLDivElement>(null)
+  const homeDecorScrollRef = useRef<HTMLDivElement>(null)
+  const jewelryScrollRef = useRef<HTMLDivElement>(null)
 
   const featuredGifts = [
     {
@@ -52,6 +60,41 @@ const Home = () => {
       image: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400",
     },
   ]
+
+  const handleScroll = (
+    ref: React.RefObject<HTMLDivElement>,
+    setActiveIndex: (index: number) => void,
+    itemsLength: number
+  ) => {
+    if (!ref.current) return
+    const scrollLeft = ref.current.scrollLeft
+    const itemWidth = ref.current.scrollWidth / itemsLength
+    const index = Math.round(scrollLeft / itemWidth)
+    setActiveIndex(index)
+  }
+
+  useEffect(() => {
+    const featuredRef = featuredScrollRef.current
+    const homeDecorRef = homeDecorScrollRef.current
+    const jewelryRef = jewelryScrollRef.current
+
+    const handleFeaturedScroll = () =>
+      handleScroll(featuredScrollRef, setFeaturedActiveIndex, featuredGifts.length)
+    const handleHomeDecorScroll = () =>
+      handleScroll(homeDecorScrollRef, setHomeDecorActiveIndex, homeDecorItems.length)
+    const handleJewelryScroll = () =>
+      handleScroll(jewelryScrollRef, setJewelryActiveIndex, jewelryItems.length)
+
+    featuredRef?.addEventListener("scroll", handleFeaturedScroll)
+    homeDecorRef?.addEventListener("scroll", handleHomeDecorScroll)
+    jewelryRef?.addEventListener("scroll", handleJewelryScroll)
+
+    return () => {
+      featuredRef?.removeEventListener("scroll", handleFeaturedScroll)
+      homeDecorRef?.removeEventListener("scroll", handleHomeDecorScroll)
+      jewelryRef?.removeEventListener("scroll", handleJewelryScroll)
+    }
+  }, [])
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f8f8f8" }}>
@@ -213,33 +256,6 @@ const Home = () => {
       <Header />
 
       <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "0" }}>
-        {/* Hero Banner
-        <div className="px-4 pt-4 pb-0">
-          <Card
-            className="page-card banner-card mb-0"
-            style={{ position: "relative", overflow: "hidden", borderRadius: "20px" }}
-          >
-            <img
-              src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwlai_rqgu8e.jpg"
-              alt="Celebrate Dil Ki Diwali"
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                opacity: 1,
-              }}
-            />
-            <div className="banner-overlay" />
-            <div style={{ position: "relative", zIndex: 10, padding: "2rem", color: "#fff" }}>
-              <p className="text-sm font-semibold mb-1">20TH - 21ST OCTOBER</p>
-              <h2 className="text-2xl font-bold mb-1">Celebrate Dil Ki Diwali</h2>
-              <p className="text-sm mb-3">Festive blessings and sweet delights!</p>
-            </div>
-          </Card>
-        </div> */}
-
         {/* Offer Banner 1 - Full Width */}
         <div className="w-full mt-4 mb-6">
           <Card 
@@ -323,6 +339,7 @@ const Home = () => {
             </div>
           </div>
           <div 
+            ref={featuredScrollRef}
             className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-2" 
             style={{ 
               maxWidth: "1400px", 
@@ -363,7 +380,7 @@ const Home = () => {
                   width: "8px", 
                   height: "8px", 
                   borderRadius: "50%", 
-                  backgroundColor: idx === 0 ? "#ff0066" : "#D0D0D0",
+                  backgroundColor: idx === featuredActiveIndex ? "#ff0066" : "#D0D0D0",
                   transition: "background-color 0.3s ease"
                 }}
               />
@@ -386,6 +403,7 @@ const Home = () => {
             </div>
           </div>
           <div 
+            ref={homeDecorScrollRef}
             className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-2" 
             style={{ 
               maxWidth: "1400px", 
@@ -426,7 +444,7 @@ const Home = () => {
                   width: "8px", 
                   height: "8px", 
                   borderRadius: "50%", 
-                  backgroundColor: idx === 0 ? "#ff0066" : "#D0D0D0",
+                  backgroundColor: idx === homeDecorActiveIndex ? "#ff0066" : "#D0D0D0",
                   transition: "background-color 0.3s ease"
                 }}
               />
@@ -481,6 +499,7 @@ const Home = () => {
             </div>
           </div>
           <div 
+            ref={jewelryScrollRef}
             className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-2" 
             style={{ 
               maxWidth: "1400px", 
@@ -521,7 +540,7 @@ const Home = () => {
                   width: "8px", 
                   height: "8px", 
                   borderRadius: "50%", 
-                  backgroundColor: idx === 0 ? "#ff0066" : "#D0D0D0",
+                  backgroundColor: idx === jewelryActiveIndex ? "#ff0066" : "#D0D0D0",
                   transition: "background-color 0.3s ease"
                 }}
               />
