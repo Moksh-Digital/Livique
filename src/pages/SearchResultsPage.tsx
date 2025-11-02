@@ -5,6 +5,7 @@ import { Star, Truck, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
+import PromoBanner from "@/components/Banner"
 
 interface Product {
   _id: string
@@ -64,19 +65,20 @@ const SearchResultsPage = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <PromoBanner />
       <Header />
 
       <main className="flex-grow">
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
           {/* Header Section */}
-          <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-              <h1 className="text-2xl font-bold text-gray-900">
+          <div className="bg-[#8B4513] sticky top-0 z-10 shadow-md">
+            <div className="max-w-7xl mx-auto px-4 py-5">
+              <h1 className="text-2xl md:text-3xl font-bold text-white">
                 Search Results for{" "}
-                <span className="text-blue-600">"{keyword}"</span>
+                <span className="text-[#FFD700]">"{keyword}"</span>
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-[#F5E6D3] mt-1">
                 {results.length} products found
               </p>
             </div>
@@ -87,7 +89,7 @@ const SearchResultsPage = () => {
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#D2691E]"></div>
                   <p className="mt-4 text-gray-600">Loading products...</p>
                 </div>
               </div>
@@ -97,10 +99,10 @@ const SearchResultsPage = () => {
                   <Link
                     key={product._id}
                     to={`/product/${product._id}`}
-                    className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col group cursor-pointer no-underline"
+                    className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-xl hover:border-[#D2691E] transition-all duration-300 flex flex-col group cursor-pointer no-underline"
                   >
                     {/* Image Container */}
-                    <div className="relative bg-gray-100 overflow-hidden h-48 flex items-center justify-center">
+                    <div className="relative bg-[#FAFAFA] overflow-hidden h-48 flex items-center justify-center">
                       <img
                         src={product.mainImage || "/placeholder.svg"}
                         alt={product.name}
@@ -111,7 +113,7 @@ const SearchResultsPage = () => {
                       />
                       {/* Discount Badge */}
                       {product.originalPrice > product.price && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                        <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-md">
                           -{discountPercentage(
                             product.originalPrice,
                             product.price
@@ -124,9 +126,9 @@ const SearchResultsPage = () => {
                         onClick={(e) => {
                           e.preventDefault()
                           e.stopPropagation()
-                          toggleWishlist(product._id) // Typo 'B' removed here
+                          toggleWishlist(product._id)
                         }}
-                        className="absolute top-2 left-2 bg-white rounded-full p-2 shadow hover:shadow-md transition-shadow"
+                        className="absolute top-2 left-2 bg-white rounded-full p-2 shadow-md hover:shadow-lg transition-all border border-gray-200"
                       >
                         <Heart
                           size={18}
@@ -140,9 +142,9 @@ const SearchResultsPage = () => {
                     </div>
 
                     {/* Product Info */}
-                    <div className="p-4 flex flex-col flex-grow">
+                    <div className="p-4 flex flex-col flex-grow bg-white">
                       {/* Category */}
-                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-1 font-medium">
                         {product.subcategory}
                       </p>
 
@@ -172,7 +174,7 @@ const SearchResultsPage = () => {
                           ))}
                         </div>
                         <span className="text-xs text-gray-600">
-                          {product.rating} ({product.reviews} reviews)
+                          {product.rating} ({product.reviews})
                         </span>
                       </div>
 
@@ -191,13 +193,13 @@ const SearchResultsPage = () => {
                       </div>
 
                       {/* Delivery Info */}
-                      <div className="flex items-center gap-2 text-xs text-green-600 mb-4">
+                      <div className="flex items-center gap-2 text-xs text-green-600 mb-4 bg-green-50 px-2 py-1 rounded">
                         <Truck size={14} />
                         <span className="font-medium">{product.delivery}</span>
                       </div>
 
                       {/* Add to Cart Button */}
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded">
+                      <Button className="w-full bg-[#D2691E] hover:bg-[#B8551A] text-white font-semibold py-2 rounded-md transition-colors shadow-sm">
                         Add to Cart
                       </Button>
                     </div>
@@ -205,7 +207,7 @@ const SearchResultsPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
+              <div className="text-center py-16 bg-white rounded-lg border border-gray-200 shadow-sm">
                 <div className="text-6xl mb-4">🔍</div>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-2">
                   No products found
