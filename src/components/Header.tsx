@@ -31,7 +31,6 @@ const Header = () => {
   const { user, signOut } = useAuth();
 
   const [showSearch, setShowSearch] = useState(false);
-  const [showCart, setShowCart] = useState(false);
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
 
@@ -40,16 +39,6 @@ const Header = () => {
     if (!keyword.trim()) return;
     navigate(`/search?keyword=${keyword}`);
     setShowSearch(false);
-  };
-
-  const handleCartClick = (e) => {
-    e.preventDefault();
-    setShowCart(true);
-  };
-
-  const handleContinueShopping = () => {
-    setShowCart(false);
-    navigate('/cart');
   };
 
   return (
@@ -104,19 +93,20 @@ const Header = () => {
               </Button>
 
               {/* Cart */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative text-[#8B4513] hover:bg-[#F5E6D3]"
-                onClick={handleCartClick}
-              >
-                <ShoppingCart className="h-5 w-5" />
-                {totalItems > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-[#D2691E] text-white text-xs rounded-full border-2 border-[#FFF8F0]">
-                    {totalItems}
-                  </Badge>
-                )}
-              </Button>
+              <Link to="/cart">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative text-[#8B4513] hover:bg-[#F5E6D3]"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {totalItems > 0 && (
+                    <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-[#D2691E] text-white text-xs rounded-full border-2 border-[#FFF8F0]">
+                      {totalItems}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
 
               {/* Admin */}
               {user?.role === "admin" && (
@@ -212,8 +202,8 @@ const Header = () => {
             Search
           </button>
 
-          <button
-            onClick={handleCartClick}
+          <Link
+            to="/cart"
             className="relative flex flex-col items-center text-xs text-[#8B7355] hover:text-[#8B4513]"
           >
             <ShoppingCart className="h-5 w-5" />
@@ -223,7 +213,7 @@ const Header = () => {
                 {totalItems}
               </Badge>
             )}
-          </button>
+          </Link>
 
           {user?.role === "admin" && (
             <Link
@@ -348,75 +338,6 @@ const Header = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Side Cart Drawer */}
-      {showCart && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/50 z-[100] animate-in fade-in duration-200"
-            onClick={() => setShowCart(false)}
-          />
-          
-          <div className="fixed right-0 top-0 h-full w-[75%] max-w-md bg-[#FFF8F0] shadow-2xl z-[101] flex flex-col animate-in slide-in-from-right duration-300">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-[#E8D5C4] bg-[#8B4513]">
-              <div className="flex items-center gap-2">
-                <Menu className="h-5 w-5 text-white" />
-                <div>
-                  <h2 className="text-lg font-semibold text-white">Shopping Cart</h2>
-                  <p className="text-xs text-[#F5E6D3]">You selected {totalItems} gifts</p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowCart(false)}
-                className="text-white hover:bg-[#6B3410]"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-
-            {/* Cart Content */}
-            <div className="flex-1 overflow-y-auto p-4">
-              {totalItems === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <ShoppingCart className="h-16 w-16 text-[#D4AF76] mb-4" />
-                  <p className="text-[#5D4037] text-lg font-medium mb-2">Your cart is empty</p>
-                  <p className="text-[#8B7355] text-sm">Add some gifts to get started!</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {items?.map((item) => (
-                    <div key={item.id} className="flex gap-3 p-3 bg-[#FFF8F0] rounded-lg border border-[#E8D5C4]">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-20 h-20 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-medium text-[#5D4037] text-sm">{item.name}</h3>
-                        <p className="text-xs text-[#8B7355] mt-1">Qty: {item.quantity}</p>
-                        <p className="text-sm font-semibold text-[#8B4513] mt-1">₹{item.price}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-4 border-t border-[#E8D5C4] bg-white">
-              <Button
-                onClick={handleContinueShopping}
-                className="w-full bg-[#DC143C] hover:bg-[#B01030] text-white py-6 text-base font-semibold rounded-md"
-              >
-                Continue Shopping
-              </Button>
-            </div>
-          </div>
-        </>
       )}
     </>
   );
