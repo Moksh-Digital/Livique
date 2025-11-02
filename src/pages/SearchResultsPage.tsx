@@ -208,7 +208,7 @@ const SearchResultsPage = () => {
               </div>
             ) : (
               <div className="text-center py-16 bg-white rounded-lg border border-gray-200 shadow-sm">
-                <div className="text-6xl mb-4">🔍</div>
+                <div className="text-6xl mb-4"></div>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-2">
                   No products found
                 </h2>
