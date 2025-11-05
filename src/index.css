@@ -94,3 +94,12 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+#toast-root, .toast, [role="alert"] {
+  z-index: 99999 !important;
+}
+
+/* Ensure toast portal stays above everything */
+[data-sonner-toaster], .toast, .sonner {
+  z-index: 99999 !important;
+}
