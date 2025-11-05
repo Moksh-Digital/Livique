@@ -16,6 +16,7 @@ interface AuthContextType {
   signOut: () => void;
   loading: boolean;
   isAdmin: boolean;
+  fetchGoogleUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,7 +26,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
 
-  // Fetch user profile from JWT
+  // ✅ Google OAuth session fetch
+const fetchGoogleUser = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/profile`, {
+      credentials: "include",
+    });
+
+    if (res.status === 401) {
+      setLoading(false);  // ✅ user not logged in
+      return;
+    }
+
+    if (!res.ok) {
+      setLoading(false);
+      return;
+    }
+
+    const data = await res.json();
+    setUser(data);
+  } catch {
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  // JWT user fetch
   const fetchUserProfile = async (jwtToken: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/profile`, {
@@ -36,14 +63,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
 
-      if (!response.ok) {
-        throw new Error('Token invalid');
-      }
+      if (!response.ok) throw new Error('Token invalid');
 
       const userData = await response.json();
       setUser(userData as User);
-    } catch (error) {
-      console.error("JWT invalid or expired:", error);
+    } catch {
       localStorage.removeItem('token');
       setUser(null);
       setToken(null);
@@ -52,28 +76,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // On mount: check for JWT or Admin
-// Inside AuthContext.tsx
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    const adminFlag = localStorage.getItem('isAdminLoggedIn');
 
-useEffect(() => {
-  const storedToken = localStorage.getItem('token');
-  const adminFlag = localStorage.getItem('isAdminLoggedIn');
+    if (storedToken) {
+      setToken(storedToken);
+      fetchUserProfile(storedToken);
+    } 
+    else if (adminFlag === 'true') {
+      setUser({ name: 'Admin', email: 'admin@shop.com', verified: true, role: 'admin' });
+      setLoading(false);
+    }
+    else {
+      // ✅ check Google session
+      fetchGoogleUser();
+    }
+  }, []);
 
-  if (storedToken) {
-    setToken(storedToken);
-    fetchUserProfile(storedToken);
-  } else if (adminFlag === 'true') {
-    setUser({ name: 'Admin', email: 'admin@shop.com', verified: true, role: 'admin' });
-    setLoading(false);
-  } else {
-    setUser(null);
-    setLoading(false);
-  }
-}, []);
-
-
-
-  // JWT sign-in
   const signIn = async (jwtToken: string) => {
     localStorage.setItem('token', jwtToken);
     setToken(jwtToken);
@@ -81,28 +101,24 @@ useEffect(() => {
     await fetchUserProfile(jwtToken);
   };
 
-  // Admin login (hardcoded)
-// Admin login (hardcoded)
-const signInAdmin = () => {
-  localStorage.setItem('isAdminLoggedIn', 'true');
-  setUser({ name: 'Admin', email: 'admin@shop.com', verified: true, role: 'admin' });
-  setLoading(false); // important to stop loading state
-};
+  const signInAdmin = () => {
+    localStorage.setItem('isAdminLoggedIn', 'true');
+    setUser({ name: 'Admin', email: 'admin@shop.com', verified: true, role: 'admin' });
+    setLoading(false);
+  };
 
-
-
-  // Sign out
   const signOut = () => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('isAdminLoggedIn');
+
+    // ✅ also logout Google session
+    fetch(`${API_BASE_URL}/logout`, { credentials: "include" });
   };
 
-  // Check if logged-in user is admin
   const isAdmin = user?.email === 'admin@shop.com';
 
-  // Loading state wrapper
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -112,13 +128,12 @@ const signInAdmin = () => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signInAdmin, signOut, isAdmin, loading }}>
+    <AuthContext.Provider value={{ user, signIn, signInAdmin, signOut, isAdmin, loading, fetchGoogleUser }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within AuthProvider');

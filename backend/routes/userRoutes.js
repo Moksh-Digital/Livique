@@ -16,6 +16,8 @@ import {
   setDefaultAddress
 } from "../controllers/addressController.js";
 import User from "../models/userModel.js";
+import passport from "../config/passport.js";
+
 
 
 const router = express.Router();

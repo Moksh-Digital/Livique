@@ -245,6 +245,27 @@ const SignUp = ({ isModal = false, onSignUpSuccess, onSwitchToSignIn }: SignUpPr
 
           {step === 1 ? renderSignUpForm() : renderOtpVerification()}
 
+          <div className="mt-4">
+  <button
+    type="button"
+    onClick={() => window.location.href = `${API_BASE_URL}/auth/google`}
+    className="w-full h-12 rounded-xl border flex items-center justify-center gap-2 hover:bg-accent transition"
+  >
+    <img
+      src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+      alt="Google logo"
+      className="w-6 h-6"
+    />
+    <span className="font-medium">Sign up with Google</span>
+  </button>
+</div>
+
+<div className="flex items-center gap-2 my-4">
+  <div className="flex-1 h-px bg-border" />
+  <span className="text-xs text-muted-foreground">OR</span>
+  <div className="flex-1 h-px bg-border" />
+</div>
+
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Already have an account?{" "}

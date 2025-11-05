@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken"; // ADD THIS LINE
 
 const addressSchema = mongoose.Schema(
   {
@@ -22,7 +23,8 @@ const userSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: function () { return !this.googleId; } },
+    googleId: { type: String }, // <-- Google login users
     isVerified: { type: Boolean, default: false },
     otp: String,
     otpExpires: Date,
@@ -49,11 +51,20 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// ADD THIS NEW METHOD
+userSchema.methods.generateToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: "30d", // Token will expire in 30 days
+  });
+};
+
 // Hash password before save
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) next();
+  if (!this.isModified("password") || !this.password) return next();
+
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 const User = mongoose.model("User", userSchema);
