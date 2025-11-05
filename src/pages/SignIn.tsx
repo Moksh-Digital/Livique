@@ -11,7 +11,14 @@ import { useToast } from "@/hooks/use-toast";
 // NOTE: Set this to your local backend URL (e.g., http://localhost:5000)
 const API_BASE_URL = "http://localhost:5000/api/users";
 
-const SignIn = () => {
+// Props for the modal implementation
+interface SignInProps {
+  isModal?: boolean;
+  onSignInSuccess?: () => void;
+  onSwitchToSignUp?: () => void; // Defined for modal switching
+}
+
+const SignIn = ({ isModal = false, onSignInSuccess, onSwitchToSignUp }: SignInProps) => {
   const [step, setStep] = useState(1); // 1: Credentials, 2: OTP Verification
   const [loading, setLoading] = useState(false);
 
@@ -66,7 +73,6 @@ const SignIn = () => {
   };
 
   // --- STEP 2: VERIFY OTP and Complete Sign In ---
-  // --- STEP 2: VERIFY OTP and Complete Sign In ---
   const handleVerifySigninOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -83,8 +89,6 @@ const SignIn = () => {
       if (response.ok && data.success) {
         const jwtToken = data.token; // Get the JWT token from the backend response
 
-        // 🛑 REMOVE: const success = await signIn(email, password);
-        // ✅ NEW: Use AuthContext signIn to save the token and fetch profile
         signIn(jwtToken);
 
         toast({
@@ -92,7 +96,13 @@ const SignIn = () => {
           description: `Sign in successful as ${data.name}.`
         });
 
-        navigate("/"); // Redirect to home
+        // MODAL LOGIC: If in modal, call success callback to close it
+        if (isModal && onSignInSuccess) {
+          onSignInSuccess();
+        } else {
+          // If not in modal (full page), redirect to home
+          navigate("/");
+        }
 
       } else {
         toast({
@@ -148,7 +158,9 @@ const SignIn = () => {
           <input type="checkbox" className="rounded" />
           <span>Remember me</span>
         </label>
-        <Link to="/forgot-password" className="text-primary hover:underline">
+        <Link to="/forgot-password" className="text-primary hover:underline"
+            onClick={isModal ? () => onSignInSuccess && onSignInSuccess() : undefined} // Close modal before navigating away
+        >
           Forgot password?
         </Link>
       </div>
@@ -207,8 +219,12 @@ const SignIn = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8 rounded-2xl">
+    // Conditional styling for full page vs modal
+    <div className={isModal ? "p-0 w-full" : "min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 flex items-center justify-center p-4"}>
+      <Card 
+        // Conditional styling for Card container
+        className={isModal ? "w-full p-8 shadow-none border-none bg-transparent" : "w-full max-w-md p-8 rounded-2xl"}
+      >
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 text-3xl font-bold text-accent mb-2">
             <Gift className="h-8 w-8" />
@@ -226,9 +242,14 @@ const SignIn = () => {
 
         <p className="text-center text-sm text-muted-foreground mt-6">
           Don't have an account?{" "}
-          <Link to="/signup" className="text-primary font-semibold hover:underline">
+          {/* Switch to Sign Up modal using the prop handler */}
+          <button
+            type="button"
+            className="text-primary font-semibold hover:underline"
+            onClick={isModal && onSwitchToSignUp ? onSwitchToSignUp : () => navigate("/signup")}
+          >
             Sign up
-          </Link>
+          </button>
         </p>
       </Card>
     </div>

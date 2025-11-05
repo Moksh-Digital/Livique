@@ -9,7 +9,7 @@ import {
   LogOut,
   UserCircle,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -21,9 +21,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext"; 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// Corrected import paths to match your file structure (assuming pages is a sibling to components)
+import SignIn from "../pages/SignIn"; 
+import SignUp from "../pages/SignUp"; 
 
 const Header = () => {
   const { getTotalItems, items } = useCart();
@@ -31,6 +33,8 @@ const Header = () => {
   const { user, signOut } = useAuth();
 
   const [showSearch, setShowSearch] = useState(false);
+  const [showSignInModal, setShowSignInModal] = useState(false);
+  const [showSignUpModal, setShowSignUpModal] = useState(false); 
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
 
@@ -39,6 +43,24 @@ const Header = () => {
     if (!keyword.trim()) return;
     navigate(`/search?keyword=${keyword}`);
     setShowSearch(false);
+  };
+
+  // Handlers for switching and closing modals
+  const handleOpenSignIn = () => {
+    setShowSignUpModal(false); // Close Sign Up if open
+    setShowSignInModal(true); // Open Sign In
+  };
+
+  const handleOpenSignUp = () => {
+    setShowSignInModal(false); // Close Sign In if open
+    setShowSignUpModal(true); // Open Sign Up
+  };
+
+  const handleAuthSuccess = () => {
+    // This closes both modals after a successful sign in or sign up, 
+    // relying on the individual components to handle navigation.
+    setShowSignInModal(false);
+    setShowSignUpModal(false);
   };
 
   return (
@@ -121,7 +143,7 @@ const Header = () => {
                 </Link>
               )}
 
-              {/* Profile */}
+              {/* Profile/Auth */}
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -160,15 +182,14 @@ const Header = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Link to="/signin">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-[#8B4513] hover:bg-[#F5E6D3]"
-                  >
-                    <User className="h-5 w-5" />
-                  </Button>
-                </Link>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-[#8B4513] hover:bg-[#F5E6D3]"
+                  onClick={handleOpenSignIn} // Opens Sign In modal
+                >
+                  <User className="h-5 w-5" />
+                </Button>
               )}
             </div>
           </div>
@@ -257,13 +278,13 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link
-              to="/signin"
+            <button
+              onClick={handleOpenSignIn} // Opens Sign In modal
               className="flex flex-col items-center text-xs text-[#8B7355] hover:text-[#8B4513]"
             >
               <User className="h-5 w-5" />
               Sign In
-            </Link>
+            </button>
           )}
         </div>
       </nav>
@@ -336,6 +357,47 @@ const Header = () => {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* AUTH MODAL OVERLAY (Sign In or Sign Up) */}
+      {(showSignInModal || showSignUpModal) && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[101] flex items-center justify-center p-4"
+          onClick={() => { setShowSignInModal(false); setShowSignUpModal(false); }} // Click outside to close both
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 animate-in fade-in slide-in-from-bottom-2 duration-300 relative"
+            onClick={(e) => e.stopPropagation()} // Stop click from propagating to the overlay
+          >
+            {/* Render Sign In */}
+            {showSignInModal && (
+              <SignIn 
+                isModal={true} 
+                onSignInSuccess={handleAuthSuccess} 
+                onSwitchToSignUp={handleOpenSignUp} // Prop to switch to Sign Up
+              />
+            )}
+
+            {/* Render Sign Up */}
+            {showSignUpModal && (
+              <SignUp 
+                isModal={true} 
+                onSignUpSuccess={handleAuthSuccess} 
+                onSwitchToSignIn={handleOpenSignIn} // Prop to switch to Sign In
+              />
+            )}
+
+            {/* Global Close Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => { setShowSignInModal(false); setShowSignUpModal(false); }}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 z-50"
+            >
+              <X className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       )}

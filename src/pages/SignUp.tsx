@@ -3,14 +3,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthContext"; // Import updated AuthContext
+import { useAuth } from "@/contexts/AuthContext"; // Keeping alias path for context
 import { useToast } from "@/hooks/use-toast";
-import Header from "@/components/Header";
+// Removed: import Header from "@/components/Header"; // Header is now rendered by the modal host
 
 // NOTE: Set this to your local backend URL (e.g., http://localhost:5000)
 const API_BASE_URL = "http://localhost:5000/api/users";
 
-const SignUp = () => {
+// Props for the modal implementation
+interface SignUpProps {
+  isModal?: boolean;
+  onSignUpSuccess?: () => void;
+  onSwitchToSignIn?: () => void; // New prop for switching to Sign In modal
+}
+
+const SignUp = ({ isModal = false, onSignUpSuccess, onSwitchToSignIn }: SignUpProps) => {
   const [step, setStep] = useState(1); // 1: Credentials, 2: OTP Verification
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +30,7 @@ const SignUp = () => {
   // Step 2 State: OTP
   const [otp, setOtp] = useState("");
 
-  // ✅ FIX 1: Import the new token-based 'signIn' function instead of the old mock 'signUp'
+  // FIX 1: Import the new token-based 'signIn' function instead of the old mock 'signUp'
   const { signIn } = useAuth(); 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -94,7 +101,7 @@ const SignUp = () => {
       if (response.ok && data.success) {
         const jwtToken = data.token; // Get the JWT token from the backend response
 
-        // ✅ FIX 2: Use the imported 'signIn' function to establish the session with the token
+        // FIX 2: Use the imported 'signIn' function to establish the session with the token
         signIn(jwtToken); 
 
         toast({
@@ -102,7 +109,13 @@ const SignUp = () => {
           description: `Successfully signed up and logged in as ${data.name}.`
         });
 
-        navigate("/"); // Redirect to home
+        // MODAL LOGIC: If in modal, call success callback to close it
+        if (isModal && onSignUpSuccess) {
+          onSignUpSuccess();
+        } else {
+          // If not in modal (full page), redirect to home
+          navigate("/"); 
+        }
 
       } else {
         toast({
@@ -213,11 +226,16 @@ const SignUp = () => {
 
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-
-      <main className="max-w-md mx-auto px-4 py-12">
-        <Card className="p-8 rounded-2xl">
+    // CONDITIONAL STYLES: If not in modal, use full-page layout, otherwise just use padding.
+    // NOTE: Removed the "min-h-screen bg-background" if in a modal, and let the parent handle layout.
+    <div className={isModal ? "p-0 w-full" : "min-h-screen bg-background"}>
+      
+      {/* If not in modal, center the content with main tag. If modal, use w-full */}
+      <main className={isModal ? "w-full" : "max-w-md mx-auto px-4 py-12"}>
+        <Card 
+          // CONDITIONAL STYLES: Remove full-page styling if in modal
+          className={isModal ? "w-full p-8 shadow-none border-none bg-transparent" : "p-8 rounded-2xl"}
+        >
           <h1 className="text-3xl font-bold mb-2">
             {step === 1 ? "Create Account" : "Verify Email"}
           </h1>
@@ -230,9 +248,14 @@ const SignUp = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link to="/signin" className="text-primary font-semibold hover:underline">
+              {/* If in modal, click handler switches the modal. If full-page, it links to /signin */}
+              <button
+                type="button"
+                className="text-primary font-semibold hover:underline"
+                onClick={isModal && onSwitchToSignIn ? onSwitchToSignIn : () => navigate("/signin")}
+              >
                 Sign In
-              </Link>
+              </button>
             </p>
           </div>
         </Card>
