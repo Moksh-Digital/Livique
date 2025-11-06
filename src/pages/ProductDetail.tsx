@@ -71,7 +71,7 @@ const ProductDetail = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         <Header />
         <div className="max-w-[1400px] mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold">Product not found</h1>

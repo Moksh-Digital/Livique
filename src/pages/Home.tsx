@@ -6,7 +6,7 @@ import Footer from "@/components/Footer"
 import { CATEGORIES } from "@/data/categories"
 import PromoBanner from "@/components/Banner"
 import { useState, useRef, useEffect } from "react"
-
+import BannerSlider from "./BannerSlider"
 const Home = () => {
   const [featuredActiveIndex, setFeaturedActiveIndex] = useState(0)
   const [homeDecorActiveIndex, setHomeDecorActiveIndex] = useState(0)
@@ -15,25 +15,31 @@ const Home = () => {
   const featuredScrollRef = useRef<HTMLDivElement>(null)
   const homeDecorScrollRef = useRef<HTMLDivElement>(null)
   const jewelryScrollRef = useRef<HTMLDivElement>(null)
-
+   const beautyScrollRef = useRef<HTMLDivElement>(null)
+  const toyScrollRef = useRef<HTMLDivElement>(null)
+   const stationaryScrollRef = useRef<HTMLDivElement>(null)
   const featuredGifts = [
     {
-      name: "Teddy Bears",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+      name: "bags & clutches",
+      image: "https://rukminim2.flixcart.com/image/480/640/xif0q/clutch/i/l/l/fashionableclutch18-party1018-bridalcollections18-exotic-original-imahfmxtkfg7qz6d.jpeg?q=90",
     },
     {
       name: "Customized Mugs",
-      image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400",
+      image: "https://m.media-amazon.com/images/I/61M+5U6n1HL._AC_UF894,1000_QL80_.jpg",
     },
     {
       name: "Flower Bouquets",
+      image: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400",
+    },
+     {
+      name: "flower bouquets",
       image: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400",
     },
   ]
 
   const homeDecorItems = [
     {
-      name: "Cushions",
+      name: "scented candles",
       image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
     },
     {
@@ -41,26 +47,89 @@ const Home = () => {
       image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400",
     },
     {
-      name: "Clocks & Figurines",
+      name: "wall art",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    },
+     {
+      name: "show pieces",
       image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
     },
   ]
 
   const jewelryItems = [
     {
-      name: "Jewelry",
+      name: "bracelets",
       image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400",
     },
     {
-      name: "Scented Candles",
+      name: "pendants",
       image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
     },
     {
-      name: "Chocolates",
+      name: "earrings",
+      image: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400",
+    },
+    {
+      name: "handbags & clutches",
       image: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400",
     },
   ]
+  
+    const beautyItems= [
+    {
+      name: "skincare kits",
+      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+    },
+    {
+      name: "perfumes",
+      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400",
+    },
+    {
+      name: "bath & body gift sets",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    },
+     {
+      name: "shaving kits",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    },
+  ]
 
+     const toyItems= [
+    {
+      name: "Soft Toys",
+      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+    },
+    {
+      name: "desk toys",
+      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400",
+    },
+    {
+      name: "Outdoor & Sports Toys",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    },
+     {
+      name: "Baby & Toddler Toys",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    },
+  ]
+     const stationaryItems= [
+    {
+      name: "Cushions",
+      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+    },
+    {
+      name: "Lipstick",
+      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400",
+    },
+    {
+      name: "Clocks & Figurines",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    },
+     {
+      name: "Clocks & Figurines",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    },
+  ]
   const handleScroll = (
     ref: React.RefObject<HTMLDivElement>,
     setActiveIndex: (index: number) => void,
@@ -255,19 +324,15 @@ const Home = () => {
       <PromoBanner />
       <Header />
 
-      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "0" }}>
-        {/* Offer Banner 1 - Full Width */}
-        <div className="w-full mt-4 mb-6">
-          <Card 
-            className="banner-card" 
-            style={{ 
-              position: "relative", 
-              overflow: "hidden", 
-              borderRadius: "0",
-              margin: 0,
-              height: "250px"
-            }}
-          >
+      <main className="w-full p-0">
+       
+        <BannerSlider />
+        {/* <div 
+          className="relative w-full" 
+          style={{ margin: 0, padding: 0 }} 
+        >
+         <Card 
+           className="banner-card h-[300px] md:h-[500px] w-full relative overflow-hidden rounded-none">
             <img
               src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwali2_qdaxy2.jpg"
               alt="Flat 25% OFF"
@@ -281,24 +346,35 @@ const Home = () => {
               }}
             />
             <div className="banner-overlay" />
-            <div style={{ position: "relative", zIndex: 10, padding: "2.5rem 1.5rem", color: "#fff", textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", height: "100%" }}>
-              <h3 className="text-3xl font-bold mb-2">🎉 Flat 25% OFF on First Order!</h3>
-              <p className="text-base">Use code: FIRST25 | Valid till 31st Oct</p>
+           
+            <div style={{ 
+              position: "relative", 
+              zIndex: 10, 
+              padding: "2.5rem 1.5rem", 
+              color: "#fff", 
+              textAlign: "center", 
+              display: "flex", 
+              flexDirection: "column", 
+              justifyContent: "center", 
+              height: "100%" 
+            }}>
+             
             </div>
           </Card>
-        </div>
+        </div> */}
 
         {/* Categories Section - Compact Icons */}
         <section className="mb-8 px-4">
-          <div className="text-center mb-6">
+          <div className="text-center mb-12 mt-12">
             <div className="flex items-center justify-center gap-3 mb-2">
               <div className="h-[2px] w-12 bg-gradient-to-r from-transparent to-[#D4AF76]"></div>
-              <h2 className="text-2xl font-bold text-[#5D4037]">Shop by Category</h2>
+              <h2 className="text-2xl md:text-4xl  font-bold text-[#5D4037]">Shop by Category</h2>
               <div className="h-[2px] w-12 bg-gradient-to-l from-transparent to-[#D4AF76]"></div>
             </div>
           </div>
           
-          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+          <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-9 gap-4 ml-0 md:ml-24">
+
             {CATEGORIES.slice(0, 8).map((cat) => (
               <div key={cat.id} className="text-center">
                 <Link to={`/category/${cat.slug}`}>
@@ -325,260 +401,477 @@ const Home = () => {
         </section>
 
         {/* Featured Gifts Section */}
-        <section className="mb-0" style={{ backgroundColor: "#FFF8F0", padding: "2rem 0" }}>
-          <div className="mb-5 px-4" style={{ maxWidth: "1400px", margin: "0 auto" }}>
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
-              <h2 className="text-xl md:text-2xl font-bold text-[#5D4037] px-4">Featured Gifts</h2>
-              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
+        <section
+          className="w-full py-8"
+          style={{ backgroundColor: "#F3ECE5" }}
+        >
+          {/* Section Heading */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-4 mb-2 px-4">
+              <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
+              <h2 className="text-3xl font-serif text-[#3E2723] font-semibold">
+                Featured Gifts
+              </h2>
+              <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
-            <div className="text-center">
-              <Link to="/category/gifts" className="text-xs md:text-sm text-[#ff0066] font-semibold hover:underline">
-                View All →
-              </Link>
-            </div>
+            <Link
+              to="/category/gifts"
+              className="text-sm text-[#B94C63] font-semibold underline-offset-2 hover:underline"
+            >
+              View All
+            </Link>
           </div>
-          <div 
-            ref={featuredScrollRef}
-            className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-2" 
-            style={{ 
-              maxWidth: "1400px", 
+
+          {/* Cards Grid */}
+          <div
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 md:px-10"
+            style={{
+              maxWidth: "1400px",
               margin: "0 auto",
-              scrollSnapType: "x mandatory",
-              WebkitOverflowScrolling: "touch"
             }}
           >
-            {featuredGifts.map((cat, idx) => (
-              <Link 
-                key={idx} 
-                to={`/category/gifts/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
-                style={{ 
-                  minWidth: "160px",
-                  maxWidth: "160px",
-                  scrollSnapAlign: "start"
-                }}
-              >
-                <Card className="page-card" style={{ borderRadius: "12px", overflow: "hidden", backgroundColor: "#FAF3E8", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-                  <div style={{ aspectRatio: "1", overflow: "hidden" }}>
-                    <img
-                      src={cat.image || "/placeholder.svg"}
-                      alt={cat.name}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  </div>
-                  <div style={{ padding: "10px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#333" }}>{cat.name}</div>
-                </Card>
+            {featuredGifts.map((item, idx) => (
+                 <Link
+                    key={idx}
+                    to={`/category/gifts/${item.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+              <div
+              key={idx}
+              className="bg-[#FFFFFF]  shadow-md  hover:shadow-lg  transition-all  duration-300  flex flex-col  border-[6px]  border-white  rounded-none h-[300px] md:h-[440px]"
+            >
+
+                {/* Image Section */}
+                <div
+                  className="relative overflow-hidden flex-shrink-0 md:h-[70%] h-[65%]" // 🔹 slightly smaller image for mobile
+                  style={{
+                    border: "3px solid #FFFFFF",
+                    backgroundColor: "#FFFFFF",
+                  }}
+                >
+                  <img
+                    src={item.image || "/placeholder.svg"}
+                    alt={item.name}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  />
+                </div>
+
+                {/* Text Section */}
+                <div className="text-center py-2 flex-grow flex flex-col justify-center">
+                  <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
+                    {item.name}
+                  </h3>
+                </div>
+              </div> 
               </Link>
-            ))}
-          </div>
-          {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-3">
-            {featuredGifts.map((_, idx) => (
-              <div 
-                key={idx} 
-                style={{ 
-                  width: "8px", 
-                  height: "8px", 
-                  borderRadius: "50%", 
-                  backgroundColor: idx === featuredActiveIndex ? "#ff0066" : "#D0D0D0",
-                  transition: "background-color 0.3s ease"
-                }}
-              />
             ))}
           </div>
         </section>
+
+
+
 
         {/* Home Decor Section */}
-        <section className="mb-0" style={{ backgroundColor: "#ffffff", padding: "2rem 0" }}>
-          <div className="mb-5 px-4" style={{ maxWidth: "1400px", margin: "0 auto" }}>
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
-              <h2 className="text-xl md:text-2xl font-bold text-[#5D4037] px-4">Home Decor & Lifestyle</h2>
-              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
+            <section className="w-full py-8 ">
+        {/* Section Heading */}
+        <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-4 mb-2 px-4">
+              <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
+              <h2 className="text-2xl md:text-3xl font-serif text-[#3E2723] font-semibold">
+              Home Decor & Lifestyle
+              </h2>
+              <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
-            <div className="text-center">
-              <Link to="/category/home-decor" className="text-xs md:text-sm text-[#ff0066] font-semibold hover:underline">
-                View All →
-              </Link>
-            </div>
-          </div>
-          <div 
-            ref={homeDecorScrollRef}
-            className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-2" 
-            style={{ 
-              maxWidth: "1400px", 
-              margin: "0 auto",
-              scrollSnapType: "x mandatory",
-              WebkitOverflowScrolling: "touch"
-            }}
+          <Link
+            to="/category/home-decor-gifting"
+            className="text-sm text-[#B94C63] font-semibold underline-offset-2 hover:underline"
           >
-            {homeDecorItems.map((cat, idx) => (
-              <Link 
-                key={idx} 
-                to={`/category/home-decor-gifting/${cat.name.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "")}`}
-                style={{ 
-                  minWidth: "160px",
-                  maxWidth: "160px",
-                  scrollSnapAlign: "start"
-                }}
-              >
-                <Card className="page-card" style={{ borderRadius: "12px", overflow: "hidden", backgroundColor: "#F5EFE6", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-                  <div style={{ aspectRatio: "1", overflow: "hidden" }}>
-                    <img
-                      src={cat.image || "/placeholder.svg"}
-                      alt={cat.name}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  </div>
-                  <div style={{ padding: "10px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#333" }}>{cat.name}</div>
-                </Card>
-              </Link>
-            ))}
-          </div>
-          {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-3">
-            {homeDecorItems.map((_, idx) => (
-              <div 
-                key={idx} 
-                style={{ 
-                  width: "8px", 
-                  height: "8px", 
-                  borderRadius: "50%", 
-                  backgroundColor: idx === homeDecorActiveIndex ? "#ff0066" : "#D0D0D0",
-                  transition: "background-color 0.3s ease"
-                }}
-              />
-            ))}
-          </div>
-        </section>
-
-        {/* Offer Banner 2 - Full Width */}
-        <div className="w-full mb-6">
-          <Card 
-            className="banner-card" 
-            style={{ 
-              position: "relative", 
-              overflow: "hidden", 
-              borderRadius: "0",
-              margin: 0,
-              height: "250px"
-            }}
-          >
-            <img
-              src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwlai_rqgu8e.jpg"
-              alt="Buy 2 Get 1 FREE"
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                opacity: 1,
-              }}
-            />
-            <div className="banner-overlay" />
-            <div style={{ position: "relative", zIndex: 10, padding: "2.5rem 1.5rem", color: "#fff", textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", height: "100%" }}>
-              <h3 className="text-3xl font-bold mb-2">💝 Buy 2 Get 1 FREE!</h3>
-              <p className="text-base">On selected gift items | Limited time offer</p>
-            </div>
-          </Card>
+            View All  
+          </Link>
         </div>
 
-        {/* Jewelry & Accessories Section */}
-        <section className="mb-0" style={{ backgroundColor: "#FFF8F0", padding: "2rem 0" }}>
-          <div className="mb-5 px-4" style={{ maxWidth: "1400px", margin: "0 auto" }}>
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
-              <h2 className="text-xl md:text-2xl font-bold text-[#5D4037] px-4">Jewelry & Accessories</h2>
-              <div className="flex-1 h-[1px] bg-[#D4AF76]"></div>
-            </div>
-            <div className="text-center">
-              <Link to="/category/jewelry" className="text-xs md:text-sm text-[#ff0066] font-semibold hover:underline">
-                View All →
+        {/* Cards Grid */}
+        <div
+          ref={homeDecorScrollRef}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 md:px-10"
+          style={{
+            maxWidth: "1400px",
+            margin: "0 auto",
+          }}
+        >
+          {homeDecorItems.map((cat, idx) => (
+              <Link
+                    key={idx}
+                    to={`/category/home-decor-gifting/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+            <div
+              key={idx}
+              className="bg-[#F3ECE5] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[8px] border-[#F3ECE5] rounded-none h-[320px] md:h-[440px]"
+            >
+              {/* Image Section */}
+              <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
+                <img
+                  src={cat.image || "/placeholder.svg"}
+                  alt={cat.name}
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+
+              {/* Text Section */}
+              <div className="text-center py-2 flex-grow flex flex-col justify-center">
+                  <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
+                    {cat.name}
+                  </h3>
+                </div>
+              </div>
               </Link>
-            </div>
+          ))}
+        </div>
+
+      </section>
+
+
+        {/* Offer Banner 2 - Full Width */}
+    <div className="w-full mb-6">
+        <Card
+          className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
+        >
+          {/* Background Image */}
+          <img
+            src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwlai_rqgu8e.jpg"
+            alt="Buy 2 Get 1 FREE"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/30"></div>
+
+          {/* Text Content */}
+          <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
+            <h3 className="text-2xl sm:text-3xl font-bold mb-2">
+              💝 Buy 2 Get 1 FREE!
+            </h3>
+            <p className="text-sm sm:text-base">
+              On selected gift items | Limited time offer
+            </p>
           </div>
-          <div 
-            ref={jewelryScrollRef}
-            className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-2" 
-            style={{ 
-              maxWidth: "1400px", 
-              margin: "0 auto",
-              scrollSnapType: "x mandatory",
-              WebkitOverflowScrolling: "touch"
-            }}
-          >
-            {jewelryItems.map((cat, idx) => (
-              <Link 
-                key={idx} 
-                to={`/category/gifts/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
-                style={{ 
-                  minWidth: "160px",
-                  maxWidth: "160px",
-                  scrollSnapAlign: "start"
+        </Card>
+      </div>
+
+
+
+        {/* Jewelry & Accessories Section */}
+       <section
+              className="w-full py-8"
+              style={{ backgroundColor: "#FFF8F0" }}
+            >
+              {/* Section Heading */}
+              <div className="text-center mb-8">
+                <div className="flex items-center justify-center gap-4 mb-2 px-4">
+                  <div className="flex-1 max-w-[250px] h-[1px] bg-[#D4AF76]"></div>
+                  <h2 className="text-2xl md:text-3xl font-serif text-[#5D4037] font-semibold">
+                    Jewelry & Accessories
+                  </h2>
+                  <div className="flex-1 max-w-[250px] h-[1px] bg-[#D4AF76]"></div>
+                </div>
+                <Link
+                  to="/category/jewelry"
+                  className="text-sm text-[#ff0066] font-semibold underline-offset-2 hover:underline"
+                >
+                  View All
+                </Link>
+              </div>
+
+              {/* Cards Grid (Same as Featured Gifts) */}
+              <div
+                ref={jewelryScrollRef}
+                className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 md:px-10"
+                style={{
+                  maxWidth: "1400px",
+                  margin: "0 auto",
                 }}
               >
-                <Card className="page-card" style={{ borderRadius: "12px", overflow: "hidden", backgroundColor: "#FAF3E8", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-                  <div style={{ aspectRatio: "1", overflow: "hidden" }}>
-                    <img
-                      src={cat.image || "/placeholder.svg"}
-                      alt={cat.name}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  </div>
-                  <div style={{ padding: "10px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#333" }}>{cat.name}</div>
-                </Card>
-              </Link>
-            ))}
-          </div>
-          {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-3">
-            {jewelryItems.map((_, idx) => (
-              <div 
-                key={idx} 
-                style={{ 
-                  width: "8px", 
-                  height: "8px", 
-                  borderRadius: "50%", 
-                  backgroundColor: idx === jewelryActiveIndex ? "#ff0066" : "#D0D0D0",
-                  transition: "background-color 0.3s ease"
-                }}
-              />
-            ))}
-          </div>
-        </section>
+                {jewelryItems.map((cat, idx) => (
+                  <Link
+                    key={idx}
+                    to={`/category/jewelry-accessories/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+                    <div
+                      className="bg-[#FFFFFF] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[6px] border-white rounded-none h-[300px] md:h-[440px]"
+                    >
+                      {/* Image Section */}
+                      <div
+                        className="relative overflow-hidden flex-shrink-0 md:h-[70%] h-[65%]"
+                        style={{
+                          border: "3px solid #FFFFFF",
+                          backgroundColor: "#FFFFFF",
+                        }}
+                      >
+                        <img
+                          src={cat.image || "/placeholder.svg"}
+                          alt={cat.name}
+                          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                        />
+                      </div>
 
-        {/* Final Offer Banner - Full Width */}
-        <div className="w-full mb-0">
-          <Card 
-            className="banner-card" 
-            style={{ 
-              position: "relative", 
-              overflow: "hidden", 
-              borderRadius: "0",
-              margin: 0,
-              height: "250px"
-            }}
+                      {/* Text Section */}
+                      <div className="text-center py-2 flex-grow flex flex-col justify-center">
+                        <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
+                          {cat.name}
+                        </h3>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+
+        {/* Final Offer Banner - 3 Full Width */}
+       <div className="w-full mb-0">
+          <Card
+            className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
           >
+            {/* Background Image */}
             <img
               src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwali2_qdaxy2.jpg"
               alt="FREE Shipping"
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                opacity: 1,
-              }}
+              className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="banner-overlay" />
-            <div style={{ position: "relative", zIndex: 10, padding: "2.5rem 1.5rem", color: "#fff", textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", height: "100%" }}>
-              <h3 className="text-3xl font-bold mb-2">🚚 FREE Shipping Above ₹499!</h3>
-              <p className="text-base">Shop now and save on delivery charges</p>
+
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-black/30"></div>
+
+            {/* Text Content */}
+            <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
+              <h3 className="text-2xl sm:text-3xl font-bold mb-2">
+                🚚 FREE Shipping Above ₹499!
+              </h3>
+              <p className="text-sm sm:text-base">
+                Shop now and save on delivery charges
+              </p>
             </div>
           </Card>
         </div>
+      
+
+             {/* Delightful Toy Gifts */}
+
+            <section className="w-full py-8 ">
+        {/* Section Heading */}
+        <div className="text-center mb-8 ">
+            <div className="flex items-center justify-center gap-4 mb-2 px-4 ">
+              <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
+              <h2 className="text-2xl md:text-3xl font-serif text-[#3E2723] font-semibold">
+              Delightful Toy Gifts
+              </h2>
+              <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
+            </div>
+          <Link
+            to="/category/toys"
+            className="text-sm text-[#B94C63] font-semibold underline-offset-2 hover:underline"
+          >
+            View All  
+          </Link>
+        </div>
+
+        {/* Cards Grid */}
+        <div
+          ref={toyScrollRef}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 md:px-10"
+          style={{
+            maxWidth: "1400px",
+            margin: "0 auto",
+          }}
+        >
+          {toyItems.map((cat, idx) => (
+             <Link
+                    key={idx}
+                    to={`/category/toys/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+            <div
+              key={idx}
+              className="bg-[#F3ECE5] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[8px] border-[#F3ECE5] rounded-none h-[320px] md:h-[440px]"
+            >
+              {/* Image Section */}
+              <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
+                <img
+                  src={cat.image || "/placeholder.svg"}
+                  alt={cat.name}
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+
+              {/* Text Section */}
+              <div className="text-center py-2 flex-grow flex flex-col justify-center">
+                  <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
+                    {cat.name}
+                  </h3>
+                </div>
+              </div>
+              </Link>
+          ))}
+        </div>
+        
+
+      </section>
+
+
+
+
+              {/* Gifting Stationery & More */}
+
+            <section
+              className="w-full py-8"
+              style={{ backgroundColor: "#FFF8F0" }}
+            >
+              {/* Section Heading */}
+              <div className="text-center mb-8">
+                <div className="flex items-center justify-center gap-4 mb-2 px-4">
+                  <div className="flex-1 max-w-[250px] h-[1px] bg-[#D4AF76]"></div>
+                  <h2 className="text-2xl md:text-3xl font-serif text-[#5D4037] font-semibold">
+                   Gifting Stationery & More
+                  </h2>
+                  <div className="flex-1 max-w-[250px] h-[1px] bg-[#D4AF76]"></div>
+                </div>
+                <Link
+                  to="/category/jewelry"
+                  className="text-sm text-[#ff0066] font-semibold underline-offset-2 hover:underline"
+                >
+                  View All
+                </Link>
+              </div>
+
+             
+              <div
+                ref={jewelryScrollRef}
+                className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 md:px-10"
+                style={{
+                  maxWidth: "1400px",
+                  margin: "0 auto",
+                }}
+              >
+                {stationaryItems.map((cat, idx) => (
+                  <Link
+                    key={idx}
+                    to={`/category/gifts/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+                    <div
+                      className="bg-[#FFFFFF] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[6px] border-white rounded-none h-[300px] md:h-[440px]"
+                    >
+                      {/* Image Section */}
+                      <div
+                        className="relative overflow-hidden flex-shrink-0 md:h-[70%] h-[65%]"
+                        style={{
+                          border: "3px solid #FFFFFF",
+                          backgroundColor: "#FFFFFF",
+                        }}
+                      >
+                        <img
+                          src={cat.image || "/placeholder.svg"}
+                          alt={cat.name}
+                          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                        />
+                      </div>
+
+                      {/* Text Section */}
+                      <div className="text-center py-2 flex-grow flex flex-col justify-center">
+                        <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
+                          {cat.name}
+                        </h3>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+                  {/* Final Offer Banner - 4 Full Width */}
+       <div className="w-full mb-0">
+          <Card
+            className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
+          >
+            {/* Background Image */}
+            <img
+              src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwali2_qdaxy2.jpg"
+              alt="FREE Shipping"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-black/30"></div>
+
+            {/* Text Content */}
+            <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
+              <h3 className="text-2xl sm:text-3xl font-bold mb-2">
+                🚚 FREE Shipping Above ₹499!
+              </h3>
+              <p className="text-sm sm:text-base">
+                Shop now and save on delivery charges
+              </p>
+            </div>
+          </Card>
+        </div>
+
+
+       {/* Beauty & Fragrance Collection */}
+      
+             <section className="w-full py-8 ">
+        {/* Section Heading */}
+        <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-4 mb-2 px-4">
+              <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
+              <h2 className="text-2xl md:text-3xl font-serif text-[#3E2723] font-semibold">
+              Beauty & Fragrance Collection
+              </h2>
+              <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
+            </div>
+          <Link
+            to="/category/beauty-self-care"
+            className="text-sm text-[#B94C63] font-semibold underline-offset-2 hover:underline"
+          >
+            View All  
+          </Link>
+        </div>
+
+        {/* Cards Grid */}
+        <div
+          ref={beautyScrollRef}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 md:px-10 cursor-pointer"
+          style={{
+            maxWidth: "1400px",
+            margin: "0 auto",
+          }}
+        >
+          {beautyItems.map((cat, idx) => (
+             <Link
+                    key={idx}
+                    to={`/category/beauty-self-care/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+            <div
+              key={idx}
+              className="bg-[#F3ECE5] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[8px] border-[#F3ECE5] rounded-none h-[320px] md:h-[440px]"
+            >
+              {/* Image Section */}
+              <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
+                <img
+                  src={cat.image || "/placeholder.svg"}
+                  alt={cat.name}
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+
+              {/* Text Section */}
+              <div className="text-center py-2 flex-grow flex flex-col justify-center">
+                  <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
+                    {cat.name}
+                  </h3>
+                </div>
+              </div>
+              </Link>
+          ))}
+        </div>
+
+      </section>
 
       </main>
       <Footer />

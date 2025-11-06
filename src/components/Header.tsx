@@ -68,20 +68,20 @@ const Header = () => {
       {/* Top Header */}
       <header className="sticky top-8 z-50 bg-[#FFF8F0] shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4">
-          <div className="flex items-center justify-between h-16 gap-4">
+       <div className="flex items-center justify-between h-16 md:h-24 gap-4">
             {/* Left: Logo with Brand Name */}
             <div className="flex items-center gap-3">
               <Link to="/" className="flex items-center gap-2">
                 <img
-                  src="Logo.jpg"
+                  src="/Logo.jpg"
                   alt="Logo"
-                  className="h-10 w-10 md:h-12 md:w-12 object-contain"
+                  className="h-14 w-14 md:h-16 md:w-16 object-contain"
                 />
                 <div className="flex flex-col leading-tight">
-                  <span className="text-lg md:text-xl font-bold text-[#8B4513] tracking-wide" style={{ fontFamily: "'Playfair Display', serif" }}>
-                    LIVQUE
+                  <span className="text-xl md:text-3xl font-bold text-[#8B4513] tracking-wide" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    LIVIQUE
                   </span>
-                  <span className="text-[9px] md:text-[10px] text-[#8B7355] tracking-widest uppercase">
+                  <span className="text-[10px] md:text-[14px] text-[#8B7355] tracking-widest uppercase">
                     Gifts & More
                   </span>
                 </div>
@@ -103,7 +103,7 @@ const Header = () => {
             </div>
 
             {/* Right: Icons */}
-            <div className="flex items-center gap-2 md:gap-3">
+            <div className="flex items-center gap-2 md:gap-">
               {/* Search Icon (Mobile) */}
               <Button
                 variant="ghost"
@@ -121,7 +121,8 @@ const Header = () => {
                   size="icon"
                   className="relative text-[#8B4513] hover:bg-[#F5E6D3]"
                 >
-                  <ShoppingCart className="h-5 w-5" />
+                  <ShoppingCart className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9" />
+
                   {totalItems > 0 && (
                     <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-[#D2691E] text-white text-xs rounded-full border-2 border-[#FFF8F0]">
                       {totalItems}

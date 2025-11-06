@@ -154,7 +154,7 @@ const Cart = () => {
 
               <Button
                 onClick={handleCheckout}
-                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 mb-3"
+                className="w-full h-12 rounded-xl bg-gradient-to-br from-[#A7443F] via-[#7C2A25] to-[#3A1916] text-white hover:bg-primary/90 mb-3"
               >
                 Proceed to Checkout
               </Button>
