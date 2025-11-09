@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const BANNER_IMAGES = [
   {
     id: 1,
-    src: "./assets/banners/image1.png",
+    src: "./image1.png",
     alt: "Flat 25% OFF on Gifts",
     title: "",
     subtitle: "",
@@ -13,7 +13,7 @@ const BANNER_IMAGES = [
   },
   {
     id: 2,
-    src: "./assets/banners/image2.png",
+    src: "./image2.png",
     alt: "Ajmal Luxury Perfumes",
     title: "",
     subtitle: "",
@@ -21,7 +21,7 @@ const BANNER_IMAGES = [
   },
   {
     id: 3,
-    src: "./assets/banners/image3.png",
+    src: "./image3.png",
     alt: "Buy 2 Get 1 FREE",
     title: "",
     subtitle: "",
@@ -29,7 +29,7 @@ const BANNER_IMAGES = [
   },
   {
     id: 4,
-    src: "./assets/banners/image4.png",
+    src: "./image4.png",
     alt: "Jewelry Collection",
     title: "",
     subtitle: "",
@@ -37,7 +37,7 @@ const BANNER_IMAGES = [
   },
   {
     id: 5,
-    src: "./assets/banners/image5.png",
+    src: "./image5.png",
     alt: "Fresh Flower Arrangements",
     title: "",
     subtitle: "",
