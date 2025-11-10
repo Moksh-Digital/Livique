@@ -582,217 +582,285 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                   </Button>
                 </DialogTrigger>
 
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {editingProduct ? "Edit Product" : "Add Product"}
-                    </DialogTitle>
-                  </DialogHeader>
+<DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto p-0">
+  <DialogHeader className="p-6 pb-0">
+    <DialogTitle className="text-2xl font-extrabold text-accent flex items-center gap-2">
+      {editingProduct ? <Edit className="h-6 w-6" /> : <Plus className="h-6 w-6" />} 
+      {editingProduct ? "Edit Product Listing" : "Create New Product"}
+    </DialogTitle>
+    <p className="text-sm text-muted-foreground">Fill out the details below to add or update a product in your store catalog.</p>
+  </DialogHeader>
 
-                  <form onSubmit={handleSubmit} className="space-y-4">
+  <form onSubmit={handleSubmit} className="p-6 pt-4 space-y-8">
 
+    {/* --- 1. General Info & Categorization --- */}
+    <Card className="p-6 border-l-4 border-primary/70 shadow-lg">
+      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-700">General Information</h3>
+      <div className="grid md:grid-cols-2 gap-6">
+        
+        {/* Product Name */}
+        <div>
+          <Label htmlFor="product-name" className="text-sm font-semibold text-gray-600">Product Name *</Label>
+          <Input
+            id="product-name"
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
+            placeholder="e.g., Ultra-Soft Memory Foam Pillow"
+            className="mt-1"
+          />
+        </div>
 
+        {/* Category Select */}
+        <div>
+          <Label htmlFor="category-select" className="text-sm font-semibold text-gray-600">Category *</Label>
+          <select
+            id="category-select"
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                category: e.target.value,
+                subcategory: "", // reset subcategory
+              })
+            }
+            required
+            className="w-full px-3 py-2 border rounded-lg h-10 bg-background mt-1 focus:ring-2 focus:ring-accent"
+          >
+            <option value="" disabled>--- Select Primary Category ---</option>
+            {CATEGORY_OPTIONS.map((opt) => (
+              <option key={opt.slug} value={opt.slug}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-                    {/* other inputs */}
-                    {[
-                      ["Name", "name"],
-                      ["Price", "price"],
-                      ["Original Price", "originalPrice"],
-                      ["Description", "description"],
-                    ].map(([label, key]) => (
-                      <div key={key}>
-                        <Label>{label}</Label>
-                        <Input
-                          type={
-                            key === "price" || key === "originalPrice"
-                              ? "number"
-                              : "text"
-                          }
-                          value={(formData as any)[key]}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              [key]:
-                                key === "price" || key === "originalPrice"
-                                  ? Number(e.target.value)
-                                  : e.target.value,
-                            })
-                          }
-                          required
-                        />
-                      </div>
-                    ))}
-                    {/* Category select */}
-                    <div>
-                      <Label>Category</Label>
-                      <select
-                        value={formData.category}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            category: e.target.value,
-                            // reset subcategory when category changes
-                            subcategory: "",
-                          })
-                        }
-                        required
-                        className="w-full px-3 py-2 border rounded"
-                      >
-                        <option value="">Select category</option>
-                        {CATEGORY_OPTIONS.map((opt) => (
-                          <option key={opt.slug} value={opt.slug}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+        {/* Subcategory select (conditional) */}
+        {(() => {
+          const selCat = CATEGORY_OPTIONS.find(c => c.slug === formData.category);
+          if (!selCat || selCat.subcategories.length === 0) return null;
+          return (
+            <div className="md:col-span-2">
+              <Label htmlFor="subcategory-select" className="text-sm font-semibold text-gray-600">Subcategory</Label>
+              <select
+                id="subcategory-select"
+                value={formData.subcategory}
+                onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg h-10 bg-background mt-1 focus:ring-2 focus:ring-accent"
+              >
+                <option value="" disabled>--- Select Secondary Category ---</option>
+                {selCat.subcategories.map((sub) => (
+                  <option key={sub.slug} value={sub.slug}>
+                    {sub.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          );
+        })()}
 
-                    <div>
-                      <Label>Delivery Charge (₹)</Label>
-                      <Input
-                        type="number"
-                        value={formData.deliveryCharge}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            deliveryCharge: Number(e.target.value), // Convert to number
-                          })
-                        }
-                        placeholder="0"
-                        min="0"
-                      />
-                    </div>
+        {/* Product Description */}
+        <div className="md:col-span-2">
+          <Label htmlFor="description-input" className="text-sm font-semibold text-gray-600">Product Description *</Label>
+          <textarea
+            id="description-input"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            required
+            rows={4}
+            className="w-full px-3 py-2 border rounded-lg bg-background resize-none mt-1 focus:ring-2 focus:ring-accent"
+            placeholder="A detailed description of the product features, materials, and benefits. Minimum 50 characters."
+          />
+        </div>
+      </div>
+    </Card>
 
-                    {/* Subcategory select (shown only if selected category has subcategories) */}
-                    {(() => {
-                      const selCat = CATEGORY_OPTIONS.find(c => c.slug === formData.category);
-                      if (!selCat || selCat.subcategories.length === 0) return null;
-                      return (
-                        <div>
-                          <Label>Subcategory</Label>
-                          <select
-                            value={formData.subcategory}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                subcategory: e.target.value,
-                              })
-                            }
-                            required
-                            className="w-full px-3 py-2 border rounded"
-                          >
-                            <option value="">Select subcategory</option>
-                            {selCat.subcategories.map((sub) => (
-                              <option key={sub.slug} value={sub.slug}>
-                                {sub.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      );
-                    })()}
-                    {/* Main Image (file or url) */}
-                    <div>
-                      <Label>Main Image (file or URL)</Label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="block mb-2"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          const dataUrl = await readFileAsDataUrl(file);
-                          setFormData({ ...formData, mainImage: dataUrl });
-                        }}
-                      />
-                      <Input
-                        placeholder="Or paste image URL"
-                        value={(formData as any).mainImage}
-                        onChange={(e) => setFormData({ ...formData, mainImage: e.target.value })}
-                      />
-                      {/* preview */}
-                      <div className="mt-2">
-                        {(formData as any).mainImage ? (
-                          (((formData as any).mainImage as string).startsWith("data:") ||
-                            ((formData as any).mainImage as string).startsWith("http")) ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={(formData as any).mainImage}
-                              alt="main-preview"
-                              className="w-24 h-24 object-cover rounded-md border"
-                            />
-                          ) : (
-                            <div className="w-24 h-24 flex items-center justify-center text-4xl bg-muted rounded-md border">
-                              {(formData as any).mainImage}
-                            </div>
-                          )
-                        ) : null}
-                      </div>
-                    </div>
+    {/* --- 2. Pricing & Logistics --- */}
+    <Card className="p-6 border-l-4 border-accent/70 shadow-lg">
+      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-700">Pricing & Logistics</h3>
+      <div className="grid md:grid-cols-3 gap-6">
+        
+        {/* Price */}
+        <div>
+          <Label htmlFor="price-input" className="text-sm font-semibold text-gray-600">Selling Price (₹) *</Label>
+          <Input
+            id="price-input"
+            type="number"
+            min="1"
+            value={formData.price || ""}
+            onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+            required
+            placeholder="599"
+            className="mt-1"
+          />
+        </div>
+        
+        {/* Original Price */}
+        <div>
+          <Label htmlFor="original-price-input" className="text-sm font-semibold text-gray-600">Original Price (₹)</Label>
+          <Input
+            id="original-price-input"
+            type="number"
+            min="1"
+            value={formData.originalPrice || ""}
+            onChange={(e) => setFormData({ ...formData, originalPrice: Number(e.target.value) })}
+            placeholder="999 (for discount calculation)"
+            className="mt-1"
+            required
+          />
+        </div>
+        
+        {/* Delivery Charge */}
+        <div>
+          <Label htmlFor="delivery-charge-input" className="text-sm font-semibold text-gray-600">Delivery Charge (₹)</Label>
+          <Input
+            id="delivery-charge-input"
+            type="number"
+            value={formData.deliveryCharge || ""}
+            onChange={(e) => setFormData({ ...formData, deliveryCharge: Number(e.target.value) })}
+            placeholder="0 for free delivery"
+            min="0"
+            className="mt-1"
+          />
+        </div>
+      </div>
+    </Card>
 
-                    {/* Gallery images (multiple) */}
-                    <div>
-                      <Label>Gallery Images (files or URLs)</Label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        className="block mb-2"
-                        onChange={async (e) => {
-                          const files = Array.from(e.target.files || []);
-                          if (files.length === 0) return;
-                          const dataUrls = await Promise.all(files.map(f => readFileAsDataUrl(f)));
-                          setFormData({ ...formData, images: [...(formData.images || []), ...dataUrls] });
-                        }}
-                      />
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Paste image URL and press Add"
-                          id="gallery-url-input"
-                        // local uncontrolled input not required, simple inline handler below
-                        />
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            const el = document.getElementById("gallery-url-input") as HTMLInputElement | null;
-                            const url = el?.value?.trim();
-                            if (!url) return;
-                            setFormData({ ...formData, images: [...(formData.images || []), url] });
-                            if (el) el.value = "";
-                          }}
-                        >
-                          Add
-                        </Button>
-                      </div>
-                      {/* show preview / remove */}
-                      <div className="flex gap-2 mt-2 flex-wrap">
-                        {(formData.images || []).map((src: string, idx: number) => (
-                          <div key={idx} className="relative">
-                            <div className="w-20 h-20 bg-muted rounded-md overflow-hidden flex items-center justify-center">
-                              {src.startsWith('data:') || src.startsWith('http') ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={src} alt={`img-${idx}`} className="object-cover w-full h-full" />
-                              ) : (
-                                <span className="text-3xl">{src}</span>
-                              )}
-                            </div>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="absolute -top-2 -right-2"
-                              onClick={() => setFormData({ ...formData, images: (formData.images || []).filter((_, i) => i !== idx) })}
-                            >
-                              ✕
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <Button type="submit" className="w-full">
-                      Save
-                    </Button>
-                  </form>
-                </DialogContent>
+    {/* --- 3. Media Upload --- */}
+    <Card className="p-6 border-l-4 border-blue-500/70 shadow-lg">
+      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-700">Product Media</h3>
+
+      {/* Main Image */}
+      <div className="mb-8 p-4 border rounded-xl bg-blue-50/50">
+        <Label className="block mb-3 font-bold text-blue-700 flex items-center gap-1">
+            Main Image (Required) 🖼️
+        </Label>
+        <div className="flex flex-col sm:flex-row gap-4 items-start">
+          
+          <div className="w-full sm:flex-1 space-y-3">
+            <input
+              type="file"
+              accept="image/*"
+              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const dataUrl = await readFileAsDataUrl(file);
+                setFormData({ ...formData, mainImage: dataUrl });
+              }}
+            />
+            <Input
+              placeholder="Or paste image URL"
+              value={formData.mainImage}
+              onChange={(e) => setFormData({ ...formData, mainImage: e.target.value })}
+            />
+          </div>
+          
+          {/* Main Image Preview - Large and Rounded */}
+          <div className="shrink-0">
+            {formData.mainImage ? (
+              (((formData.mainImage as string).startsWith("data:") ||
+                (formData.mainImage as string).startsWith("http")) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={formData.mainImage}
+                  alt="main-preview"
+                  className="w-32 h-32 object-cover rounded-2xl border-4 border-blue-300 shadow-xl transition-transform hover:scale-[1.02]"
+                />
+              ) : (
+                <div className="w-32 h-32 flex items-center justify-center text-5xl bg-blue-100 rounded-2xl border-4 border-blue-300">
+                  {formData.mainImage}
+                </div>
+              ))
+            ) : (
+              <div className="w-32 h-32 flex items-center justify-center bg-gray-100 rounded-2xl text-gray-400 border-4 border-dashed border-gray-300">
+                <Package className="h-8 w-8" />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Gallery Images (Multiple) */}
+      <div>
+        <Label className="block mb-3 font-bold text-gray-700">Gallery Images (Optional)</Label>
+        <div className="space-y-3">
+          
+          {/* File Input */}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+            onChange={async (e) => {
+              const files = Array.from(e.target.files || []);
+              if (files.length === 0) return;
+              const dataUrls = await Promise.all(files.map(f => readFileAsDataUrl(f)));
+              setFormData({ ...formData, images: [...(formData.images || []), ...dataUrls] });
+            }}
+          />
+
+          {/* URL Input with Add Button */}
+          <div className="flex gap-2">
+            <Input
+              placeholder="Paste image URL and click 'Add to Gallery'"
+              id="gallery-url-input"
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              className="shrink-0"
+              onClick={() => {
+                const el = document.getElementById("gallery-url-input") as HTMLInputElement | null;
+                const url = el?.value?.trim();
+                if (!url) return;
+                setFormData({ ...formData, images: [...(formData.images || []), url] });
+                if (el) el.value = "";
+              }}
+            >
+              <Plus className="h-4 w-4 mr-1" /> Add to Gallery
+            </Button>
+          </div>
+          
+          {/* Gallery Image Previews - Interactive */}
+          <div className="flex gap-4 mt-4 flex-wrap p-2 rounded-lg border border-dashed border-gray-200 min-h-[50px]">
+            {(formData.images || []).filter(src => src !== formData.mainImage).map((src: string, idx: number) => (
+              <div key={idx} className="relative group">
+                <div className="w-20 h-20 bg-muted rounded-xl overflow-hidden flex items-center justify-center border-2 border-gray-300 hover:border-red-500 transition-all">
+                  {src.startsWith('data:') || src.startsWith('http') ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={src} alt={`gallery-img-${idx}`} className="object-cover w-full h-full" />
+                  ) : (
+                    <span className="text-xl">{src}</span>
+                  )}
+                </div>
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  className="absolute -top-3 -right-3 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  onClick={() => setFormData({ ...formData, images: (formData.images || []).filter((_, i) => i !== idx) })}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            ))}
+            {/* Placeholder for empty gallery */}
+            {(formData.images || []).filter(src => src !== formData.mainImage).length === 0 && (
+                <p className="text-sm text-gray-400 p-4">Add 1-4 more images for the product gallery.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
+
+    {/* --- Submit Button (Stays prominent) --- */}
+    <Button type="submit" className="w-full h-12 text-lg font-bold shadow-lg hover:shadow-xl transition-all">
+      {editingProduct ? "💾 Update Product Listing" : "🚀 Publish New Product"}
+    </Button>
+  </form>
+</DialogContent>
               </Dialog>
             </div>
 
