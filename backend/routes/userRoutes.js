@@ -5,7 +5,12 @@ import {
     sendSigninOtp,
     verifySigninOtp,
     authUser,
-    getUserProfile
+    getUserProfile,
+    // --- NEW IMPORTS ---
+    forgotPassword,
+    validateResetToken,
+    resetPassword,
+    // -------------------
 } from '../controllers/userController.js';
 import { protect } from '../middleware/authMiddleware.js'; 
 import {
@@ -28,6 +33,12 @@ router.route('/verify-otp').post(verifyOtpAndRegister);
 router.route('/send-signin-otp').post(sendSigninOtp);
 router.route('/verify-signin-otp').post(verifySigninOtp); // now returns JWT
 router.post('/login', authUser); // optional legacy
+
+// --- NEW FORGOT PASSWORD ROUTES ---
+router.route('/forgot-password').post(forgotPassword);
+router.route('/validate-reset-token').post(validateResetToken);
+router.route('/reset-password').post(resetPassword);
+// ----------------------------------
 
 // Private/Protected Route
 router.get("/profile", protect, getUserProfile);

@@ -233,6 +233,131 @@ const verifySigninOtp = async (req, res) => {
 
 
 
+// ------------------------------------------------------------------
+// --- NEW: FORGOT PASSWORD CONTROLLERS -----------------------------
+// ------------------------------------------------------------------
+
+// @desc    Step 1: Request Password Reset (Send OTP)
+// @route   POST /api/users/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ message: 'Please enter your email address.' });
+    }
+
+    try {
+        const user = await User.findOne({ email, isVerified: true });
+
+        if (!user) {
+            // Send a generic success message even if the user is not found to prevent email enumeration
+            return res.status(200).json({ message: 'If an account exists for this email, a password reset code has been sent.' });
+        }
+
+        // Generate a reset token (using 6-digit OTP for simplicity in UI)
+        const resetToken = generateOTP();
+        const resetTokenExpires = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpires = resetTokenExpires;
+        await user.save();
+        
+        console.log(`Generated Password Reset Token for ${email}: ${resetToken}`);
+
+        const emailResult = await sendEmail({
+            to: email,
+            subject: 'Password Reset Verification Code',
+            html: `<p>Hello ${user.name},</p>
+                   <p>You requested a password reset. Your verification code is: <strong>${resetToken}</strong></p>
+                   <p>This code is valid for 10 minutes. If you did not request this, please ignore this email.</p>`,
+        });
+
+        if (emailResult.success) {
+            res.status(200).json({
+                message: 'Password reset code sent successfully. Check your email.',
+                email: email
+            });
+        } else {
+            // If email fails, clear the token to force a retry
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+            await user.save();
+            res.status(500).json({ message: 'Error sending reset code email. Please try again later.' });
+        }
+    } catch (error) {
+        console.error("Database or Server Error:", error);
+        res.status(500).json({ message: 'An error occurred during password reset request.' });
+    }
+};
+
+
+// @desc    Step 2: Validate Reset Token (OTP)
+// @route   POST /api/users/validate-reset-token
+// @access  Public
+const validateResetToken = async (req, res) => {
+    const { email, token } = req.body;
+
+    try {
+        const user = await User.findOne({ 
+            email,
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() } // $gt: greater than current time (not expired)
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired reset code.' });
+        }
+
+        // Token is valid. Do NOT clear it yet, as the user needs to use it for the final step.
+        res.status(200).json({ success: true, message: 'Code validated. Please set your new password.' });
+
+    } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).json({ message: "Error validating reset code." });
+    }
+};
+
+// @desc    Step 3: Set New Password
+// @route   POST /api/users/reset-password
+// @access  Public
+const resetPassword = async (req, res) => {
+    const { email, token, newPassword } = req.body;
+
+    if (!newPassword || newPassword.length < 6) {
+        return res.status(400).json({ message: 'Password must be at least 6 characters long.' });
+    }
+
+    try {
+        const user = await User.findOne({ 
+            email,
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired reset session. Please restart the forgot password process.' });
+        }
+
+        // Update password (pre-save hook will hash it)
+        user.password = newPassword;
+        
+        // Clear reset fields
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        res.status(200).json({ success: true, message: 'Password updated successfully! You can now log in with your new password.' });
+
+    } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).json({ message: "Error setting new password." });
+    }
+};
+// ------------------------------------------------------------------
+
+
 // @desc    Authenticate user & get token (Login) - Legacy endpoint (kept for completeness)
 // @route   POST /api/users/login
 // @access  Public
@@ -261,11 +386,6 @@ const authUser = async (req, res) => {
 };
 
 
-// Placeholder for protected route
-// const getUserProfile = (req, res) => {
-//     // In a real application, req.user would be set by the 'protect' middleware after JWT verification
-//     res.json({ message: 'User profile data (using MongoDB, requires JWT protect middleware to work fully)' });
-// };
 const getUserProfile = async (req, res) => {
   try {
     // req.user is already set by middleware
@@ -287,4 +407,9 @@ export {
     verifySigninOtp,
     authUser,
     getUserProfile,
+    // --- NEW EXPORTS ---
+    forgotPassword,
+    validateResetToken,
+    resetPassword,
+    // -------------------
 };

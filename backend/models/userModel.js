@@ -31,6 +31,10 @@ const userSchema = mongoose.Schema(
     isAdmin: { type: Boolean, default: false },
     signinOtp: String,
     signinOtpExpires: Date,
+    // --- NEW: Password Reset Fields ---
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
+    // ---------------------------------
     cart: [
       {
         id: { type: String, required: true },
