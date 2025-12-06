@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Header from "../components/Header";
 import axios from "axios";
 import {
   User,
@@ -246,7 +247,9 @@ useEffect(() => {
     : "N/A";
 
   return (
-    <div className="bg-gray-100 min-h-screen p-4 md:p-8">
+    <>
+      <Header />
+      <div className="bg-gray-100 min-h-screen p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">My Account</h1>
 
@@ -630,7 +633,8 @@ useEffect(() => {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
