@@ -12,6 +12,7 @@ import {
   ChevronRight,
   ShieldCheck,
   CreditCard,
+  X,
 } from "lucide-react";
 
 // NEW INTERFACE for Order
@@ -46,15 +47,20 @@ const ProfilePage = () => {
   const [error, setError] = useState<string | null>(null); // For better error handling
   const [orders, setOrders] = useState<Order[]>([]); // 👈 STATE FOR ORDERS
   const [addresses, setAddresses] = useState<any[]>([]);
-const [showAddressForm, setShowAddressForm] = useState(false);
-const [formData, setFormData] = useState({
-  fullName: "",
-  phone: "",
-  street: "",
-  city: "",
-  state: "",
-  pincode: "",
-});
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [editingName, setEditingName] = useState("");
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editSuccess, setEditSuccess] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    phone: "",
+    street: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
 
 
 useEffect(() => {
@@ -97,6 +103,7 @@ useEffect(() => {
 
         setUser(userResponse.data);
         setOrders(ordersResponse.data); // Save fetched orders
+        setEditingName(userResponse.data.name); // Initialize editing name
 
       } catch (err: any) { 
         console.error("Error fetching profile or orders:", err);
@@ -111,6 +118,52 @@ useEffect(() => {
     };
     fetchData();
   }, []); // Run once on component mount
+
+  // Handle profile update
+  const handleUpdateProfile = async () => {
+    if (!editingName.trim()) {
+      setEditError("Name cannot be empty.");
+      return;
+    }
+
+    setEditLoading(true);
+    setEditError(null);
+    setEditSuccess(false);
+
+    try {
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await axios.patch(
+        "http://localhost:5000/api/users/profile",
+        { name: editingName },
+        config
+      );
+
+      setUser(prevUser => 
+        prevUser ? { ...prevUser, name: response.data.name } : null
+      );
+      setEditSuccess(true);
+      
+      // Close modal after 1.5 seconds
+      setTimeout(() => {
+        setShowEditProfileModal(false);
+        setEditSuccess(false);
+      }, 1500);
+    } catch (err: any) {
+      setEditError(
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to update profile. Please try again."
+      );
+    } finally {
+      setEditLoading(false);
+    }
+  };
 
 
   // ---------------- ORDER STATISTICS CALCULATION ----------------
@@ -217,7 +270,9 @@ useEffect(() => {
                 <span className="font-medium">Joined:</span>
                 <span className="ml-2">{joinedDate}</span>
               </div>
-              <button className="mt-6 w-full bg-gray-800 text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+              <button className="mt-6 w-full bg-gray-800 text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                onClick={() => setShowEditProfileModal(true)}
+              >
                 Edit Profile
               </button>
             </div>
@@ -484,6 +539,97 @@ useEffect(() => {
           </div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {showEditProfileModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Edit Profile</h2>
+              <button
+                onClick={() => {
+                  setShowEditProfileModal(false);
+                  setEditError(null);
+                  setEditSuccess(false);
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {editError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {editError}
+              </div>
+            )}
+
+            {editSuccess && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                Profile updated successfully!
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={editingName}
+                  onChange={(e) => setEditingName(e.target.value)}
+                  disabled={editLoading}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent outline-none disabled:bg-gray-100"
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={user?.email || ""}
+                  disabled
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                />
+                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => {
+                    setShowEditProfileModal(false);
+                    setEditError(null);
+                    setEditSuccess(false);
+                    setEditingName(user?.name || "");
+                  }}
+                  disabled={editLoading}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateProfile}
+                  disabled={editLoading}
+                  className="flex-1 px-4 py-2 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {editLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

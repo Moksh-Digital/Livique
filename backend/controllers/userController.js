@@ -393,9 +393,44 @@ const getUserProfile = async (req, res) => {
       name: req.user.name,
       email: req.user.email,
       verified: req.user.isVerified,
+      createdAt: req.user.createdAt,
     });
   } catch (error) {
     res.status(500).json({ message: "Error fetching profile" });
+  }
+};
+
+// @desc    Update user profile
+// @route   PATCH /api/users/profile
+// @access  Private (Protected)
+const updateProfile = async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: "Name is required." });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    user.name = name;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully.",
+      name: user.name,
+      email: user.email,
+      verified: user.isVerified,
+      createdAt: user.createdAt,
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ message: "Error updating profile" });
   }
 };
 
@@ -407,6 +442,7 @@ export {
     verifySigninOtp,
     authUser,
     getUserProfile,
+    updateProfile,
     // --- NEW EXPORTS ---
     forgotPassword,
     validateResetToken,
