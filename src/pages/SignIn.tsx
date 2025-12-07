@@ -20,7 +20,7 @@ const isLocalhost =
 
 const API_BASE_URL = isLocalhost
   ? "http://localhost:5000/api/users"          // local dev
-  : "http://64.227.146.210:5000/api/users";    // production = droplet IP
+  : "https://api.livique.co.in/api/users";    // production = droplet IP
 
 
 

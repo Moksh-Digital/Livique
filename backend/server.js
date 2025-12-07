@@ -29,7 +29,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://64.227.146.210",
   "http://64.227.146.210:5000",
-  "https://livique-psi.vercel.app",  // << yeh add karo
+  "https://livique-psi.vercel.app",
+  "https://www.livique.co.in",
   CLIENT_URL,
 ];
 
