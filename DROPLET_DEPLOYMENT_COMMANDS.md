@@ -65,13 +65,93 @@ sudo systemctl status nginx
 ```
 
 ## Step 6: Create Nginx Configuration File
+
 ```bash
 # Create the config file
 sudo nano /etc/nginx/sites-available/livique
 ```
 
-**Paste the following content:**
+**⚠️ PASTE ONLY THE HTTP VERSION FIRST (Step 1 config above)**
+
+This allows Let's Encrypt to validate your domains before we enable HTTPS.
 ```nginx
+# ==========================================
+# STEP 1: HTTP ONLY - Get certificates first
+# ==========================================
+
+# Backend API
+server {
+    listen 80;
+    server_name api.livique.co.in;
+
+    # Logging
+    access_log /var/log/nginx/livique-api.access.log;
+    error_log /var/log/nginx/livique-api.error.log;
+
+    # Let's Encrypt challenge
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    # Reverse Proxy to Backend
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        
+        # Headers
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+}
+
+# Frontend
+server {
+    listen 80;
+    server_name www.livique.co.in livique.co.in;
+
+    # Logging
+    access_log /var/log/nginx/livique-web.access.log;
+    error_log /var/log/nginx/livique-web.error.log;
+
+    # Let's Encrypt challenge
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    # Root directory for frontend build
+    root /root/livique/dist;  # Update with your actual path
+    index index.html;
+
+    # Serve static files
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # SPA fallback - route all requests to index.html
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+**⚠️ IMPORTANT: After getting SSL certificates (Step 8), replace this entire config with the HTTPS version below!**
+
+```nginx
+# ==========================================
+# STEP 2: HTTPS with SSL (After certbot)
+# ==========================================
+
 # Redirect HTTP to HTTPS for API
 server {
     listen 80;
@@ -84,7 +164,7 @@ server {
     listen 443 ssl http2;
     server_name api.livique.co.in;
 
-    # SSL Certificates (Using Let's Encrypt Certbot - see Step 7)
+    # SSL Certificates (From Let's Encrypt)
     ssl_certificate /etc/letsencrypt/live/api.livique.co.in/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/api.livique.co.in/privkey.pem;
 
@@ -144,7 +224,7 @@ server {
     error_log /var/log/nginx/livique-web.error.log;
 
     # Root directory for frontend build
-    root /path/to/livique-ecom/dist;  # Update with your actual path
+    root /root/livique/dist;  # Update with your actual path
     index index.html;
 
     # Serve static files
@@ -306,35 +386,239 @@ sudo tail -100 /var/log/nginx/livique-web.error.log
 ssh root@64.227.146.210
 
 # 2. Navigate and pull latest code
-cd /path/to/livique-ecom
+cd /root/livique
 git pull origin main
 
-# 3. Update .env (choose one method)
-nano backend/.env  # Manual edit
+# 3. Update .env automatically
+cd backend
+sed -i '1i NODE_ENV=production' .env 2>/dev/null || true
+sed -i 's|^BACKEND_URL=.*|BACKEND_URL=https://api.livique.co.in|' .env || sed -i '1i BACKEND_URL=https://api.livique.co.in' .env
+sed -i 's|^CLIENT_URL=.*|CLIENT_URL=https://www.livique.co.in|' .env || sed -i '1i CLIENT_URL=https://www.livique.co.in' .env
+echo "=== Updated .env ===" && cat .env
 
 # 4. Install Nginx
 sudo apt update && sudo apt install -y nginx
 
-# 5. Create Nginx config
-sudo nano /etc/nginx/sites-available/livique
-# (Paste the nginx config from Step 6)
+# 5. Create directory for Let's Encrypt validation
+sudo mkdir -p /var/www/certbot
 
-# 6. Enable and test Nginx
+# 6. Create Nginx config with HTTP only (for SSL certificate validation)
+sudo tee /etc/nginx/sites-available/livique > /dev/null << 'EOF'
+# Backend API
+server {
+    listen 80;
+    server_name api.livique.co.in;
+
+    access_log /var/log/nginx/livique-api.access.log;
+    error_log /var/log/nginx/livique-api.error.log;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+}
+
+# Frontend
+server {
+    listen 80;
+    server_name www.livique.co.in livique.co.in;
+
+    access_log /var/log/nginx/livique-web.access.log;
+    error_log /var/log/nginx/livique-web.error.log;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    root /root/livique/dist;
+    index index.html;
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+EOF
+
+# 7. Enable Nginx site
 sudo ln -sf /etc/nginx/sites-available/livique /etc/nginx/sites-enabled/livique
+sudo rm -f /etc/nginx/sites-enabled/default
+
+# 8. Test and reload Nginx
 sudo nginx -t && sudo systemctl reload nginx
+echo "✅ Nginx reloaded successfully"
 
-# 7. Install SSL certificates
+# 9. Install Certbot for SSL
 sudo apt install -y certbot python3-certbot-nginx
-sudo certbot certonly --standalone -d api.livique.co.in
-sudo certbot certonly --standalone -d www.livique.co.in -d livique.co.in
 
-# 8. Rebuild and restart backend
-cd backend && npm install && pm2 restart all
+# 10. Get SSL certificate for API domain
+echo "Getting SSL certificate for api.livique.co.in..."
+sudo certbot certonly --webroot -w /var/www/certbot -d api.livique.co.in --non-interactive --agree-tos -m mokshdigitalco@gmail.com
 
-# 9. Build frontend
-cd .. && npm install && npm run build
+# 11. Get SSL certificate for Frontend domains
+echo "Getting SSL certificate for livique.co.in..."
+sudo certbot certonly --webroot -w /var/www/certbot -d www.livique.co.in -d livique.co.in --non-interactive --agree-tos -m mokshdigitalco@gmail.com
 
-# 10. Verify
-curl https://api.livique.co.in/
+# 12. Verify certificates were created
+echo "=== Checking certificates ===" && sudo ls -la /etc/letsencrypt/live/
+
+# 13. Update Nginx config to use HTTPS
+sudo tee /etc/nginx/sites-available/livique > /dev/null << 'EOF'
+# Redirect HTTP to HTTPS for API
+server {
+    listen 80;
+    server_name api.livique.co.in;
+    return 301 https://$server_name$request_uri;
+}
+
+# HTTPS Backend API
+server {
+    listen 443 ssl http2;
+    server_name api.livique.co.in;
+
+    ssl_certificate /etc/letsencrypt/live/api.livique.co.in/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.livique.co.in/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    access_log /var/log/nginx/livique-api.access.log;
+    error_log /var/log/nginx/livique-api.error.log;
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+}
+
+# Redirect HTTP to HTTPS for Frontend
+server {
+    listen 80;
+    server_name www.livique.co.in livique.co.in;
+    return 301 https://$server_name$request_uri;
+}
+
+# HTTPS Frontend
+server {
+    listen 443 ssl http2;
+    server_name www.livique.co.in livique.co.in;
+
+    ssl_certificate /etc/letsencrypt/live/livique.co.in/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/livique.co.in/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    access_log /var/log/nginx/livique-web.access.log;
+    error_log /var/log/nginx/livique-web.error.log;
+
+    root /root/livique/dist;
+    index index.html;
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+EOF
+
+# 14. Test HTTPS config
+sudo nginx -t
+
+# 15. Reload Nginx with HTTPS enabled
+sudo systemctl reload nginx
+echo "✅ Nginx reloaded with HTTPS"
+
+# 16. Enable auto-renewal for certificates
+sudo systemctl enable certbot.timer
+sudo systemctl start certbot.timer
+
+# 17. Rebuild and restart backend
+cd /root/livique/backend
+npm install
+pm2 restart all
+
+# 18. Build frontend
+cd /root/livique
+npm install
+npm run build
+
+# 19. Verify everything is running
+echo "=== Checking services ===" 
+sudo systemctl status nginx
+pm2 status
+
+# 20. Test your application
+echo "=== Testing application ===" 
+curl -I http://localhost:5000
+curl -I https://api.livique.co.in/
+echo "✅ All setup complete!"
+```
+
+---
+
+## If You Get SSL Certificate Errors
+
+**If certbot fails** because port 443 is already in use:
+
+```bash
+# Kill any process using port 443
+sudo lsof -i :443
+sudo kill -9 <PID>
+
+# Or stop Nginx temporarily
+sudo systemctl stop nginx
+
+# Then rerun certbot commands
+sudo certbot certonly --webroot -w /var/www/certbot -d api.livique.co.in --non-interactive --agree-tos -m mokshdigitalco@gmail.com
+sudo certbot certonly --webroot -w /var/www/certbot -d www.livique.co.in -d livique.co.in --non-interactive --agree-tos -m mokshdigitalco@gmail.com
+
+# Restart Nginx
+sudo systemctl start nginx
+```
+
+## If Nginx Config has Errors
+
+```bash
+# Check for syntax errors
+sudo nginx -t
+
+# View detailed error log
+sudo tail -50 /var/log/nginx/livique-api.error.log
+
+# View access log
+sudo tail -50 /var/log/nginx/livique-api.access.log
 ```
 
