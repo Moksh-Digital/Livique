@@ -60,8 +60,7 @@ app.use(
   })
 );
 
-// Preflight ke liye
-app.options("*", cors());
+
 
 // ================== Session BEFORE passport ==================
 const isProduction = process.env.NODE_ENV === "production" || !!process.env.BACKEND_URL?.includes("api.livique");
