@@ -7,6 +7,10 @@ import { useProducts } from "@/contexts/ProductsContext";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
+// ✅ AUTO SWITCH API BASE URL
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -32,7 +36,7 @@ const ProductDetail = () => {
           return;
         }
 
-        const res = await fetch(`http://localhost:5000/api/products/${id}`);
+        const res = await fetch(`${API_BASE_URL}/products/${id}`);
         if (!res.ok) throw new Error("Product not found");
         const data = await res.json();
         setProduct(data);

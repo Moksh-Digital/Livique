@@ -41,6 +41,11 @@ interface UserProfile {
   // Add any other fields you get from your API here
 }
 
+// ✅ AUTO SWITCH API BASE URL
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
+
 const ProfilePage = () => {
   // 2. Type your state
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -69,7 +74,8 @@ useEffect(() => {
     const token = localStorage.getItem("token");
     console.log("Fetching addresses...");
 
-    const { data } = await axios.get("http://localhost:5000/api/users/addresses", {
+    const { data } = await axios.get(`${API_BASE_URL}/users/addresses`, {
+      
       
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -98,8 +104,10 @@ useEffect(() => {
       try {
         // Fetch User Profile and Orders concurrently using Promise.all
         const [userResponse, ordersResponse] = await Promise.all([
-            axios.get<UserProfile>("http://localhost:5000/api/users/profile", config),
-            axios.get<Order[]>("http://localhost:5000/api/orders/my-orders", config), // 👈 API call to fetch user's orders
+            axios.get<UserProfile>(`${API_BASE_URL}/users/profile`, config),
+            
+            axios.get<Order[]>(`${API_BASE_URL}/orders/my-orders`, config), // 👈 API call to fetch user's orders
+            
         ]);
 
         setUser(userResponse.data);
@@ -140,7 +148,8 @@ useEffect(() => {
       };
 
       const response = await axios.patch(
-        "http://localhost:5000/api/users/profile",
+        `${API_BASE_URL}/users/profile`,
+        
         { name: editingName },
         config
       );
@@ -442,12 +451,13 @@ useEffect(() => {
     };
 
     try {
-      await axios.post("http://localhost:5000/api/users/addresses", payload, {
+      
+      await axios.post(`${API_BASE_URL}/users/addresses`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       // Optionally, fetch addresses again instead of reloading
-      const { data } = await axios.get("http://localhost:5000/api/users/addresses", {
+      const { data } = await axios.get(`${API_BASE_URL}/users/addresses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAddresses(data);

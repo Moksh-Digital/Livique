@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Define the localStorage key
 const LOCAL_STORAGE_KEY = 'livique_admin_products';
+// ✅ AUTO SWITCH API BASE URL
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
 
 
 // Helper function to get initial products from localStorage
@@ -251,7 +255,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     const fetchProductsFromBackend = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${API_BASE_URL}/products`);
         const data = await res.json();
         if (res.ok && Array.isArray(data)) {
           setProducts(data.map(p => ({ ...p, id: p._id })));
@@ -327,7 +331,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Refresh products from backend (used after orders to update quantities)
   const refreshProducts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/products");
+      const res = await fetch(`${API_BASE_URL}/products`);
       const data = await res.json();
       if (res.ok && Array.isArray(data)) {
         setProducts(data.map(p => ({ ...p, id: p._id })));

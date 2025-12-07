@@ -21,6 +21,10 @@ import {
 } from "@/components/ui/sheet";
 import { getCategoryBySlug } from "@/data/categories";
 import PromoBanner from "@/components/Banner"
+// ✅ AUTO SWITCH API BASE URL
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
 
 const Category = () => {
   const { category, subcategory } = useParams();
@@ -53,7 +57,7 @@ const Category = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        let url = "http://localhost:5000/api/products";
+        let url = `${API_BASE_URL}/products`;
         
         // If we have both category and subcategory, it's a subcategory view
         if (subcategory) {

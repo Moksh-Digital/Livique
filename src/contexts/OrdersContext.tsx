@@ -2,6 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 // LocalStorage key for caching
 const LOCAL_STORAGE_KEY = "livique_admin_orders";
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
 
 // ✅ User interface
 export interface User {
@@ -104,7 +107,7 @@ export const OrdersProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setLoading(true);
       setError(null);
 
-      const res = await fetch("http://localhost:5000/api/orders");
+      const res = await fetch(`${API_BASE_URL}/orders`);
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || "Failed to fetch orders");

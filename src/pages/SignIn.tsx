@@ -13,7 +13,10 @@ import { Mail, Lock, X, ArrowLeft, KeyRound, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext"; 
 import { useToast } from "../hooks/use-toast"; 
 
-const API_BASE_URL = "http://localhost:5000/api/users";
+// ✅ AUTO SWITCH API BASE URL
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:5000/api/users`;
+
 
 interface SignInProps {
   isModal?: boolean;

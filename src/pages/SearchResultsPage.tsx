@@ -23,6 +23,10 @@ interface Product {
   createdAt: string
   updatedAt: string
 }
+// ✅ AUTO SWITCH API BASE URL
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
 
 const SearchResultsPage = () => {
   const [searchParams] = useSearchParams()
@@ -37,7 +41,7 @@ const SearchResultsPage = () => {
       setLoading(true)
       try {
         const { data } = await axios.get(
-          `http://localhost:5000/api/products/search?keyword=${keyword}`
+          `${API_BASE_URL}/products/search?keyword=${keyword}`
         )
         setResults(data)
       } catch (error) {

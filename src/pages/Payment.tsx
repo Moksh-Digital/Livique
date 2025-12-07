@@ -10,6 +10,11 @@ import Header from "@/components/Header";
 import StepsTracker from "@/components/StepsTracker";
 import axios from 'axios'; // 👈 IMPORT AXIOS
 
+// ✅ AUTO SWITCH API BASE URL
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
+
 const Payment = () => {
   const navigate = useNavigate();
   const { cart, clearCart, getTotalPrice } = useCart();
@@ -75,7 +80,7 @@ const handlePlaceOrder = async () => {
     if (paymentMethod === "cod") {
       // 🧾 Normal COD flow
       const { data: createdOrder } = await axios.post(
-        "http://localhost:5000/api/orders",
+        `${API_BASE_URL}/orders`,
         orderData,
         config
       );
@@ -92,7 +97,7 @@ const handlePlaceOrder = async () => {
     } else if (paymentMethod === "razorpay") {
       // 💳 Razorpay flow
       const { data } = await axios.post(
-        "http://localhost:5000/api/payment/create-order",
+        `${API_BASE_URL}/payment/create-order`,
         { amount: total },
         config
       );
@@ -107,14 +112,14 @@ const options = {
 
   handler: async (response) => {
     const verifyRes = await axios.post(
-      "http://localhost:5000/api/payment/verify",
+      `${API_BASE_URL}/payment-verify`,
       response
     );
 
     if (verifyRes.data.success) {
       // ✅ Create order in DB after successful payment
       const { data: createdOrder } = await axios.post(
-        "http://localhost:5000/api/orders",
+        `${API_BASE_URL}/orders`,
         { ...orderData, paymentStatus: "Paid" },
         config
       );

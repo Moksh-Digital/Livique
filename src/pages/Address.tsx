@@ -11,6 +11,11 @@ import Header from "@/components/Header";
 import StepsTracker from "@/components/StepsTracker";
 import { Loader2, MapPin } from "lucide-react";
 
+// ✅ AUTO SWITCH API BASE URL
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
+
 interface AddressType {
   _id?: string;
   fullName: string;
@@ -53,7 +58,7 @@ const Address = () => {
     const fetchAddresses = async () => {
       if (!token) return;
       try {
-        const { data } = await axios.get("http://localhost:5000/api/address", {
+        const { data } = await axios.get(`${API_BASE_URL}/address`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setSavedAddresses(data);
@@ -94,7 +99,7 @@ const Address = () => {
     if (!validateForm()) return;
     try {
       // Save to backend
-      const { data } = await axios.post("http://localhost:5000/api/address", formData, {
+      const { data } = await axios.post(`${API_BASE_URL}/address`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       localStorage.setItem("shippingAddress", JSON.stringify(formData));

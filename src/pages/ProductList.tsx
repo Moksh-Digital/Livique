@@ -18,6 +18,10 @@ import { CATEGORIES, getCategoryBySlug } from "@/data/categories";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+// ✅ AUTO SWITCH API BASE URL
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
 const ProductList = () => {
   const { category, subcategory } = useParams();
   const [products, setProducts] = useState([]);
@@ -35,7 +39,7 @@ const ProductList = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        let url = "http://localhost:5000/api/products";
+        let url = `${API_BASE_URL}/products`;
         if (subcategory) url += `?subcategory=${subcategory}`;
         else if (category) url += `?category=${category}`;
 
