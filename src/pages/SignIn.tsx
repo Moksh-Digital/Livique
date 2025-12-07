@@ -88,7 +88,8 @@ const SignIn = ({ isModal = false, onSignInSuccess, onSwitchToSignUp, onClose }:
 
   // ✅ Google Login
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/api/users/auth/google?prompt=select_account";
+    window.location.href = `${API_BASE_URL}/auth/google?prompt=select_account`;
+    
   };
 
   // ------------------------------------------------------------------
