@@ -40,16 +40,28 @@ const allowedOrigins = [
 
 
 // Dynamic CORS – Postman / server-to-server ke liye origin null allowed
+// ✅ Simple CORS – sab allowed origins ko reflect karo
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // mobile apps, Postman, curl, etc.
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error("Not allowed by CORS"), false);
+      // Postman / mobile ke liye
+      if (!origin) return callback(null, true);
+
+      // Agar hamari list me hai to allow
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // ⚠️ Agar future me tighten karna ho, yaha error de sakte ho.
+      // Abhi ke liye: TESTING mein sab allow karo
+      return callback(null, true);
     },
     credentials: true,
   })
 );
+
+// Preflight ke liye
+app.options("*", cors());
 
 // ================== Session BEFORE passport ==================
 const isProduction = process.env.NODE_ENV === "production" || !!process.env.BACKEND_URL?.includes("api.livique");
