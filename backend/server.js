@@ -8,7 +8,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import addressRoutes from "./routes/addressRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import session from "express-session";
-import passport from "./config/passport.js";
+import passport, { CLIENT_URL } from "./config/passport.js"; 
 
 dotenv.config();
 connectDB();
@@ -20,17 +20,21 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // ================== CORS ==================
-// Frontend ka base URL .env se (baad me yahan apna actual domain daalna)
+// Determine frontend URL based on environment
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:8080";
 
 // Yahan pe sari allowed origins list karo
 const allowedOrigins = [
   "http://localhost:8080",
   "http://localhost:5173",
+  "http://127.0.0.1:8080",
+  "http://127.0.0.1:5173",
   "http://64.227.146.210",
   "http://64.227.146.210:5000",
   "https://livique-psi.vercel.app",
   "https://www.livique.co.in",
+  "https://livique.co.in",
+  "https://api.livique.co.in",
   CLIENT_URL,
 ];
 
@@ -48,13 +52,18 @@ app.use(
 );
 
 // ================== Session BEFORE passport ==================
+const isProduction = process.env.NODE_ENV === "production" || !!process.env.BACKEND_URL?.includes("api.livique");
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "secret123",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // HTTPS ho jaaye to isko true + proxy set karna
+      secure: isProduction,
+      httpOnly: true,
+      sameSite: isProduction ? "lax" : false,
+      domain: isProduction ? ".livique.co.in" : undefined,
     },
   })
 );
@@ -82,7 +91,6 @@ app.get(
   }),
   async (req, res) => {
     const token = req.user.generateToken();
-    // Frontend domain env se
     res.redirect(`${CLIENT_URL}?token=${token}`);
   }
 );

@@ -3,24 +3,17 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../models/userModel.js";
 
 // ----------------------------------------
-// URL CONFIG (no BACKEND_URL env needed)
+// URL CONFIG
 // ----------------------------------------
 
-// Server side pe `window` nahi hota, isliye yahan env se hi pata chalega
-// ki production hai ya local. Ye normal hai backend me.
-const isProduction = process.env.NODE_ENV === "production";
-
-// ✅ Local:  http://localhost:5000
-// ✅ Live:   https://api.livique.co.in
-const BACKEND_URL = isProduction
+// Use explicit env vars if set, otherwise detect based on deployment
+const BACKEND_URL = process.env.BACKEND_URL || (process.env.NODE_ENV === "production"
   ? "https://api.livique.co.in"
-  : "http://localhost:5000";
+  : "http://localhost:5000");
 
-// ✅ Local frontend:  http://localhost:8080
-// ✅ Live frontend:   https://www.livique.co.in  (ya sirf https://livique.co.in)
-const CLIENT_URL = isProduction
+const CLIENT_URL = process.env.CLIENT_URL || (process.env.NODE_ENV === "production"
   ? "https://www.livique.co.in"
-  : "http://localhost:8080";
+  : "http://localhost:8080");
 
 // ----------------------------------------
 // GOOGLE STRATEGY
