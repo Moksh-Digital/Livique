@@ -6,7 +6,8 @@ import {
   getProductById,
   deleteProduct,
   updateProduct,
-  migrateProductsAddStockField
+  migrateProductsAddStockField,
+  decreaseProductQuantity
 } from '../controllers/productController.js';
 import { searchProducts } from "../controllers/productController.js";
 
@@ -22,6 +23,9 @@ router.get("/search", searchProducts);
 
 // Order matters: place ID route before "/"
 router.get('/:id', getProductById);
+
+// Decrease quantity (when order is placed)
+router.put('/:id/decrease-quantity', decreaseProductQuantity);
 
 // Update product
 router.put('/:id', updateProduct);

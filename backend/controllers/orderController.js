@@ -2,6 +2,7 @@
 import asyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
 import User from "../models/userModel.js";
+import Product from "../models/productModel.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -23,6 +24,20 @@ const addOrderItems = asyncHandler(async (req, res) => {
   if (!items || items.length === 0) {
     res.status(400);
     throw new Error("No order items");
+  }
+
+  // Decrease product quantities for each item in the order
+  for (const item of items) {
+    const product = await Product.findById(item.id);
+    if (product) {
+      // Decrease quantity by the ordered amount
+      product.quantity = Math.max(0, product.quantity - item.quantity);
+      // Set inStock to false if quantity reaches 0
+      if (product.quantity === 0) {
+        product.inStock = false;
+      }
+      await product.save();
+    }
   }
 
   // Create the order

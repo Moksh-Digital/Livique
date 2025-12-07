@@ -38,6 +38,7 @@ export interface Product {
   inStock: boolean;
   badge?: string;
   description?: string;
+  quantity?: number;
 }
 
 export interface SubCategory {
@@ -64,6 +65,7 @@ interface ProductsContextType {
   deleteProduct: (id: string) => void;
   // 🚨 CHANGE 2: Add setter function to the interface
   setProducts: (products: Product[]) => void;
+  refreshProducts: () => Promise<void>;
 }
 
 
@@ -245,6 +247,23 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // 🚨 CHANGE 4: Initializing state to only read from localStorage, expecting data to be fetched
   const [products, setProducts] = useState<Product[]>(() => getInitialProducts());
 
+  // Fetch products from backend on mount
+  useEffect(() => {
+    const fetchProductsFromBackend = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/products");
+        const data = await res.json();
+        if (res.ok && Array.isArray(data)) {
+          setProducts(data.map(p => ({ ...p, id: p._id })));
+        }
+      } catch (err) {
+        console.error("Error fetching products from backend:", err);
+      }
+    };
+    
+    fetchProductsFromBackend();
+  }, []);
+
   // 2. Use useEffect to save products to localStorage whenever the state changes (remains the same)
   useEffect(() => {
     try {
@@ -305,6 +324,18 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
+  // Refresh products from backend (used after orders to update quantities)
+  const refreshProducts = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/products");
+      const data = await res.json();
+      if (res.ok && Array.isArray(data)) {
+        setProducts(data.map(p => ({ ...p, id: p._id })));
+      }
+    } catch (err) {
+      console.error("Error refreshing products:", err);
+    }
+  };
 
   return (
     <ProductsContext.Provider
@@ -319,6 +350,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         deleteProduct,
         // 🚨 CHANGE 5: Expose the setter function
         setProducts,
+        refreshProducts,
       }}
     >
       {children}

@@ -102,6 +102,7 @@ const Admin = () => {
     delivery: "Today",
     deliveryCharge: 0,
     inStock: true,
+    quantity: 0,
   });
 
   
@@ -391,6 +392,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
       rating: 4.8,
       reviews: 100,
       inStock: formData.inStock,
+      quantity: formData.quantity,
     };
 
     // --- API Call Logic (The new part) ---
@@ -481,6 +483,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
       delivery: "Today",
       deliveryCharge: 0,
       inStock: true,
+      quantity: 0,
     });
   };
 
@@ -697,6 +700,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                         delivery: "Today",
                         deliveryCharge: 0,
                         inStock: true,
+                        quantity: 0,
                       });
                     }}
                   >
@@ -843,6 +847,20 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
             value={formData.deliveryCharge || ""}
             onChange={(e) => setFormData({ ...formData, deliveryCharge: Number(e.target.value) })}
             placeholder="0 for free delivery"
+            min="0"
+            className="mt-1"
+          />
+        </div>
+
+        {/* Quantity Available */}
+        <div>
+          <Label htmlFor="quantity-input" className="text-sm font-semibold text-gray-600">Quantity Available (pieces)</Label>
+          <Input
+            id="quantity-input"
+            type="number"
+            value={formData.quantity || ""}
+            onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+            placeholder="Enter number of pieces available"
             min="0"
             className="mt-1"
           />
@@ -1031,7 +1049,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                       </p>
                       <div className="mt-2">
                         <span className={`text-xs font-bold px-2 py-1 rounded ${(product as any).inStock ?? true ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
-                          {(product as any).inStock ?? true ? "In Stock" : "Out of Stock"}
+                          {(product as any).inStock ?? true ? `In Stock (${(product as any).quantity ?? 0})` : "Out of Stock"}
                         </span>
                       </div>
                     </div>
@@ -1056,6 +1074,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                             delivery: product.delivery,
                             deliveryCharge: (product as any).deliveryCharge ?? 0,
                             inStock: (product as any).inStock ?? true,
+                            quantity: (product as any).quantity ?? 0,
                           });
                           setIsDialogOpen(true);
                         }}

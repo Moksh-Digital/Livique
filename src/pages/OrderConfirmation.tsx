@@ -1,13 +1,21 @@
 import { useLocation, Link } from "react-router-dom";
+import { useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import StepsTracker from "@/components/StepsTracker";
+import { useProducts } from "@/contexts/ProductsContext";
 
 const OrderConfirmation = () => {
   const location = useLocation();
   const order = location.state?.order;
+  const { refreshProducts } = useProducts();
+
+  // Refresh products when order is confirmed to update quantities
+  useEffect(() => {
+    refreshProducts();
+  }, [refreshProducts]);
 
   if (!order) {
     return (

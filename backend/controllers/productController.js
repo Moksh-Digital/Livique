@@ -16,7 +16,8 @@ export const createProduct = async (req, res) => {
             mainImage, 
             images, 
             description, 
-            delivery 
+            delivery,
+            quantity
         } = req.body;
 
         // Validation
@@ -151,6 +152,8 @@ export const createProduct = async (req, res) => {
             discount: req.body.discount || "0% OFF",
             rating: req.body.rating || 4.8,
             reviews: req.body.reviews || 100,
+            quantity: quantity || 0,
+            inStock: (quantity && quantity > 0) ? true : false,
         });
 
         console.log("🆕 Created product:", {
@@ -358,7 +361,8 @@ export const updateProduct = async (req, res) => {
       discount,
       rating,
       reviews,
-      inStock
+      inStock,
+      quantity
     } = req.body;
 
     // Validate MongoDB ID
@@ -396,7 +400,8 @@ export const updateProduct = async (req, res) => {
         discount,
         rating,
         reviews,
-        inStock
+        inStock,
+        quantity
       },
       { new: true } // Return the updated document
     );
@@ -427,5 +432,56 @@ export const migrateProductsAddStockField = async (req, res) => {
   } catch (error) {
     console.error("Error during migration:", error);
     res.status(500).json({ message: "Server error during migration" });
+  }
+};
+
+// @desc    Decrease product quantity (when order is placed)
+// @route   PUT /api/products/:id/decrease-quantity
+// @access  Private
+export const decreaseProductQuantity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity = 1 } = req.body;
+
+    // Validate MongoDB ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+
+    // Find product
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Check if enough quantity available
+    if (product.quantity < quantity) {
+      return res.status(400).json({ 
+        message: "Insufficient stock", 
+        available: product.quantity,
+        requested: quantity
+      });
+    }
+
+    // Decrease quantity
+    const newQuantity = product.quantity - quantity;
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      { 
+        quantity: newQuantity,
+        inStock: newQuantity > 0 ? true : false
+      },
+      { new: true }
+    );
+
+    res.json({ 
+      message: "Product quantity decreased successfully", 
+      product: updatedProduct,
+      previousQuantity: product.quantity,
+      newQuantity: newQuantity
+    });
+  } catch (error) {
+    console.error("Error decreasing product quantity:", error);
+    res.status(500).json({ message: "Server error while decreasing quantity" });
   }
 };

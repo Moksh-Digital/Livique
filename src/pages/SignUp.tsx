@@ -263,9 +263,9 @@ const SignUp = ({ isModal = false, onSignUpSuccess, onSwitchToSignIn, onClose }:
           <div className="w-full bg-gradient-to-br from-[#8C2E2B] via-[#66201D] to-[#1A0B0A] rounded-t-3xl p-12 text-left shadow-lg">
             <h1 className="text-5xl font-bold text-white mb-6">Create Account</h1>
             <p className="text-lg text-orange-50 leading-relaxed mb-12 mt-4 w-[70%]">
-              Lorem ipsum dolor sit amet, consectetuer 
+              Lorem ipsum dolor sit amet, consectetuer
             </p>
-    
+
             <p className="text-lg text-white">
               Already have an Account?{" "}
               <button onClick={onSwitchToSignIn} className="underline font-semibold hover:opacity-90">
@@ -297,9 +297,9 @@ const SignUp = ({ isModal = false, onSignUpSuccess, onSwitchToSignIn, onClose }:
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 md:hidden"
                 >
-                  <X className="h-5 w-5" />
+                  {/* <X className="h-5 w-5" /> */}
                 </button>
               )}
               <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">User Information</h2>
