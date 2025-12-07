@@ -10,12 +10,21 @@ console.log("- Email Pass Configured:", process.env.EMAIL_PASS ? "‚úÖ Yes" : "‚ù
 // Create a transporter object
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 465, 
-    secure: true,
+    port: 587, 
+    secure: false, // Use STARTTLS
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
+    tls: {
+        rejectUnauthorized: false, // For production servers
+        ciphers: 'SSLv3'
+    },
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+    debug: true, // Enable debug logs
+    logger: true // Log to console
 });
 
 // Verify transporter configuration
