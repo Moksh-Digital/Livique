@@ -8,7 +8,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import addressRoutes from "./routes/addressRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import session from "express-session";
-import passport, { CLIENT_URL } from "./config/passport.js"; 
+import passport from "./config/passport.js"; 
 
 dotenv.config();
 connectDB();
