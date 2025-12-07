@@ -2,8 +2,15 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 // LocalStorage key for caching
 const LOCAL_STORAGE_KEY = "livique_admin_orders";
-const API_BASE_URL =
-  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+const isLocalhost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+const API_BASE_URL = isLocalhost
+  ? "http://localhost:5000/api"          // local dev
+  : "https://api.livique.co.in/api";    // production = droplet IP
+
+
 
 
 // ✅ User interface

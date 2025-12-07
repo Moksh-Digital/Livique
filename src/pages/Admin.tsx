@@ -41,6 +41,15 @@ import { CATEGORIES } from "@/data/categories";
 import { Order, useOrders } from "../contexts/OrdersContext";
 import axios from "axios";
 
+const isLocalhost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+const API_BASE_URL = isLocalhost
+  ? "http://localhost:5000/api"          // local dev
+  : "https://api.livique.co.in/api";    // production = droplet IP
+
+
 
 async function signIn({
   email,
@@ -131,7 +140,9 @@ const Admin = () => {
  useEffect(() => {
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/products");
+      const res = await fetch(`${API_BASE_URL}/products`);
+      
+
       const data = await res.json();
       if (res.ok && Array.isArray(data)) {
         setProducts(data.map(p => ({ ...p, id: p._id })));
@@ -148,7 +159,8 @@ const Admin = () => {
   useEffect(() => {
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/users");
+      const { data } = await axios.get(`${API_BASE_URL}/users`);
+
       setUsers(data); // data should be array of user objects
     } catch (error) {
       console.error("Failed to fetch users:", error);
@@ -189,7 +201,7 @@ const Admin = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/orders");
+        const res = await fetch(`${API_BASE_URL}/orders`);
         const data = await res.json();
 
         if (res.ok && Array.isArray(data)) {
@@ -215,7 +227,8 @@ const Admin = () => {
   useEffect(() => {
     const migrateProducts = async () => {
       try {
-        await axios.post('http://localhost:5000/api/products/migrate/add-stock-field');
+        await axios.post(`${API_BASE_URL}/products/migrate/add-stock-field`);
+        
         console.log("Product migration completed");
       } catch (error) {
         console.error("Migration error (non-critical):", error);
@@ -282,7 +295,8 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
     
     setIsDeleting(true);
     try {
-      const response = await axios.delete(`http://localhost:5000/api/products/${productToDelete}`);
+      const response = await axios.delete(`${API_BASE_URL}/products/${productToDelete}`);
+      
       if (response.status === 200) {
         deleteProduct(productToDelete);
         toast({ title: "Product deleted successfully" });
@@ -305,7 +319,8 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
     setIsTogglingStock(product.id);
     try {
       const newStockStatus = !(product.inStock ?? true);
-      const response = await axios.put(`http://localhost:5000/api/products/${product.id}`, {
+      const response = await axios.put(`${API_BASE_URL}/products/${product.id}`, {
+        
         name: product.name,
         price: product.price,
         originalPrice: product.originalPrice,
@@ -399,7 +414,8 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
     if (editingProduct?.id != null) {
       // If editing an existing product
       try {
-        const res = await fetch(`http://localhost:5000/api/products/${editingProduct.id}`, {
+        const res = await fetch(`${API_BASE_URL}/products/${editingProduct.id}`, {
+          
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -428,7 +444,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
     } else {
       // 🚀 New Product Creation API Call
       try {
-        const res = await fetch('http://localhost:5000/api/products', {
+        const res = await fetch(`${API_BASE_URL}/products`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

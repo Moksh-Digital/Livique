@@ -1,6 +1,14 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:5000/api/users`;
+const isLocalhost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+const API_BASE_URL = isLocalhost
+  ? "http://localhost:5000/api/users"          // local dev
+  : "https://api.livique.co.in/api/users";    // production = droplet IP
+
+
 
 interface User {
   name: string;
