@@ -4,7 +4,8 @@ import {
   createProduct,
   getProducts,
   getProductById,
-  deleteProduct
+  deleteProduct,
+  updateProduct
 } from '../controllers/productController.js';
 import { searchProducts } from "../controllers/productController.js";
 
@@ -17,6 +18,9 @@ router.get("/search", searchProducts);
 
 // Order matters: place ID route before "/"
 router.get('/:id', getProductById);
+
+// Update product
+router.put('/:id', updateProduct);
 
 // Delete product
 router.delete('/:id', deleteProduct);

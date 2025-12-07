@@ -336,9 +336,33 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
     // --- API Call Logic (The new part) ---
     if (editingProduct?.id != null) {
       // If editing an existing product
-      // 🚨 TODO: Implement PUT/PATCH API call for product update later
-      updateProduct(editingProduct.id, payload);
-      toast({ title: "Product updated successfully (Local only)" });
+      try {
+        const res = await fetch(`http://localhost:5000/api/products/${editingProduct.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || 'Failed to update product.');
+        }
+
+        // Update the product in context
+        updateProduct(editingProduct.id, payload);
+        toast({ title: "Product updated successfully!" });
+      } catch (error: any) {
+        console.error("Product update failed:", error);
+        toast({
+          title: "Update Failed",
+          description: error.message || "Could not connect to the backend.",
+          variant: "destructive"
+        });
+        return; // Stop execution on failure
+      }
     } else {
       // 🚀 New Product Creation API Call
       try {

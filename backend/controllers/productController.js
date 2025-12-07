@@ -335,3 +335,73 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: "Server error while deleting product" });
   }
 };
+
+// @desc    Update product
+// @route   PUT /api/products/:id
+// @access  Private/Admin
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      name,
+      price,
+      originalPrice,
+      category,
+      categorySlug,
+      subcategory,
+      subcategorySlug,
+      mainImage,
+      images,
+      description,
+      delivery,
+      deliveryCharge,
+      discount,
+      rating,
+      reviews
+    } = req.body;
+
+    // Validate MongoDB ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+
+    // Check if product exists
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Validation
+    if (!name || !price || !category || !description || !images || images.length === 0) {
+      return res.status(400).json({ message: 'Please fill in all required fields (Name, Price, Category, Description, and at least one Image).' });
+    }
+
+    // Update product with new data
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        name,
+        price,
+        originalPrice,
+        category,
+        categorySlug,
+        subcategory,
+        subcategorySlug,
+        mainImage,
+        images,
+        description,
+        delivery,
+        deliveryCharge,
+        discount,
+        rating,
+        reviews
+      },
+      { new: true } // Return the updated document
+    );
+
+    res.json({ message: "Product updated successfully", product: updatedProduct });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({ message: "Server error while updating product" });
+  }
+};
