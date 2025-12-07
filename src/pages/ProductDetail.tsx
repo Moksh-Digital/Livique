@@ -8,8 +8,14 @@ import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 // ✅ AUTO SWITCH API BASE URL
-const API_BASE_URL =
-  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+const isLocalhost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+const API_BASE_URL = isLocalhost
+  ? "http://localhost:5000/api"          // local dev
+  : "http://64.227.146.210:5000/api";    // production = droplet IP
+
 
 
 const ProductDetail = () => {

@@ -27,10 +27,12 @@ const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:8080";
 const allowedOrigins = [
   "http://localhost:8080",
   "http://localhost:5173",
-  CLIENT_URL,
   "http://64.227.146.210",
-  "http://64.227.146.210:5173",
+  "http://64.227.146.210:5000",
+  "https://livique-psi.vercel.app",  // << yeh add karo
+  CLIENT_URL,
 ];
+
 
 // Dynamic CORS – Postman / server-to-server ke liye origin null allowed
 app.use(

@@ -12,8 +12,17 @@ import StepsTracker from "@/components/StepsTracker";
 import { Loader2, MapPin } from "lucide-react";
 
 // ✅ AUTO SWITCH API BASE URL
-const API_BASE_URL =
-  `${window.location.protocol}//${window.location.hostname}:5000/api`;
+const isLocalhost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+const API_BASE_URL = isLocalhost
+  ? "http://localhost:5000/api"          // local dev
+  : "http://64.227.146.210:5000/api";    // production = droplet IP
+
+
+const USERS_URL = `${API_BASE_URL}/users`;
+
 
 
 interface AddressType {
@@ -58,7 +67,7 @@ const Address = () => {
     const fetchAddresses = async () => {
       if (!token) return;
       try {
-        const { data } = await axios.get(`${API_BASE_URL}/address`, {
+        const { data } = await axios.get(`${USERS_URL}/address`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setSavedAddresses(data);

@@ -14,8 +14,14 @@ import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../hooks/use-toast"; 
 
 // ✅ AUTO SWITCH API BASE URL
-const API_BASE_URL =
-  `${window.location.protocol}//${window.location.hostname}:5000/api/users`;
+const isLocalhost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+const API_BASE_URL = isLocalhost
+  ? "http://localhost:5000/api/users"          // local dev
+  : "http://64.227.146.210:5000/api/users";    // production = droplet IP
+
 
 
 interface SignInProps {
