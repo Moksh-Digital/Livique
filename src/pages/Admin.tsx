@@ -23,6 +23,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useProducts } from "@/contexts/ProductsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -75,6 +84,9 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     price: 0,
@@ -243,8 +255,32 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
 
 
   const handleDelete = (id: string) => {
-    deleteProduct(id.toString());
-    toast({ title: "Product deleted successfully" });
+    setProductToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!productToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await axios.delete(`http://localhost:5000/api/products/${productToDelete}`);
+      if (response.status === 200) {
+        deleteProduct(productToDelete);
+        toast({ title: "Product deleted successfully" });
+        setIsDeleteDialogOpen(false);
+        setProductToDelete(null);
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      toast({ 
+        title: "Error deleting product", 
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const readFileAsDataUrl = (file: File): Promise<string> =>
@@ -1044,6 +1080,28 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
 
 
         </Tabs>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Product</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this product? This action cannot be undone and the product will be permanently removed from the database.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex gap-3 justify-end">
+              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

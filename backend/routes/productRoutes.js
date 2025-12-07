@@ -3,7 +3,8 @@ import express from 'express';
 import {
   createProduct,
   getProducts,
-  getProductById
+  getProductById,
+  deleteProduct
 } from '../controllers/productController.js';
 import { searchProducts } from "../controllers/productController.js";
 
@@ -16,6 +17,9 @@ router.get("/search", searchProducts);
 
 // Order matters: place ID route before "/"
 router.get('/:id', getProductById);
+
+// Delete product
+router.delete('/:id', deleteProduct);
 
 // All products
 router.get('/', getProducts);
