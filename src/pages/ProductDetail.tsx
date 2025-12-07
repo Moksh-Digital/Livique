@@ -88,6 +88,15 @@ const ProductDetail = () => {
   const courierDeliveryCharge = 449;
 
   const handleAddToCart = () => {
+    if (product.inStock === false) {
+      toast({
+        title: "Out of Stock",
+        description: "This product is currently unavailable.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const selectedCharge = deliveryOption === "hand" ? handDeliveryCharge : courierDeliveryCharge;
 
     addToCart({
@@ -106,6 +115,14 @@ const ProductDetail = () => {
   };
 
   const handleBuyNow = () => {
+    if (product.inStock === false) {
+      toast({
+        title: "Out of Stock",
+        description: "This product is currently unavailable.",
+        variant: "destructive"
+      });
+      return;
+    }
     handleAddToCart();
     navigate("/cart");
   };
@@ -201,20 +218,31 @@ const ProductDetail = () => {
 
             {/* ---------------- ACTION BUTTONS ---------------- */}
             <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                className="h-12 rounded-xl border-primary text-primary hover:bg-primary/10"
-                onClick={handleAddToCart}
-              >
-                🛒 Add To Cart
-              </Button>
+              {product.inStock === false ? (
+                <div className="col-span-2">
+                  <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 text-center">
+                    <p className="text-red-600 font-bold text-lg">Out of Stock</p>
+                    <p className="text-red-500 text-sm mt-1">This product is currently unavailable</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    className="h-12 rounded-xl border-primary text-primary hover:bg-primary/10"
+                    onClick={handleAddToCart}
+                  >
+                    🛒 Add To Cart
+                  </Button>
 
-              <Button
-                className="h-12 rounded-xl bg-primary hover:bg-primary/90"
-                onClick={handleBuyNow}
-              >
-                🛍️ Buy Now
-              </Button>
+                  <Button
+                    className="h-12 rounded-xl bg-primary hover:bg-primary/90"
+                    onClick={handleBuyNow}
+                  >
+                    🛍️ Buy Now
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

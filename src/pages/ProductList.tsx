@@ -283,8 +283,8 @@ const ProductList = () => {
             {/* Products Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {displayProducts.map((product: any) => (
-                <Link key={product._id} to={`/product/${product._id}`}>
-                  <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 rounded-xl group">
+                <Link key={product._id} to={`/product/${product._id}`} className={product.inStock === false ? "pointer-events-none opacity-75" : ""}>
+                  <Card className={`overflow-hidden hover:shadow-lg transition-all duration-300 rounded-xl group ${product.inStock === false ? "opacity-75" : ""}`}>
                     <div className="relative aspect-square bg-muted flex items-center justify-center overflow-hidden">
                       <img
                         src={
@@ -293,8 +293,16 @@ const ProductList = () => {
                           "/placeholder.png"
                         }
                         alt={product.name}
-                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
+                        className={`object-cover w-full h-full group-hover:scale-110 transition-transform duration-300 ${product.inStock === false ? "grayscale" : ""}`}
                       />
+                      
+                      {product.inStock === false && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                          <div className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-center">
+                            Out of Stock
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="p-3">

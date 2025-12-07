@@ -5,13 +5,17 @@ import {
   getProducts,
   getProductById,
   deleteProduct,
-  updateProduct
+  updateProduct,
+  migrateProductsAddStockField
 } from '../controllers/productController.js';
 import { searchProducts } from "../controllers/productController.js";
 
 
 
 const router = express.Router();
+
+// Migration route - Add inStock field to existing products
+router.post("/migrate/add-stock-field", migrateProductsAddStockField);
 
 // for searching products 
 router.get("/search", searchProducts);

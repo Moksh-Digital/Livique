@@ -63,6 +63,10 @@ const productSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    inStock: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

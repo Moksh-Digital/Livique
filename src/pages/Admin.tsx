@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -87,6 +88,7 @@ const Admin = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isTogglingStock, setIsTogglingStock] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     price: 0,
@@ -99,6 +101,7 @@ const Admin = () => {
     description: "",
     delivery: "Today",
     deliveryCharge: 0,
+    inStock: true,
   });
 
   
@@ -207,6 +210,20 @@ const Admin = () => {
     fetchOrders();
   }, [setOrders]);
 
+  // Migrate existing products to add inStock field if missing
+  useEffect(() => {
+    const migrateProducts = async () => {
+      try {
+        await axios.post('http://localhost:5000/api/products/migrate/add-stock-field');
+        console.log("Product migration completed");
+      } catch (error) {
+        console.error("Migration error (non-critical):", error);
+      }
+    };
+    
+    migrateProducts();
+  }, []);
+
   // State for the INLINE LOGIN FORM
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -283,6 +300,48 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
     }
   };
 
+  const handleQuickToggleStock = async (product: any) => {
+    setIsTogglingStock(product.id);
+    try {
+      const newStockStatus = !(product.inStock ?? true);
+      const response = await axios.put(`http://localhost:5000/api/products/${product.id}`, {
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        category: product.category,
+        categorySlug: (product as any).categorySlug || product.category,
+        subcategory: product.subcategory,
+        subcategorySlug: (product as any).subcategorySlug || product.subcategory,
+        mainImage: (product as any).mainImage || product.image,
+        images: (product as any).images || [product.image],
+        description: product.description,
+        delivery: product.delivery,
+        deliveryCharge: (product as any).deliveryCharge || 0,
+        discount: product.discount,
+        rating: product.rating,
+        reviews: product.reviews,
+        inStock: newStockStatus,
+      });
+
+      if (response.status === 200) {
+        updateProduct(product.id, { ...product, inStock: newStockStatus });
+        toast({ 
+          title: newStockStatus ? "Product In Stock" : "Product Out of Stock",
+          description: newStockStatus ? "Product is now available" : "Product is now unavailable"
+        });
+      }
+    } catch (error) {
+      console.error("Error updating stock status:", error);
+      toast({ 
+        title: "Error updating stock status", 
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsTogglingStock(null);
+    }
+  };
+
   const readFileAsDataUrl = (file: File): Promise<string> =>
     new Promise((res, rej) => {
       const fr = new FileReader();
@@ -331,6 +390,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
       discount, // Include calculated discount
       rating: 4.8,
       reviews: 100,
+      inStock: formData.inStock,
     };
 
     // --- API Call Logic (The new part) ---
@@ -420,6 +480,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
       description: "",
       delivery: "Today",
       deliveryCharge: 0,
+      inStock: true,
     });
   };
 
@@ -635,6 +696,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                         description: "",
                         delivery: "Today",
                         deliveryCharge: 0,
+                        inStock: true,
                       });
                     }}
                   >
@@ -783,6 +845,18 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
             placeholder="0 for free delivery"
             min="0"
             className="mt-1"
+          />
+        </div>
+
+        {/* Stock Status */}
+        <div className="flex items-center justify-between p-4 border rounded-lg bg-gray-50">
+          <Label htmlFor="in-stock" className="text-sm font-semibold text-gray-600 cursor-pointer">
+            In Stock
+          </Label>
+          <Switch
+            id="in-stock"
+            checked={formData.inStock}
+            onCheckedChange={(checked) => setFormData({ ...formData, inStock: checked })}
           />
         </div>
       </div>
@@ -955,6 +1029,11 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                       <p className="text-sm font-semibold mt-1">
                         ₹ {product.price.toLocaleString()}
                       </p>
+                      <div className="mt-2">
+                        <span className={`text-xs font-bold px-2 py-1 rounded ${(product as any).inStock ?? true ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
+                          {(product as any).inStock ?? true ? "In Stock" : "Out of Stock"}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex gap-2">
@@ -976,11 +1055,22 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                             description: product.description,
                             delivery: product.delivery,
                             deliveryCharge: (product as any).deliveryCharge ?? 0,
+                            inStock: (product as any).inStock ?? true,
                           });
                           setIsDialogOpen(true);
                         }}
                       >
                         <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className={isTogglingStock === product.id ? "opacity-50" : (product as any).inStock ?? true ? "text-green-600 border-green-600 hover:bg-green-50" : "text-orange-600 border-orange-600 hover:bg-orange-50"}
+                        onClick={() => handleQuickToggleStock(product)}
+                        disabled={isTogglingStock === product.id}
+                        title={(product as any).inStock ?? true ? "In Stock - Click to mark Out of Stock" : "Out of Stock - Click to mark In Stock"}
+                      >
+                        {(product as any).inStock ?? true ? "✓" : "✕"}
                       </Button>
                       <Button
                         variant="outline"

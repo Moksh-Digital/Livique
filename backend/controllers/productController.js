@@ -357,7 +357,8 @@ export const updateProduct = async (req, res) => {
       deliveryCharge,
       discount,
       rating,
-      reviews
+      reviews,
+      inStock
     } = req.body;
 
     // Validate MongoDB ID
@@ -394,7 +395,8 @@ export const updateProduct = async (req, res) => {
         deliveryCharge,
         discount,
         rating,
-        reviews
+        reviews,
+        inStock
       },
       { new: true } // Return the updated document
     );
@@ -403,5 +405,27 @@ export const updateProduct = async (req, res) => {
   } catch (error) {
     console.error("Error updating product:", error);
     res.status(500).json({ message: "Server error while updating product" });
+  }
+};
+
+// @desc    Migrate existing products - Add inStock field to products that don't have it
+// @route   POST /api/products/migrate/add-stock-field
+// @access  Private/Admin
+export const migrateProductsAddStockField = async (req, res) => {
+  try {
+    // Update all products that don't have inStock field
+    const result = await Product.updateMany(
+      { inStock: { $exists: false } },
+      { $set: { inStock: true } }
+    );
+
+    res.json({ 
+      message: "Migration completed", 
+      modifiedCount: result.modifiedCount,
+      matchedCount: result.matchedCount
+    });
+  } catch (error) {
+    console.error("Error during migration:", error);
+    res.status(500).json({ message: "Server error during migration" });
   }
 };
