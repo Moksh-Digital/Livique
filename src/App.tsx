@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "./contexts/AuthContext";  // ✅ import auth context
+import PromoBanner from "./components/Banner";
 
 import Home from "./pages/Home";
 import ProductList from "./pages/ProductList";
@@ -74,6 +75,8 @@ const App = () => (
       <Toaster />
       <Sonner />
     </div>
+    
+    <PromoBanner />
 
     <BrowserRouter>
       <AppRoutes />
