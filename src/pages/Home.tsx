@@ -324,7 +324,7 @@ const Home = () => {
       <PromoBanner />
       <Header />
 
-      <main className="w-full p-0">
+      <main className="w-full p-0 pb-24 md:pb-8">
        
         <BannerSlider />
         {/* <div 

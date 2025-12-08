@@ -175,3 +175,17 @@ img:hover {
     gap: 10px;
   }
 }
+
+/* ✨ LAYOUT FIX FOR HEADER AND FOOTER */
+/* Ensure content doesn't get hidden under fixed header/footer */
+
+/* Add padding to main content to account for fixed bottom nav on mobile */
+main {
+  padding-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  main {
+    padding-bottom: 80px !important;
+  }
+}

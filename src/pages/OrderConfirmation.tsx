@@ -37,7 +37,7 @@ const OrderConfirmation = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="max-w-2xl mx-auto px-4 py-12">
+      <main className="max-w-2xl mx-auto px-4 py-12 pb-24 md:pb-8">
         <Card className="p-8 rounded-2xl text-center">
           <div className="flex justify-center mb-6">
             <CheckCircle2 className="h-20 w-20 text-success" />

@@ -253,7 +253,7 @@ const options = {
             <StepsTracker currentStep={2} />   {/* 👈 Add this line */}
 
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-8 pb-24 md:pb-8">
         <h1 className="text-3xl font-bold mb-6">Payment Options</h1>
 
         <div className="grid lg:grid-cols-3 gap-8">

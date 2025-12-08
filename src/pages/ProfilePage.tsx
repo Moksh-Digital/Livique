@@ -264,7 +264,7 @@ useEffect(() => {
   return (
     <>
       <Header />
-      <div className="bg-gray-100 min-h-screen p-4 md:p-8">
+      <div className="bg-gray-100 min-h-screen p-4 md:p-8 pb-24 md:pb-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">My Account</h1>
 

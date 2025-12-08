@@ -644,7 +644,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
       </header>
 
       {/* Main */}
-      <div className="max-w-[1400px] mx-auto px-4 py-8">
+      <div className="max-w-[1400px] mx-auto px-4 py-8 pb-24 md:pb-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Tab List */}
           <TabsList className="mb-8">

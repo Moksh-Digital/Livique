@@ -42,7 +42,7 @@ const Cart = () => {
       <PromoBanner/>
       <Header />
 
-      <main className="max-w-[1400px] mx-auto px-4 py-8">
+      <main className="max-w-[1400px] mx-auto px-4 py-8 pb-24 md:pb-8">
         <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
 
         <div className="grid lg:grid-cols-3 gap-8">

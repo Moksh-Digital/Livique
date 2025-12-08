@@ -134,7 +134,7 @@ const Address = () => {
       <Header />
       <StepsTracker currentStep={1} />
 
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <main className="max-w-3xl mx-auto px-4 py-8 pb-24 md:pb-8">
         <h1 className="text-3xl font-bold mb-6">Delivery Address</h1>
 
         {/* ✅ Saved Addresses Section */}

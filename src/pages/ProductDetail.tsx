@@ -142,7 +142,7 @@ const ProductDetail = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="max-w-[1400px] mx-auto px-4 py-6">
+      <main className="max-w-[1400px] mx-auto px-4 py-6 pb-24 md:pb-8">
         <div className="grid md:grid-cols-2 gap-8">
           {/* ---------------- PRODUCT IMAGES ---------------- */}
           <div>

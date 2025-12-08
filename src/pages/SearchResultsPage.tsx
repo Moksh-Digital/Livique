@@ -79,7 +79,7 @@ const SearchResultsPage = () => {
       <PromoBanner />
       <Header />
 
-      <main className="flex-grow">
+      <main className="flex-grow pb-24 md:pb-8">
         <div className="min-h-screen">
           {/* Header Section */}
           <div className="bg-[#8B4513] sticky top-0 z-10 shadow-md">
