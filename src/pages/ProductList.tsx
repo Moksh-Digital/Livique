@@ -266,10 +266,10 @@ const ProductList = () => {
                   </SheetContent>
                 </Sheet>
 
-                <Button variant="outline" size="sm">
+                {/* <Button variant="outline" size="sm">
                   Sort by: Recommended
                   <ChevronDown className="h-4 w-4 ml-1" />
-                </Button>
+                </Button> */}
               </div>
             </div>
 
