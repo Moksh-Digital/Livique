@@ -20,8 +20,8 @@ const API_BASE_URL = isLocalhost
   ? "http://localhost:5000/api"          // local dev
   : "https://api.livique.co.in/api";    // production = droplet IP
 
-
 const USERS_URL = `${API_BASE_URL}/users`;
+const ADDRESS_URL = `${API_BASE_URL}/address`;
 
 
 
@@ -63,20 +63,27 @@ const Address = () => {
   const token = localStorage.getItem("token");
 
   // ✅ Fetch saved addresses on load
+  const fetchAddresses = async () => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const { data } = await axios.get(`${ADDRESS_URL}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Fetched addresses:", data);
+      setSavedAddresses(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error fetching addresses:", err);
+      setSavedAddresses([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAddresses = async () => {
-      if (!token) return;
-      try {
-        const { data } = await axios.get(`${USERS_URL}/address`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setSavedAddresses(data);
-      } catch (err) {
-        console.error("Error fetching addresses:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    setLoading(true);
     fetchAddresses();
   }, [token]);
 
@@ -107,16 +114,64 @@ const Address = () => {
     e.preventDefault();
     if (!validateForm()) return;
     try {
+      // Prepare address data - make sure all required fields are included
+      const addressPayload = {
+        fullName: formData.fullName,
+        mobile: formData.mobile,
+        houseNo: formData.houseNo,
+        street: formData.street,
+        landmark: formData.landmark || "",
+        locality: formData.locality,
+        city: formData.city,
+        state: formData.state,
+        pincode: formData.pincode,
+        addressType: formData.addressType,
+      };
+
       // Save to backend
-      const { data } = await axios.post(`${API_BASE_URL}/address`, formData, {
+      const response = await axios.post(`${API_BASE_URL}/address`, addressPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      localStorage.setItem("shippingAddress", JSON.stringify(formData));
+      
+      console.log("Address save response:", response.data);
+      
+      // Update with all addresses from backend response
+      if (response.data.addresses && Array.isArray(response.data.addresses)) {
+        setSavedAddresses(response.data.addresses);
+      }
+      
+      // Get the newly added address (last one in the array)
+      const newAddress = response.data.addresses 
+        ? response.data.addresses[response.data.addresses.length - 1] 
+        : null;
+      
+      if (newAddress) {
+        localStorage.setItem("shippingAddress", JSON.stringify(newAddress));
+      }
+      
       toast({ title: "Address Saved Successfully", description: "Proceeding to payment..." });
+      
+      // Reset form and hide the new address form
+      setFormData({
+        fullName: "",
+        mobile: "",
+        pincode: "",
+        houseNo: "",
+        street: "",
+        landmark: "",
+        locality: "",
+        city: "",
+        state: "",
+        addressType: "home",
+      });
+      setAddingNew(false);
+      
+      // Navigate to payment
       navigate("/payment");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving address:", error);
-      toast({ title: "Error", description: "Failed to save address.", variant: "destructive" });
+      const errorMessage = error.response?.data?.message || error.message || "Failed to save address.";
+      toast({ title: "Error", description: errorMessage, variant: "destructive" });
     }
   };
 

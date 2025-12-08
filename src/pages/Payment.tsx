@@ -36,7 +36,7 @@ const handlePlaceOrder = async () => {
     street: `${rawAddress.houseNo}, ${rawAddress.street}, ${rawAddress.locality}`,
     city: rawAddress.city,
     state: rawAddress.state,
-    zipCode: rawAddress.pincode,
+    pincode: rawAddress.pincode,
     landmark: rawAddress.landmark || "",
     addressType: rawAddress.addressType || "home",
   };
