@@ -358,13 +358,65 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
     }
   };
 
-  const readFileAsDataUrl = (file: File): Promise<string> =>
-    new Promise((res, rej) => {
-      const fr = new FileReader();
-      fr.onload = () => res(String(fr.result));
-      fr.onerror = rej;
-      fr.readAsDataURL(file);
+  // Upload image to Cloudinary
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to upload image');
+      }
+
+      return data.url; // Return Cloudinary URL
+    } catch (error) {
+      console.error('Error uploading to Cloudinary:', error);
+      toast({
+        title: 'Upload Failed',
+        description: error instanceof Error ? error.message : 'Failed to upload image',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  // Upload multiple images to Cloudinary
+  const uploadMultipleToCloudinary = async (files: File[]): Promise<string[]> => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('images', file);
     });
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload/upload-multiple`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to upload images');
+      }
+
+      return data.images.map((img: any) => img.url); // Return array of Cloudinary URLs
+    } catch (error) {
+      console.error('Error uploading to Cloudinary:', error);
+      toast({
+        title: 'Upload Failed',
+        description: error instanceof Error ? error.message : 'Failed to upload images',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
 
   // Admin.tsx (inside the Admin component)
   // ... (keep all your existing imports, states, and functions)
@@ -915,8 +967,14 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
               onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (!file) return;
-                const dataUrl = await readFileAsDataUrl(file);
-                setFormData({ ...formData, mainImage: dataUrl });
+                try {
+                  toast({ title: 'Uploading image...', description: 'Please wait' });
+                  const cloudinaryUrl = await uploadToCloudinary(file);
+                  setFormData({ ...formData, mainImage: cloudinaryUrl });
+                  toast({ title: 'Image uploaded successfully!' });
+                } catch (error) {
+                  // Error already handled in uploadToCloudinary
+                }
               }}
             />
             <Input
@@ -965,8 +1023,14 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
             onChange={async (e) => {
               const files = Array.from(e.target.files || []);
               if (files.length === 0) return;
-              const dataUrls = await Promise.all(files.map(f => readFileAsDataUrl(f)));
-              setFormData({ ...formData, images: [...(formData.images || []), ...dataUrls] });
+              try {
+                toast({ title: `Uploading ${files.length} image(s)...`, description: 'Please wait' });
+                const cloudinaryUrls = await uploadMultipleToCloudinary(files);
+                setFormData({ ...formData, images: [...(formData.images || []), ...cloudinaryUrls] });
+                toast({ title: 'Images uploaded successfully!' });
+              } catch (error) {
+                // Error already handled in uploadMultipleToCloudinary
+              }
             }}
           />
 
