@@ -1,67 +1,103 @@
-import nodemailer from 'nodemailer';
+import Mailjet from 'node-mailjet';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-console.log("📧 Email Configuration:");
-console.log("- Email User:", process.env.EMAIL_USER);
-console.log("- Email Pass Configured:", process.env.EMAIL_PASS ? "✅ Yes" : "❌ No");
+console.log("📧 Email Configuration (Mailjet):");
+console.log("- Email From:", process.env.EMAIL_USER);
+console.log("- Mailjet API Key Configured:", process.env.MAILJET_API_KEY ? "✅ Yes" : "❌ No");
+console.log("- Mailjet Secret Key Configured:", process.env.MAILJET_SECRET_KEY ? "✅ Yes" : "❌ No");
 
-// Create a transporter object
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587, 
-    secure: false, // Use STARTTLS
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-        rejectUnauthorized: false, // For production servers
-        ciphers: 'SSLv3'
-    },
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-    debug: true, // Enable debug logs
-    logger: true // Log to console
-});
+// Initialize Mailjet client
+let mailjetClient = null;
 
-// Verify transporter configuration
-transporter.verify((error, success) => {
-    if (error) {
-        console.error("❌ Email transporter verification failed:", error);
-    } else {
-        console.log("✅ Email server is ready to send emails");
-    }
-});
+if (process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_KEY) {
+    mailjetClient = new Mailjet({
+        apiKey: process.env.MAILJET_API_KEY,
+        apiSecret: process.env.MAILJET_SECRET_KEY
+    });
+    console.log("✅ Mailjet client initialized successfully");
+} else {
+    console.error("❌ MAILJET_API_KEY or MAILJET_SECRET_KEY not found in environment variables");
+    console.log("💡 Get your API credentials from: https://app.mailjet.com/account/apikeys");
+}
 
 /**
- * Sends an email with the provided content.
+ * Sends an email using Mailjet.
+ * @param {Object} options - Email options
+ * @param {string} options.to - Recipient email address
+ * @param {string} options.subject - Email subject
+ * @param {string} [options.text] - Plain text content
+ * @param {string} [options.html] - HTML content
+ * @returns {Promise<{success: boolean, messageId?: string, error?: string}>}
  */
 const sendEmail = async ({ to, subject, text, html }) => {
     try {
-        console.log("Attempting to send email to:", to);
-        console.log("EMAIL_USER configured:", process.env.EMAIL_USER ? "Yes" : "No");
-        console.log("EMAIL_PASS configured:", process.env.EMAIL_PASS ? "Yes" : "No");
-        
-        const mailOptions = {
-            from: `Livique <${process.env.EMAIL_USER}>`,
-            to: to,
-            subject: subject,
-            text: text,
-            html: html,
-        };
+        if (!mailjetClient) {
+            console.error("❌ Cannot send email: Mailjet client not initialized");
+            return { 
+                success: false, 
+                error: "Email service not configured. Please contact support." 
+            };
+        }
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log("✅ Email sent successfully: %s", info.messageId);
-        return { success: true, messageId: info.messageId };
+        console.log("📤 Attempting to send email via Mailjet to:", to);
+        
+        const request = mailjetClient
+            .post('send', { version: 'v3.1' })
+            .request({
+                Messages: [
+                    {
+                        From: {
+                            Email: process.env.EMAIL_USER || 'noreply@livique.co.in',
+                            Name: 'Livique'
+                        },
+                        To: [
+                            {
+                                Email: to,
+                                Name: to.split('@')[0]
+                            }
+                        ],
+                        Subject: subject,
+                        TextPart: text || '',
+                        HTMLPart: html || text || '',
+                    }
+                ]
+            });
+
+        const result = await request;
+        
+        console.log("✅ Email sent successfully via Mailjet");
+        console.log("   - Status:", result.body.Messages[0].Status);
+        console.log("   - Message ID:", result.body.Messages[0].To[0].MessageID);
+        
+        return { 
+            success: true, 
+            messageId: result.body.Messages[0].To[0].MessageID 
+        };
+        
     } catch (error) {
-        console.error("❌ ERROR: Failed to send email.");
-        console.error("Error details:", error.message);
-        console.error("Error code:", error.code);
-        console.error("Full error:", error);
-        return { success: false, error: error.message };
+        console.error("❌ ERROR: Failed to send email via Mailjet");
+        console.error("   - Error:", error.statusCode || error.message);
+        
+        if (error.response) {
+            console.error("   - Response Body:", JSON.stringify(error.response.body, null, 2));
+        }
+        
+        // Return user-friendly error message
+        let errorMessage = "Failed to send email. Please try again later.";
+        
+        if (error.statusCode === 401) {
+            errorMessage = "Email service authentication failed. Please contact support.";
+            console.error("💡 Check if MAILJET_API_KEY and MAILJET_SECRET_KEY are correct");
+        } else if (error.statusCode === 400) {
+            errorMessage = "Invalid email configuration. Please contact support.";
+        }
+        
+        return { 
+            success: false, 
+            error: errorMessage 
+        };
     }
 };
 
