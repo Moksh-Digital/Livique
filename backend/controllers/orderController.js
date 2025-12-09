@@ -3,6 +3,8 @@ import asyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
 import User from "../models/userModel.js";
 import Product from "../models/productModel.js";
+import sendEmail from "../utils/sendEmail.js";
+import { generateOrderConfirmationEmail } from "../utils/orderEmailTemplate.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -65,6 +67,29 @@ const addOrderItems = asyncHandler(async (req, res) => {
   }
 
   res.status(201).json(createdOrder);
+
+  // Send order confirmation email (non-blocking - after response)
+  if (user && user.email) {
+    try {
+      console.log("📧 Sending order confirmation email to:", user.email);
+      
+      const emailHtml = generateOrderConfirmationEmail(createdOrder, user, items);
+      
+      const emailResult = await sendEmail({
+        to: user.email,
+        subject: `Order Confirmed! #${createdOrder._id.toString().substring(0, 8).toUpperCase()} - Livique`,
+        html: emailHtml,
+      });
+
+      if (emailResult && emailResult.success) {
+        console.log("✅ Order confirmation email sent successfully");
+      } else {
+        console.warn("⚠️ Failed to send order confirmation email");
+      }
+    } catch (emailError) {
+      console.error("❌ Error sending order confirmation email:", emailError.message);
+    }
+  }
 });
 
 // @desc    Get logged-in user's orders
