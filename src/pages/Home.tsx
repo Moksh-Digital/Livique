@@ -22,113 +22,113 @@ const Home = () => {
   const featuredGifts = [
     {
       name: "Customized Mug",
-      image: "https://images.unsplash.com/photo-1599599810694-b5ac4dd64c4f?w=400&h=400&fit=crop",
+      image: "https://www.fnp.com/images/pr/l/v20230918223819/personalized-mug-for-her_1.jpg",
     },
     {
       name: "Scented Candle",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop",
+      image: "https://m.media-amazon.com/images/I/81HSydTuXVL.jpg",
     },
     {
       name: "Gift Box",
-      image: "https://images.unsplash.com/photo-1513885535751-59a92f141541?w=400&h=400&fit=crop",
+      image: "https://m.media-amazon.com/images/I/51fgzRAZiRL.jpg",
     },
     {
       name: "Perfume Set",
-      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop",
+      image: "https://m.media-amazon.com/images/I/61-x2-oHOvL._AC_UF1000,1000_QL80_.jpg",
     },
   ]
 
   const homeDecorItems = [
     {
       name: "Wall Clock",
-      image: "https://images.unsplash.com/photo-1557672172-298e090d0f80?w=400&h=400&fit=crop",
+      image: "https://www.titan.co.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw6ef4a954/images/Titan/Catalog/W0046PA01_1.jpg?sw=800&sh=800",
     },
     {
       name: "Candle Stand",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop",
+      image: "https://nestasia.in/cdn/shop/products/DSC6301.jpg?v=1680864642",
     },
     {
       name: "Flower Vase",
-      image: "https://images.unsplash.com/photo-1578500494198-246f612d03b3?w=400&h=400&fit=crop",
+      image: "https://m.media-amazon.com/images/I/51LMse-rYWL._AC_UF894,1000_QL80_.jpg",
     },
     {
       name: "Wall Art",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop",
+      image: "https://artstreet.in/cdn/shop/files/71U0MNnAYJL._SL1300_f5e7a943-77ad-490d-a338-a1d81ab06ba3_700x700.jpg?v=1755503553",
     },
   ]
 
   const jewelryItems = [
     {
       name: "Earrings",
-      image: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400&h=400&fit=crop",
+      image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSsNWsu2HAvJVxfLzEBWsMvwrSdyv675LhyQjLZR1s4WlnpjctXK27w1sAbp-gvvrdi1-eV12TzfjGj93wwnBcplArYPo8LocF2QukxitDjVKLI3IsGzr8j",
     },
     {
       name: "Necklaces",
-      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop",
+      image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTea7KjYKz3mWBxrBGlOYgxIby1yw-fTfvzyXbxvsxOGF-7iS2HDjNJO8P5uE0XU4-dl88pbaU0_1ImIfZRBu1dRWnIBUBG3VH_BRO5e7o_bKgV-MgOoogd3A",
     },
     {
       name: "Bracelets & Bangles",
-      image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&h=400&fit=crop",
+      image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQpVXo6_Tfea_8RqWRov8dIL2f6Q48kW4DWTCuE9rNVPDpJJWfav5FfawXvWXJpLx7b4Z63q4PuvogdBOjcWhKnisiAbzmbEuKJuwEipA9DK2V4CAE7tE-GP58",
     },
     {
       name: "Rings",
-      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=400&fit=crop",
+      image: "https://cdn-media.glamira.com/media/product/newgeneration/view/1/sku/sydney016-n1/diamond/diamond-Brillant_AAA/stone2/diamond-Brillant_AAA/alloycolour/yellow.jpg",
     },
   ]
 
   const beautyItems = [
     {
       name: "Oversized Sunglasses",
-      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop",
+      image: "https://m.media-amazon.com/images/I/81U6qxkqKqL._AC_UY1100_.jpg",
     },
     {
       name: "Cat-eye Sunglasses",
-      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop",
+      image: "https://m.media-amazon.com/images/I/41cCIOblYjL._AC_UY1100_.jpg",
     },
     {
       name: "Fashion Specs",
-      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop",
+      image: "https://img.joomcdn.net/d684d2b6201227f5109327528c86cf7e931c9507_1024_1024.jpeg",
     },
     {
       name: "Round Frames",
-      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop",
+      image: "https://assets.myntassets.com/w_412,q_30,dpr_3,fl_progressive,f_webp/assets/images/30014421/2024/6/21/1641cc3e-75af-4290-9591-7bd36384ebf21718993451688SUNNIESUnisexRoundSunglasseswithUVProtectedLens6.jpg",
     },
   ]
 
   const toyItems = [
     {
       name: "Teddy Bear",
-      image: "https://images.unsplash.com/photo-1585707571428-4e0f1d4efcd0?w=400&h=400&fit=crop",
+      image: "https://m.media-amazon.com/images/I/41xJambIv2L._AC_UF1000,1000_QL80_.jpg",
     },
     {
       name: "Remote Car",
-      image: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=400&h=400&fit=crop",
+      image: "https://m.media-amazon.com/images/I/61Ny+lQg+TL._AC_UF1000,1000_QL80_.jpg",
     },
     {
       name: "Building Blocks",
-      image: "https://images.unsplash.com/photo-1607734564536-96981a9ad5c5?w=400&h=400&fit=crop",
+      image: "https://rukminim2.flixcart.com/image/480/480/xif0q/block-construction/h/u/3/200-piece-classic-big-building-bricks-large-toy-blocks-original-imahaeyp4qhn4vfy.jpeg?q=90",
     },
     {
       name: "Doll Set",
-      image: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=400&h=400&fit=crop",
+      image: "https://m.media-amazon.com/images/I/81DI+QuY4zL.jpg",
     },
   ]
   const stationaryItems = [
     {
       name: "Hairbands",
-      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop",
+      image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQd_PGhzXxzKXmtvfXsYfeoW8MDhKP-7W8AgXt9HhMi14bShNmCxc-KBNxGVF4zrZBfGM9xiz1HOiN-IPRrzrYhVGhZj82_ZC3yvtHu1fR0_wNiIHOREcmI_KHY",
     },
     {
       name: "Scrunchies",
-      image: "https://images.unsplash.com/photo-1556821552-5ff63b1b6bcc?w=400&h=400&fit=crop",
+      image: "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQYxqdOXpmJKsBrtfbB7ePxzprCQUMGCa_OI13e9G0odceT4h_HFTY8FdCYbZ3_x3We2mFcM25iy0gxTNCvxzq-NWA4a9DCp4n-HK_jgDM34B_EdvI_WcLpaFfu",
     },
     {
       name: "Claw Clips",
-      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop",
+      image: "https://jewelsmars.com/cdn/shop/files/3B9120E1-9779-4FD4-80CF-0C84013D746C.jpg?v=1729679011",
     },
     {
       name: "Hair Pins & Barrettes",
-      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop",
+      image: "https://images-cdn.ubuy.co.in/66856064ad5d1a0d92061382-vintage-retro-hair-stick-hairpin-long.jpg",
     },
   ]
   const handleScroll = (

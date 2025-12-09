@@ -20,6 +20,8 @@ const upload = multer({
   }
 });
 
+
+
 // Upload single image to Cloudinary
 router.post('/upload', upload.single('image'), async (req, res) => {
   try {
