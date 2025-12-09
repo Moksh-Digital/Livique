@@ -21,114 +21,114 @@ const Home = () => {
   const stationaryScrollRef = useRef<HTMLDivElement>(null)
   const featuredGifts = [
     {
-      name: "bags & clutches",
-      image: "https://rukminim2.flixcart.com/image/480/640/xif0q/clutch/i/l/l/fashionableclutch18-party1018-bridalcollections18-exotic-original-imahfmxtkfg7qz6d.jpeg?q=90",
+      name: "Customized Mug",
+      image: "https://images.unsplash.com/photo-1599599810694-b5ac4dd64c4f?w=400&h=400&fit=crop",
     },
     {
-      name: "Customized Mugs",
-      image: "https://m.media-amazon.com/images/I/61M+5U6n1HL._AC_UF894,1000_QL80_.jpg",
+      name: "Scented Candle",
+      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop",
     },
     {
-      name: "Flower Bouquets",
-      image: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400",
+      name: "Gift Box",
+      image: "https://images.unsplash.com/photo-1513885535751-59a92f141541?w=400&h=400&fit=crop",
     },
     {
-      name: "flower bouquets",
-      image: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400",
+      name: "Perfume Set",
+      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop",
     },
   ]
 
   const homeDecorItems = [
     {
-      name: "scented candles",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+      name: "Wall Clock",
+      image: "https://images.unsplash.com/photo-1557672172-298e090d0f80?w=400&h=400&fit=crop",
     },
     {
-      name: "Indoor Plants",
-      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400",
+      name: "Candle Stand",
+      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop",
     },
     {
-      name: "wall art",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+      name: "Flower Vase",
+      image: "https://images.unsplash.com/photo-1578500494198-246f612d03b3?w=400&h=400&fit=crop",
     },
     {
-      name: "show pieces",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+      name: "Wall Art",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop",
     },
   ]
 
   const jewelryItems = [
     {
-      name: "bracelets",
-      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400",
+      name: "Earrings",
+      image: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400&h=400&fit=crop",
     },
     {
-      name: "pendants",
-      image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
+      name: "Necklaces",
+      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop",
     },
     {
-      name: "earrings",
-      image: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400",
+      name: "Bracelets & Bangles",
+      image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&h=400&fit=crop",
     },
     {
-      name: "handbags & clutches",
-      image: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400",
+      name: "Rings",
+      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=400&fit=crop",
     },
   ]
 
   const beautyItems = [
     {
-      name: "skincare kits",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+      name: "Oversized Sunglasses",
+      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop",
     },
     {
-      name: "perfumes",
-      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400",
+      name: "Cat-eye Sunglasses",
+      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop",
     },
     {
-      name: "bath & body gift sets",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+      name: "Fashion Specs",
+      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop",
     },
     {
-      name: "shaving kits",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+      name: "Round Frames",
+      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop",
     },
   ]
 
   const toyItems = [
     {
-      name: "Soft Toys",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+      name: "Teddy Bear",
+      image: "https://images.unsplash.com/photo-1585707571428-4e0f1d4efcd0?w=400&h=400&fit=crop",
     },
     {
-      name: "desk toys",
-      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400",
+      name: "Remote Car",
+      image: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=400&h=400&fit=crop",
     },
     {
-      name: "Outdoor & Sports Toys",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+      name: "Building Blocks",
+      image: "https://images.unsplash.com/photo-1607734564536-96981a9ad5c5?w=400&h=400&fit=crop",
     },
     {
-      name: "Baby & Toddler Toys",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+      name: "Doll Set",
+      image: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=400&h=400&fit=crop",
     },
   ]
   const stationaryItems = [
     {
-      name: "Cushions",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+      name: "Hairbands",
+      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop",
     },
     {
-      name: "Lipstick",
-      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400",
+      name: "Scrunchies",
+      image: "https://images.unsplash.com/photo-1556821552-5ff63b1b6bcc?w=400&h=400&fit=crop",
     },
     {
-      name: "Clocks & Figurines",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+      name: "Claw Clips",
+      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop",
     },
     {
-      name: "Clocks & Figurines",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+      name: "Hair Pins & Barrettes",
+      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop",
     },
   ]
   const handleScroll = (
