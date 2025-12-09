@@ -4,7 +4,7 @@ export const CATEGORIES = [
     id: "home-decor",
     name: "Home Decor",
     slug: "home-decor",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+    image: "https://i.pinimg.com/736x/bb/73/ca/bb73ca5bf2470414e6ba6f226b514137.jpg",
     description: "Beautiful home decor items",
     subcategories: [
       { name: "Wall Clock", slug: "wall-clock" },
@@ -20,7 +20,7 @@ export const CATEGORIES = [
     id: "gift-items",
     name: "Gift Items",
     slug: "gift-items",
-    image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
+    image: "https://m.media-amazon.com/images/I/51cqh4bm3pL._AC_UF894,1000_QL80_.jpg",
     description: "Perfect gift items for every occasion",
     subcategories: [
       { name: "Perfume Set", slug: "perfume-set" },
@@ -36,7 +36,7 @@ export const CATEGORIES = [
     id: "toys",
     name: "Toys",
     slug: "toys",
-    image: "https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?w=400",
+    image: "https://www.shumee.in/cdn/shop/files/wooden-frog-rainbow-stacker-toy-for-girls-and-boys-active-play-gifting-for-ages-1-2-3-4.jpg?v=1757301911&width=600",
     description: "Fun toys for all ages",
     subcategories: [
       { name: "Teddy Bear", slug: "teddy-bear" },
@@ -52,7 +52,7 @@ export const CATEGORIES = [
     id: "jewelry",
     name: "Jewelry",
     slug: "jewelry",
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400",
+    image: "https://m.media-amazon.com/images/I/61xUQIASFkL._AC_UY1100_.jpg",
     description: "Elegant jewelry collection",
     subcategories: [
       { name: "Earrings", slug: "earrings" },
@@ -67,7 +67,7 @@ export const CATEGORIES = [
     id: "hair-accessories",
     name: "Hair Accessories",
     slug: "hair-accessories",
-    image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400",
+    image: "https://www.jiomart.com/images/product/original/rvpnh4r5zk/diversa-pearl-hair-clutcher-wedding-elegant-pendant-pearl-butterfly-hair-clips-flying-metal-hair-claw-clips-hair-clamps-styling-clips-butterfly-pearl-cluther-clip-for-girls-and-women-buutrfly-hair-clip-for-women-golden-pack-of-1-product-images-rvpnh4r5zk-5-202307051450.jpg?im=Resize=(500,630)",
     description: "Stylish hair accessories",
     subcategories: [
       { name: "Hairbands", slug: "hairbands" },
@@ -81,7 +81,7 @@ export const CATEGORIES = [
     id: "bags-wallets",
     name: "Bags & Wallets",
     slug: "bags-wallets",
-    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400",
+    image: "https://m.media-amazon.com/images/I/71izkVh7BML._AC_UY1100_.jpg",
     description: "Stylish bags and wallets",
     subcategories: [
       { name: "Handbags", slug: "handbags" },
@@ -110,7 +110,7 @@ export const CATEGORIES = [
     id: "watches",
     name: "Watches",
     slug: "watches",
-    image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400",
+    image: "https://cdn.shopify.com/s/files/1/0316/2705/1053/files/T1374101104100_1_540x.jpg?v=1727188676",
     description: "Stylish watches collection",
     subcategories: [
       { name: "Metal Strap Watches", slug: "metal-strap-watches" },
@@ -123,7 +123,7 @@ export const CATEGORIES = [
     id: "belts-scarves",
     name: "Belts & Scarves",
     slug: "belts-scarves",
-    image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuk4ZUGeOEaJmWKG-qJt9F_4lNEZc5FA5abA&s",
     description: "Fashion belts and scarves",
     subcategories: [
       { name: "Leather Belts", slug: "leather-belts" },
@@ -137,7 +137,7 @@ export const CATEGORIES = [
     id: "footwear-accessories",
     name: "Footwear Accessories",
     slug: "footwear-accessories",
-    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400",
+    image: "https://www.voganow.com/cdn/shop/files/VNLF-050-018-SRAY_1.jpg?v=1759925244",
     description: "Footwear and accessories",
     subcategories: [
       { name: "Toe Rings", slug: "toe-rings" },
