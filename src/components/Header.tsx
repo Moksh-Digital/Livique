@@ -96,7 +96,7 @@ const Header = () => {
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   onFocus={() => setShowSearch(true)}
-                  placeholder="Search for gifts, flowers, cakes..."
+                  placeholder="Search for gifts, flowers "
                   className="pl-10 pr-4 w-full bg-white border-[#D4AF76] focus:border-[#C19A6B] focus:ring-[#C19A6B] rounded-md h-10 text-[#5D4037] placeholder:text-[#8B7355]"
                 />
               </div>
@@ -305,7 +305,7 @@ const Header = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#8B7355]" />
                 <Input
                   autoFocus
-                  placeholder="Search for gifts, flowers, cakes..."
+                  placeholder="Search for gifts, flowers.."
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
@@ -337,7 +337,6 @@ const Header = () => {
                     {[
                       "Birthday Gifts",
                       "Anniversary Flowers",
-                      "Chocolate Cakes",
                       "Personalized Gifts",
                       "Same Day Delivery",
                     ].map((suggestion, index) => (

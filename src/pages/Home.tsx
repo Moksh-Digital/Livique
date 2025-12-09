@@ -396,9 +396,28 @@ const Home = () => {
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="text-[8px] font-semibold text-center leading-tight text-[#5D4037]">
-            {cat.name}
-          </div>
+         <div className="text-[14px] font-semibold text-center leading-tight text-[#5D4037]">
+  {(() => {
+    const words = cat.name.split(" ");
+    const lines = [];
+    let temp = "";
+
+    words.forEach((word) => {
+      if (word.length <= 3) {
+        // chote words previous ke saath join karo
+        temp += (temp ? " " : "") + word;
+      } else {
+        if (temp) lines.push(temp); // previous temp push karo
+        temp = word; // current word store karo
+      }
+    });
+
+    if (temp) lines.push(temp); // last temp push karo
+
+    return lines.map((line, i) => <div key={i}>{line}</div>);
+  })()}
+</div>
+
         </Link>
       </div>
     ))}
@@ -423,9 +442,29 @@ const Home = () => {
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="text-[8px] font-semibold text-center leading-tight text-[#5D4037]">
-            {cat.name}
-          </div>
+        <div className="text-[14px] text-center leading-tight text-[#5D4037]">
+
+          {(() => {
+            const words = cat.name.split(" ");
+            const lines = [];
+            let temp = "";
+
+            words.forEach((word) => {
+              if (word.length <= 3) {
+                // chote words previous ke saath join karo
+                temp += (temp ? " " : "") + word;
+              } else {
+                if (temp) lines.push(temp); // previous temp push karo
+                temp = word; // current word store karo
+              }
+            });
+
+            if (temp) lines.push(temp); // last temp push karo
+
+            return lines.map((line, i) => <div key={i}>{line}</div>);
+          })()}
+        </div>
+
         </Link>
       </div>
     ))}
@@ -450,7 +489,7 @@ const Home = () => {
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="text-[10px] font-semibold text-center leading-tight text-[#5D4037]">
+        <div className="text-[12px] font-semibold text-center leading-tight text-[#5D4037]">
           {cat.name}
         </div>
       </Link>

@@ -98,11 +98,8 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     { name: "Home Decor", slug: "home-decor", icon: "🖼️", subcategories: [] },
     { name: "Anniversary", slug: "anniversary", icon: "💍", subcategories: [] },
     { name: "Gift Hampers", slug: "gift-hampers", icon: "🧺", subcategories: [] },
-    { name: "Sweets", slug: "sweets", icon: "🍬", subcategories: [] },
-    { name: "Dry Fruits", slug: "dry-fruits", icon: "🌰", subcategories: [] },
     { name: "Chocolates", slug: "chocolates", icon: "🍫", subcategories: [] },
     { name: "Diyas", slug: "diyas", icon: "🕯️", subcategories: [] },
-    { name: "Cakes", slug: "cakes", icon: "🍰", subcategories: [] },
     { name: "Personalized", slug: "personalized", icon: "🏷️", subcategories: [] },
     { name: "Experiences", slug: "experiences", icon: "🎢", subcategories: [] },
 
@@ -214,20 +211,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         { name: 'Baby Gear', slug: 'baby-gear' },
       ],
     },
-    {
-      name: 'Grocery & Food',
-      slug: 'grocery-food',
-      icon: '🛒',
-      subcategories: [
-        { name: 'Fruits & Vegetables', slug: 'fruits-vegetables' },
-        { name: 'Dairy Products', slug: 'dairy-products' },
-        { name: 'Beverages', slug: 'beverages' },
-        { name: 'Snacks', slug: 'snacks' },
-        { name: 'Cooking Essentials', slug: 'cooking-essentials' },
-        { name: 'Organic', slug: 'organic' },
-      ],
-    },
-    {
+    { 
       name: 'Appliances',
       slug: 'appliances',
       icon: '🔌',

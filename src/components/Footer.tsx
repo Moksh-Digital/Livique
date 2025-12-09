@@ -23,7 +23,7 @@ const Footer = () => {
               </div>
             </a>
             <p className="text-sm text-[#8B7355] leading-relaxed">
-              Gifting happiness, one surprise at a time. Your one-stop shop for gifts, flowers, and cakes for every occasion.
+              Gifting happiness, one surprise at a time. Your one-stop shop for gifts, flowers for every occasion.
             </p>
             <div className="flex items-center space-x-4">
               <a href="#" className="text-[#8B4513] hover:text-[#D2691E] transition-colors">
@@ -68,7 +68,6 @@ const Footer = () => {
             <h3 className="font-semibold text-lg text-[#8B4513]">Top Categories</h3>
             <ul className="space-y-2 text-sm">
               <li><a href="/category/flowers" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Flowers</a></li>
-              <li><a href="/category/cakes" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Cakes</a></li>
               <li><a href="/category/gift-hampers" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Gift Hampers</a></li>
               <li><a href="/category/personalised" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Personalised Gifts</a></li>
             </ul>

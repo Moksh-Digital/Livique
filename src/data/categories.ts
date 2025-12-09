@@ -147,7 +147,7 @@ export const CATEGORIES = [
   },
   {
     id: "other-fashion-accessories",
-    name: "Other Fashion Accessories",
+    name: "Fashion Accessories",
     slug: "other-fashion-accessories",
     image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400",
     description: "Unique fashion accessories",
