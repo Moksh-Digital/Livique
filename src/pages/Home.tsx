@@ -1,13 +1,14 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { CATEGORIES } from "@/data/categories"
 import PromoBanner from "@/components/Banner"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect,} from "react"
 import BannerSlider from "./BannerSlider"
 const Home = () => {
+  const navigate = useNavigate()
   const [featuredActiveIndex, setFeaturedActiveIndex] = useState(0)
   const [homeDecorActiveIndex, setHomeDecorActiveIndex] = useState(0)
   const [jewelryActiveIndex, setJewelryActiveIndex] = useState(0)
@@ -588,7 +589,7 @@ const Home = () => {
       {/* <h2 className="absolute top-4 left-6 text-lg md:text-2xl font-semibold text-[#B67A43]">
         Calendar
       </h2> */}
-      <button className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
+      <button onClick={() => navigate('/category')} className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
         Explore Now
       </button>
     </div>
@@ -606,7 +607,7 @@ const Home = () => {
         {/* <h2 className="absolute top-3 left-6 text-md md:text-xl font-semibold text-[#B67A43]">
           New Year & Christmas
         </h2> */}
-        <button className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
+        <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
           Explore Now
         </button>
       </div>
@@ -623,7 +624,7 @@ const Home = () => {
           {/* <h2 className="absolute top-3 left-4 text-md md:text-lg font-semibold text-[#B67A43]">
             Seasons Greetings Card
           </h2> */}
-         <button className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
+         <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
           Explore Now
         </button>
 
@@ -638,7 +639,7 @@ const Home = () => {
           {/* <h2 className="absolute top-3 left-4 text-md md:text-lg font-semibold text-[#B67A43]">
             Corporate Gifts
           </h2> */}
-         <button className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
+         <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
           Explore Now
         </button>
 
