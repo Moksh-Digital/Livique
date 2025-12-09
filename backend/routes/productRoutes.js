@@ -7,7 +7,8 @@ import {
   deleteProduct,
   updateProduct,
   migrateProductsAddStockField,
-  decreaseProductQuantity
+  decreaseProductQuantity,
+  deleteAllProducts
 } from '../controllers/productController.js';
 import { searchProducts } from "../controllers/productController.js";
 
@@ -17,6 +18,9 @@ const router = express.Router();
 
 // Migration route - Add inStock field to existing products
 router.post("/migrate/add-stock-field", migrateProductsAddStockField);
+
+// Admin: Clear all products (for inventory reset)
+router.delete('/admin/clear-all', deleteAllProducts);
 
 // for searching products 
 router.get("/search", searchProducts);

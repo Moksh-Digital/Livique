@@ -373,9 +373,9 @@ const Home = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-9 gap-4 ml-0 md:ml-24">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 place-items-center">
 
-            {CATEGORIES.slice(0, 8).map((cat) => (
+            {CATEGORIES.map((cat) => (
               <div key={cat.id} className="text-center">
                 <Link to={`/category/${cat.slug}`}>
                   <div 
