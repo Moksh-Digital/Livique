@@ -50,9 +50,9 @@ const Footer = () => {
             <h3 className="font-semibold text-lg text-[#8B4513]">Know Us</h3>
             <ul className="space-y-2 text-sm">
               <li><a href="/about" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">About Us</a></li>
-              <li><a href="/contact" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Contact Us</a></li>
-              <li><a href="/careers" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Careers</a></li>
-              <li><a href="/blog" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Blog</a></li>
+              <li><a href="https://merchant.razorpay.com/policy/Roepb8DQiTw12t/contact_us" target="_blank" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Contact Us</a></li>
+              {/* <li><a href="/careers" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Careers</a></li>
+              <li><a href="/blog" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Blog</a></li> */}
             </ul>
           </div>
 
@@ -60,10 +60,10 @@ const Footer = () => {
           <div className="space-y-3 border-l border-[#D4AF76] pl-4">
             <h3 className="font-semibold text-lg text-[#8B4513]">Our Policies</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="/terms" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Terms & Conditions</a></li>
-              <li><a href="/privacy" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Privacy Policy</a></li>
-              <li><a href="/refund" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Refund Policy</a></li>
-              <li><a href="/faq" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">FAQs</a></li>
+              <li><a href="https://merchant.razorpay.com/policy/Roepb8DQiTw12t/terms" target="_blank" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Terms & Conditions</a></li>
+              <li><a href="https://merchant.razorpay.com/policy/Roepb8DQiTw12t/privacy" target="_blank" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Privacy Policy</a></li>
+              <li><a href="https://merchant.razorpay.com/policy/Roepb8DQiTw12t/refund" target="_blank" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Refund Policy</a></li>
+              <li><a href="https://merchant.razorpay.com/policy/Roepb8DQiTw12t/shipping" className="text-[#8B7355] hover:text-[#8B4513] hover:underline transition-colors">Shipping & Delivery Policy</a></li>
             </ul>
           </div>
 

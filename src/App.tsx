@@ -20,6 +20,7 @@ import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
 import SearchResultsPage from "./pages/SearchResultsPage";
+import About from "./pages/About";
 
 const AppRoutes = () => {
   const { signIn, fetchGoogleUser } = useAuth();
@@ -59,6 +60,7 @@ const AppRoutes = () => {
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
 
+      <Route path="/about" element={<About />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/search" element={<SearchResultsPage />} />
