@@ -374,34 +374,91 @@ const Home = () => {
           </div>
 
           {/* Super tight horizontal grid */}
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(110px,1fr))] gap-y-6 gap-x-2 justify-items-center">
+{/* Mobile View */}
+<div className="md:hidden space-y-4">
 
-            {CATEGORIES.map((cat) => (
-              <div key={cat.id} className="text-center">
-                <Link to={`/category/${cat.slug}`}>
-                  <div
-                    className="relative rounded-lg overflow-hidden page-card mb-2
-                       w-[110px] h-[110px]"
-                    style={{
-                      border: "1.5px solid #D0D0D0",
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    <img
-                      src={cat.image || "/placeholder.svg"}
-                      alt={cat.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <div className="text-[10px] font-semibold text-center leading-tight text-[#5D4037]">
-                    {cat.name}
-                  </div>
-                </Link>
-              </div>
-            ))}
-
+  {/* First Row */}
+  <div className="flex gap-2 overflow-x-auto no-scrollbar px-1">
+    {CATEGORIES.slice(0, 6).map((cat) => (
+      <div key={cat.id} className="flex-shrink-0 text-center">
+        <Link to={`/category/${cat.slug}`}>
+          <div
+            className="relative rounded-lg overflow-hidden page-card mb-1
+            w-[80px] h-[80px]"
+            style={{
+              border: "1.5px solid #D0D0D0",
+              transition: "all 0.3s ease",
+            }}
+          >
+            <img
+              src={cat.image || "/placeholder.svg"}
+              alt={cat.name}
+              className="w-full h-full object-cover"
+            />
           </div>
+          <div className="text-[8px] font-semibold text-center leading-tight text-[#5D4037]">
+            {cat.name}
+          </div>
+        </Link>
+      </div>
+    ))}
+  </div>
+
+  {/* Second Row */}
+  <div className="flex gap-2 overflow-x-auto no-scrollbar px-1">
+    {CATEGORIES.slice(6, 12).map((cat) => (
+      <div key={cat.id} className="flex-shrink-0 text-center">
+        <Link to={`/category/${cat.slug}`}>
+          <div
+            className="relative rounded-lg overflow-hidden page-card mb-1
+            w-[80px] h-[80px]"
+            style={{
+              border: "1.5px solid #D0D0D0",
+              transition: "all 0.3s ease",
+            }}
+          >
+            <img
+              src={cat.image || "/placeholder.svg"}
+              alt={cat.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="text-[8px] font-semibold text-center leading-tight text-[#5D4037]">
+            {cat.name}
+          </div>
+        </Link>
+      </div>
+    ))}
+  </div>
+</div>
+{/* Desktop View */}
+<div className="hidden md:grid grid-cols-[repeat(auto-fit,minmax(110px,1fr))] gap-y-6 gap-x-1 justify-items-center">
+  {CATEGORIES.map((cat) => (
+    <div key={cat.id} className="text-center">
+      <Link to={`/category/${cat.slug}`}>
+        <div
+          className="relative rounded-lg overflow-hidden page-card mb-2
+          w-[100px] h-[100px]"
+          style={{
+            border: "1.5px solid #D0D0D0",
+            transition: "all 0.3s ease",
+          }}
+        >
+          <img
+            src={cat.image || "/placeholder.svg"}
+            alt={cat.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="text-[10px] font-semibold text-center leading-tight text-[#5D4037]">
+          {cat.name}
+        </div>
+      </Link>
+    </div>
+  ))}
+</div>
+
+
         </section>
 
 
