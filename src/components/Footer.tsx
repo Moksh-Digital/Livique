@@ -1,4 +1,4 @@
-import { Gift, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+// import { Gift, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -29,7 +29,7 @@ const Footer = () => {
             <p className="text-sm text-[#8B7355] leading-relaxed">
               Gifting happiness, one surprise at a time. Your one-stop shop for gifts, flowers for every occasion.
             </p>
-            <div className="flex items-center space-x-4">
+            {/* <div className="flex items-center space-x-4">
               <a href="#" className="text-[#8B4513] hover:text-[#D2691E] transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
@@ -42,7 +42,7 @@ const Footer = () => {
               <a href="#" className="text-[#8B4513] hover:text-[#D2691E] transition-colors">
                 <Linkedin className="h-5 w-5" />
               </a>
-            </div>
+            </div> */}
           </div>
 
           {/* Column 2: Know Us */}
