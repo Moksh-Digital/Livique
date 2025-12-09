@@ -31,7 +31,7 @@ const Cart = () => {
           <p className="text-muted-foreground mb-6">
             Add some products to get started!
           </p>
-          <Button onClick={() => navigate("/")}>Browse Products</Button>
+          <Button className=" bg-gradient-to-br from-[#A7443F] via-[#7C2A25] to-[#3A1916]" onClick={() => navigate("/")}>Browse Products</Button>
         </main>
       </div>
     );

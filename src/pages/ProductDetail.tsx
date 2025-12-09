@@ -85,7 +85,7 @@ const ProductDetail = () => {
         <Header />
         <div className="max-w-[1400px] mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold">Product not found</h1>
-          <Button className="mt-4" onClick={() => navigate("/")}>
+          <Button className="mt-4 " onClick={() => navigate("/")}>
             Browse Products
           </Button>
         </div>
@@ -246,7 +246,7 @@ const ProductDetail = () => {
                   </Button>
 
                   <Button
-                    className="h-12 rounded-xl bg-primary hover:bg-primary/90"
+                    className="h-12 rounded-xl bg-gradient-to-br from-[#A7443F] via-[#7C2A25] to-[#3A1916] hover:bg-primary/90"
                     onClick={handleBuyNow}
                   >
                     🛍️ Buy Now
