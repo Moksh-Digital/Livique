@@ -90,8 +90,16 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    /* Prevent mobile browsers from auto-zooming text so layout matches responsive previews */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   body {
     @apply bg-background text-foreground;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 }
 
