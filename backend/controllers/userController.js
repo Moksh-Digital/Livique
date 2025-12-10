@@ -390,6 +390,7 @@ const getUserProfile = async (req, res) => {
   try {
     // req.user is already set by middleware
     res.json({
+      _id: req.user._id,
       name: req.user.name,
       email: req.user.email,
       verified: req.user.isVerified,

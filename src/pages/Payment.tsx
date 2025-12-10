@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import StepsTracker from "@/components/StepsTracker";
@@ -24,6 +25,7 @@ const API_BASE_URL = isLocalhost
 const Payment = () => {
   const navigate = useNavigate();
   const { cart, clearCart, getTotalPrice } = useCart();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState("cod");
 
@@ -117,32 +119,52 @@ const options = {
   order_id: data.id,
 
   handler: async (response) => {
-    const verifyRes = await axios.post(
-      `${API_BASE_URL}/payment-verify`,
-      response
-    );
+    try {
+      // Prepare complete order data for verification
+      const verifyData = {
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature,
+        userId: user?._id || localStorage.getItem("userId"),
+        userEmail: user?.email || localStorage.getItem("userEmail"),
+        userName: user?.name || localStorage.getItem("userName"),
+        items: orderData.items,
+        address: orderData.address,
+        subtotal: orderData.subtotal,
+        deliveryCharges: orderData.deliveryCharges,
+        total: orderData.total,
+        paymentMethod: "razorpay",
+      };
 
-    if (verifyRes.data.success) {
-      // ✅ Create order in DB after successful payment
-      const { data: createdOrder } = await axios.post(
-        `${API_BASE_URL}/orders`,
-        { ...orderData, paymentStatus: "Paid" },
-        config
+      console.log("🔍 Sending payment verification with data:", verifyData);
+
+      const verifyRes = await axios.post(
+        `${API_BASE_URL}/payment/verify`,
+        verifyData
       );
 
-      clearCart();
-      localStorage.removeItem("shippingAddress");
+      if (verifyRes.data.success) {
+        clearCart();
+        localStorage.removeItem("shippingAddress");
 
-      toast({
-        title: "Payment Successful!",
-        description: `Order ID: ${createdOrder._id || createdOrder.id}`,
-      });
+        toast({
+          title: "Payment Successful!",
+          description: `Order ID: ${verifyRes.data.orderId}`,
+        });
 
-      navigate("/order-confirmation", { state: { order: createdOrder } });
-    } else {
+        navigate("/order-confirmation", { state: { orderId: verifyRes.data.orderId } });
+      } else {
+        toast({
+          title: "Payment Verification Failed",
+          description: verifyRes.data.message || "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      console.error("❌ Payment verification error:", error.response?.data || error);
       toast({
         title: "Payment Verification Failed",
-        description: "Please try again.",
+        description: error.response?.data?.message || "Please contact support.",
         variant: "destructive",
       });
     }

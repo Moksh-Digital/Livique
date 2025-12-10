@@ -11,6 +11,7 @@ const API_BASE_URL = isLocalhost
 
 
 interface User {
+  _id?: string;
   name: string;
   email: string;
   verified: boolean;
