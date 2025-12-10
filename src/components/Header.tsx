@@ -28,7 +28,7 @@ import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp"; 
 
 const Header = () => {
-  const { getTotalItems, items } = useCart();
+  const { getTotalItems } = useCart();
   const totalItems = getTotalItems();
   const { user, signOut } = useAuth();
 
@@ -68,7 +68,7 @@ const Header = () => {
       {/* Top Header */}
       <header className="sticky top-8 z-50 bg-[#FFF8F0] shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4">
-       <div className="flex items-center justify-between h-16 md:h-24 gap-4">
+      <div className="flex items-center justify-between h-16 md:h-24 gap-4">
             {/* Left: Logo with Brand Name */}
             <div className="flex items-center gap-3">
               <Link to="/" className="flex items-center gap-2">
@@ -89,47 +89,10 @@ const Header = () => {
             </div>
 
             {/* Center: Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-2xl mx-4">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#8B7355] pointer-events-none z-10" />
-                <Input
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  onFocus={() => setShowSearch(true)}
-                  placeholder="Search for gifts, flowers "
-                  className="pl-10 pr-4 w-full bg-white border-[#D4AF76] focus:border-[#C19A6B] focus:ring-[#C19A6B] rounded-md h-10 text-[#5D4037] placeholder:text-[#8B7355]"
-                />
-              </div>
-            </div>
 
             {/* Right: Icons */}
-            <div className="flex items-center gap-2 md:gap-">
+            <div className="flex items-center gap-2 md:gap-3 pr-2 md:pr-4">
               {/* Search Icon (Mobile) */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden text-[#8B4513] hover:bg-[#F5E6D3]"
-                onClick={() => setShowSearch(true)}
-              >
-                <Search className="h-5 w-5" />
-              </Button>
-
-              {/* Cart */}
-              <Link to="/cart">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative text-[#8B4513] hover:bg-[#F5E6D3]"
-                >
-                  <ShoppingCart className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9" />
-
-                  {totalItems > 0 && (
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-[#D2691E] text-white text-xs rounded-full border-2 border-[#FFF8F0]">
-                      {totalItems}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
 
               {/* Admin */}
               {user?.role === "admin" && (
@@ -199,21 +162,13 @@ const Header = () => {
 
       {/* Bottom Navigation (Mobile) */}
       <nav className="fixed bottom-0 left-0 right-0 bg-[#FFF8F0] border-t border-[#E8D5C4] shadow-md md:hidden z-50">
-        <div className="flex justify-between items-center px-6 py-2">
+        <div className="flex justify-between items-center px-10 py-2">
           <Link
             to="/"
             className="flex flex-col items-center text-xs text-[#8B7355] hover:text-[#8B4513]"
           >
             <Home className="h-5 w-5" />
             Home
-          </Link>
-
-          <Link
-            to="/category"
-            className="flex flex-col items-center text-xs text-[#8B7355] hover:text-[#8B4513]"
-          >
-            <Menu className="h-5 w-5" />
-            Categories
           </Link>
 
           <button
