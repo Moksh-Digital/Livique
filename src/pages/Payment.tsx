@@ -109,7 +109,7 @@ const handlePlaceOrder = async () => {
       );
 
 const options = {
-  key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+  key: import.meta.env.RAZORPAY_KEY_ID,
   amount: data.amount,
   currency: data.currency,
   name: "Livique Store",
