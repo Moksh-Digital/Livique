@@ -3,7 +3,7 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import Order from "../models/orderModel.js";
 import sendEmail from "../utils/sendEmail.js";
-import { generateOrderConfirmationEmail } from "../utils/orderEmailTemplate.js";
+import { generateOrderConfirmationEmail, generateOwnerNotificationEmail } from "../utils/orderEmailTemplate.js";
 
 dotenv.config();
 
@@ -79,16 +79,44 @@ export const verifyPayment = async (req, res) => {
     await newOrder.save();
     console.log("✅ Order created in database:", newOrder._id);
 
-    // Step 3: Send order confirmation email
-    const emailHtml = generateOrderConfirmationEmail(newOrder, { name: userName, email: userEmail }, items);
+    // Step 3: Send order confirmation emails
+    try {
+      // Send email to customer
+      const emailHtml = generateOrderConfirmationEmail(newOrder, { name: userName, email: userEmail }, items);
 
-    await sendEmail({
-      to: userEmail,
-      subject: `Order Confirmed - Livique #${newOrder._id.toString().substring(0, 8).toUpperCase()}`,
-      html: emailHtml,
-    });
+      await sendEmail({
+        to: userEmail,
+        subject: `Order Confirmed - Livique #${newOrder._id.toString().substring(0, 8).toUpperCase()}`,
+        html: emailHtml,
+      });
 
-    console.log("✅ Order confirmation email sent to:", userEmail);
+      console.log("✅ Customer order confirmation email sent to:", userEmail);
+
+      // Send email to owner/admin
+      console.log("📧 Sending owner notification email to: liviqueofficial@gmail.com");
+      try {
+        const ownerEmailHtml = generateOwnerNotificationEmail(newOrder, { name: userName, email: userEmail }, items);
+        console.log("✅ Owner email HTML generated successfully");
+
+        const ownerEmailResult = await sendEmail({
+          to: "liviqueofficial@gmail.com",
+          subject: `New Order Received! #${newOrder._id.toString().substring(0, 8).toUpperCase()} - ₹${newOrder.total?.toFixed(2) || "0.00"}`,
+          html: ownerEmailHtml,
+        });
+
+        if (ownerEmailResult && ownerEmailResult.success) {
+          console.log("✅ Owner order notification email sent to: liviqueofficial@gmail.com");
+        } else {
+          console.warn("⚠️ Failed to send owner email:", ownerEmailResult?.error);
+        }
+      } catch (ownerErr) {
+        console.error("❌ Error sending owner email:", ownerErr.message);
+        console.error("Stack:", ownerErr.stack);
+      }
+    } catch (emailError) {
+      console.error("⚠️ Error sending emails:", emailError.message);
+      // Continue even if email fails - order is already created
+    }
 
     res.status(200).json({ 
       success: true, 
