@@ -210,7 +210,7 @@ const ProductDetail = () => {
             </p>
 
             {/* ---------------- DELIVERY OPTIONS ---------------- */}
-{/* ---------------- DELIVERY OPTION ---------------- */}
+            {/* ---------------- DELIVERY OPTION ---------------- */}
 <div className="mb-6">
   <h3 className="font-semibold mb-3">Delivery</h3>
   <Card className="p-4 rounded-xl shadow-md">
@@ -225,6 +225,60 @@ const ProductDetail = () => {
   </Card>
 </div>
 
+            {/* ---------------- DELIVERY INFORMATION ---------------- */}
+            <div className="mb-8 bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Delivery Information</h3>
+              <ul className="space-y-3">
+                <li className="flex gap-3">
+                  <span className="text-gray-400 mt-1">•</span>
+                  <span className="text-sm text-gray-700">
+                    We ship our products with the help of our delivery partners that's why the date of delivery is an estimated date.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-gray-400 mt-1">•</span>
+                  <span className="text-sm text-gray-700">
+                    There is a possibility of receiving the product prior or after the estimated date of delivery.
+                  </span>
+                </li>
+                {/* <li className="flex gap-3">
+                  <span className="text-gray-400 mt-1">•</span>
+                  <span className="text-sm text-gray-700">
+                    Our Same Day Delivery products are sourced locally at the delivery location from vendor and will be hand delivered within standard delivery timings.
+                  </span>
+                </li> */}
+                <li className="flex gap-3">
+                  <span className="text-gray-400 mt-1">•</span>
+                  <span className="text-sm text-gray-700">
+                    You have to give a delivery address where someone will surely be present to receive the order as our courier partners do not make a call to the customer before delivering their products.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-gray-400 mt-1">•</span>
+                  <span className="text-sm text-gray-700">
+                    We do not deliver on Sundays and national holidays.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-gray-400 mt-1">•</span>
+                  <span className="text-sm text-gray-700">
+                    You cannot redirect your order to an address other than the address given at the time of order.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-gray-400 mt-1">•</span>
+                  <span className="text-sm text-gray-700">
+                    We carefully pack and ship all of our orders from the warehouse.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-gray-400 mt-1">•</span>
+                  <span className="text-sm text-gray-700">
+                    Once the product will be dispatched, you will receive a tracking no. by which you can easily track your product.
+                  </span>
+                </li>
+              </ul>
+            </div>
 
             {/* ---------------- ACTION BUTTONS ---------------- */}
             <div className="grid grid-cols-2 gap-3">
