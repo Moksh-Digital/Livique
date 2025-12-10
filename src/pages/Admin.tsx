@@ -79,7 +79,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
-  const { user, signOut, loading, signIn , isAdmin} = useAuth(); // ✅ Added signIn function and loading state
+  const { user, signOut, loading, signIn, isAdmin } = useAuth(); // ✅ Added signIn function and loading state
   const { setProducts } = useProducts(); // ✅ get the new setter
   // const { orders, setOrders } = useOrders();
   const [orders, setOrders] = useState<Order[]>([]); // never undefined
@@ -114,7 +114,12 @@ const Admin = () => {
     quantity: 0,
   });
 
-  
+  // State for tracking IDs
+  const [trackingIds, setTrackingIds] = useState<{ [orderId: string]: string }>({});
+  const [updatingTracking, setUpdatingTracking] = useState<string | null>(null);
+
+
+
 
   // useEffect(() => {
   //   const fetchProducts = async () => {
@@ -136,38 +141,38 @@ const Admin = () => {
   //   fetchProducts();
   // }, []);
 
- 
- useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/products`);
-      
 
-      const data = await res.json();
-      if (res.ok && Array.isArray(data)) {
-        setProducts(data.map(p => ({ ...p, id: p._id })));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  fetchProducts();
-}, [setProducts]);
-
-
- 
   useEffect(() => {
-  const fetchUsers = async () => {
-    try {
-      const { data } = await axios.get(`${API_BASE_URL}/users`);
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/products`);
 
-      setUsers(data); // data should be array of user objects
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-    }
-  };
-  fetchUsers();
-}, []);
+
+        const data = await res.json();
+        if (res.ok && Array.isArray(data)) {
+          setProducts(data.map(p => ({ ...p, id: p._id })));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProducts();
+  }, [setProducts]);
+
+
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data } = await axios.get(`${API_BASE_URL}/users`);
+
+        setUsers(data); // data should be array of user objects
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
+    fetchUsers();
+  }, []);
 
 
 
@@ -223,18 +228,31 @@ const Admin = () => {
     fetchOrders();
   }, [setOrders]);
 
+  // Initialize tracking IDs from existing orders
+  useEffect(() => {
+    if (orders.length > 0) {
+      const initialTrackingIds: { [orderId: string]: string } = {};
+      orders.forEach((order) => {
+        if (order.trackingId) {
+          initialTrackingIds[order._id] = order.trackingId;
+        }
+      });
+      setTrackingIds(initialTrackingIds);
+    }
+  }, [orders]);
+
   // Migrate existing products to add inStock field if missing
   useEffect(() => {
     const migrateProducts = async () => {
       try {
         await axios.post(`${API_BASE_URL}/products/migrate/add-stock-field`);
-        
+
         console.log("Product migration completed");
       } catch (error) {
         console.error("Migration error (non-critical):", error);
       }
     };
-    
+
     migrateProducts();
   }, []);
 
@@ -245,10 +263,10 @@ const Admin = () => {
 
 
   const formattedRevenue = totalRevenue.toLocaleString("en-IN", {
-  style: "currency",
-  currency: "INR",
-  maximumFractionDigits: 0,
-});
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  });
 
 
 
@@ -258,31 +276,76 @@ const Admin = () => {
   //   if (user.role !== "admin") navigate("/");
   // }, [user, navigate]);
 
-  
+  // Handle updating tracking ID for an order
+  const handleUpdateTracking = async (orderId: string) => {
+    const trackingId = trackingIds[orderId];
 
-const handleLoginSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  try {
-    if (loginEmail === "admin@shop.com" && loginPassword === "admin123") {
-      signInAdmin(); // ✅ handles state + localStorage
+    if (!trackingId || trackingId.trim() === "") {
       toast({
-        title: "Welcome back!",
-        description: "You are logged in as admin.",
+        title: "Error",
+        description: "Please enter a tracking ID",
+        variant: "destructive",
       });
-
-      // Navigate to admin dashboard
-      navigate("/"); // <-- put your admin route here
-    } else {
-      throw new Error("Invalid credentials");
+      return;
     }
-  } catch (error: any) {
-    toast({
-      title: "Login Failed",
-      description: error.message || "Invalid email or password.",
-      variant: "destructive",
-    });
-  }
-};
+
+    setUpdatingTracking(orderId);
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/orders/${orderId}/tracking`,
+        { trackingId: trackingId.trim() }
+      );
+
+      if (response.status === 200) {
+        // Update local orders state
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId
+              ? { ...order, trackingId: trackingId.trim(), status: "Shipped" }
+              : order
+          )
+        );
+
+        toast({
+          title: "✅ Tracking ID Updated Successfully!",
+          description: `Tracking email sent to customer. Order status updated to "Shipped".`,
+        });
+      }
+    } catch (error: any) {
+      console.error("Error updating tracking ID:", error);
+      toast({
+        title: "Error updating tracking ID",
+        description: error.response?.data?.message || error.message || "Unknown error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingTracking(null);
+    }
+  };
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (loginEmail === "admin@shop.com" && loginPassword === "admin123") {
+        signInAdmin(); // ✅ handles state + localStorage
+        toast({
+          title: "Welcome back!",
+          description: "You are logged in as admin.",
+        });
+
+        // Navigate to admin dashboard
+        navigate("/"); // <-- put your admin route here
+      } else {
+        throw new Error("Invalid credentials");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid email or password.",
+        variant: "destructive",
+      });
+    }
+  };
 
 
   const handleDelete = (id: string) => {
@@ -292,11 +355,11 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
 
   const confirmDelete = async () => {
     if (!productToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       const response = await axios.delete(`${API_BASE_URL}/products/${productToDelete}`);
-      
+
       if (response.status === 200) {
         deleteProduct(productToDelete);
         toast({ title: "Product deleted successfully" });
@@ -305,8 +368,8 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
       }
     } catch (error) {
       console.error("Error deleting product:", error);
-      toast({ 
-        title: "Error deleting product", 
+      toast({
+        title: "Error deleting product",
         description: error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive"
       });
@@ -320,7 +383,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
     try {
       const newStockStatus = !(product.inStock ?? true);
       const response = await axios.put(`${API_BASE_URL}/products/${product.id}`, {
-        
+
         name: product.name,
         price: product.price,
         originalPrice: product.originalPrice,
@@ -341,15 +404,15 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
 
       if (response.status === 200) {
         updateProduct(product.id, { ...product, inStock: newStockStatus });
-        toast({ 
+        toast({
           title: newStockStatus ? "Product In Stock" : "Product Out of Stock",
           description: newStockStatus ? "Product is now available" : "Product is now unavailable"
         });
       }
     } catch (error) {
       console.error("Error updating stock status:", error);
-      toast({ 
-        title: "Error updating stock status", 
+      toast({
+        title: "Error updating stock status",
         description: error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive"
       });
@@ -467,7 +530,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
       // If editing an existing product
       try {
         const res = await fetch(`${API_BASE_URL}/products/${editingProduct.id}`, {
-          
+
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -674,7 +737,7 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                 { icon: <Package />, label: "Total Products", value: products.length },
                 { icon: <ShoppingBag />, label: "Total Orders", value: orders.length },
                 { icon: <Users />, label: "Total Users", value: users.length },
-{ icon: <BarChart3 />, label: "Revenue", value: formattedRevenue },
+                { icon: <BarChart3 />, label: "Revenue", value: formattedRevenue },
               ].map((item, i) => (
                 <Card key={i} className="p-6 rounded-2xl">
                   <div className="flex items-center justify-between mb-4 text-primary text-xl">
@@ -726,10 +789,10 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                           <p className="font-semibold text-lg">₹{order.total.toLocaleString()}</p>
                           <span
                             className={`text-xs font-medium px-2 py-1 rounded-full ${order.status === "Confirmed"
-                                ? "bg-green-100 text-green-800"
-                                : order.status === "Pending"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-red-100 text-red-800"
+                              ? "bg-green-100 text-green-800"
+                              : order.status === "Pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-red-100 text-red-800"
                               }`}
                           >
                             {order.status}
@@ -776,323 +839,323 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                   </Button>
                 </DialogTrigger>
 
-<DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto p-0">
-  <DialogHeader className="p-6 pb-0">
-    <DialogTitle className="text-2xl font-extrabold text-accent flex items-center gap-2">
-      {editingProduct ? <Edit className="h-6 w-6" /> : <Plus className="h-6 w-6" />} 
-      {editingProduct ? "Edit Product Listing" : "Create New Product"}
-    </DialogTitle>
-    <p className="text-sm text-muted-foreground">Fill out the details below to add or update a product in your store catalog.</p>
-  </DialogHeader>
+                <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto p-0">
+                  <DialogHeader className="p-6 pb-0">
+                    <DialogTitle className="text-2xl font-extrabold text-accent flex items-center gap-2">
+                      {editingProduct ? <Edit className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
+                      {editingProduct ? "Edit Product Listing" : "Create New Product"}
+                    </DialogTitle>
+                    <p className="text-sm text-muted-foreground">Fill out the details below to add or update a product in your store catalog.</p>
+                  </DialogHeader>
 
-  <form onSubmit={handleSubmit} className="p-6 pt-4 space-y-8">
+                  <form onSubmit={handleSubmit} className="p-6 pt-4 space-y-8">
 
-    {/* --- 1. General Info & Categorization --- */}
-    <Card className="p-6 border-l-4 border-primary/70 shadow-lg">
-      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-700">General Information</h3>
-      <div className="grid md:grid-cols-2 gap-6">
-        
-        {/* Product Name */}
-        <div>
-          <Label htmlFor="product-name" className="text-sm font-semibold text-gray-600">Product Name *</Label>
-          <Input
-            id="product-name"
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
-            placeholder="e.g., Ultra-Soft Memory Foam Pillow"
-            className="mt-1"
-          />
-        </div>
+                    {/* --- 1. General Info & Categorization --- */}
+                    <Card className="p-6 border-l-4 border-primary/70 shadow-lg">
+                      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-700">General Information</h3>
+                      <div className="grid md:grid-cols-2 gap-6">
 
-        {/* Category Select */}
-        <div>
-          <Label htmlFor="category-select" className="text-sm font-semibold text-gray-600">Category *</Label>
-          <select
-            id="category-select"
-            value={formData.category}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                category: e.target.value,
-                subcategory: "", // reset subcategory
-              })
-            }
-            required
-            className="w-full px-3 py-2 border rounded-lg h-10 bg-background mt-1 focus:ring-2 focus:ring-accent"
-          >
-            <option value="" disabled>--- Select Primary Category ---</option>
-            {CATEGORY_OPTIONS.map((opt) => (
-              <option key={opt.slug} value={opt.slug}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
+                        {/* Product Name */}
+                        <div>
+                          <Label htmlFor="product-name" className="text-sm font-semibold text-gray-600">Product Name *</Label>
+                          <Input
+                            id="product-name"
+                            type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            required
+                            placeholder="e.g., Ultra-Soft Memory Foam Pillow"
+                            className="mt-1"
+                          />
+                        </div>
 
-        {/* Subcategory select (conditional) */}
-        {(() => {
-          const selCat = CATEGORY_OPTIONS.find(c => c.slug === formData.category);
-          if (!selCat || selCat.subcategories.length === 0) return null;
-          return (
-            <div className="md:col-span-2">
-              <Label htmlFor="subcategory-select" className="text-sm font-semibold text-gray-600">Subcategory</Label>
-              <select
-                id="subcategory-select"
-                value={formData.subcategory}
-                onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg h-10 bg-background mt-1 focus:ring-2 focus:ring-accent"
-              >
-                <option value="" disabled>--- Select Secondary Category ---</option>
-                {selCat.subcategories.map((sub) => (
-                  <option key={sub.slug} value={sub.slug}>
-                    {sub.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          );
-        })()}
+                        {/* Category Select */}
+                        <div>
+                          <Label htmlFor="category-select" className="text-sm font-semibold text-gray-600">Category *</Label>
+                          <select
+                            id="category-select"
+                            value={formData.category}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                category: e.target.value,
+                                subcategory: "", // reset subcategory
+                              })
+                            }
+                            required
+                            className="w-full px-3 py-2 border rounded-lg h-10 bg-background mt-1 focus:ring-2 focus:ring-accent"
+                          >
+                            <option value="" disabled>--- Select Primary Category ---</option>
+                            {CATEGORY_OPTIONS.map((opt) => (
+                              <option key={opt.slug} value={opt.slug}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
 
-        {/* Product Description */}
-        <div className="md:col-span-2">
-          <Label htmlFor="description-input" className="text-sm font-semibold text-gray-600">Product Description *</Label>
-          <textarea
-            id="description-input"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            required
-            rows={4}
-            className="w-full px-3 py-2 border rounded-lg bg-background resize-none mt-1 focus:ring-2 focus:ring-accent"
-            placeholder="A detailed description of the product features, materials, and benefits. Minimum 50 characters."
-          />
-        </div>
-      </div>
-    </Card>
+                        {/* Subcategory select (conditional) */}
+                        {(() => {
+                          const selCat = CATEGORY_OPTIONS.find(c => c.slug === formData.category);
+                          if (!selCat || selCat.subcategories.length === 0) return null;
+                          return (
+                            <div className="md:col-span-2">
+                              <Label htmlFor="subcategory-select" className="text-sm font-semibold text-gray-600">Subcategory</Label>
+                              <select
+                                id="subcategory-select"
+                                value={formData.subcategory}
+                                onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+                                className="w-full px-3 py-2 border rounded-lg h-10 bg-background mt-1 focus:ring-2 focus:ring-accent"
+                              >
+                                <option value="" disabled>--- Select Secondary Category ---</option>
+                                {selCat.subcategories.map((sub) => (
+                                  <option key={sub.slug} value={sub.slug}>
+                                    {sub.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          );
+                        })()}
 
-    {/* --- 2. Pricing & Logistics --- */}
-    <Card className="p-6 border-l-4 border-accent/70 shadow-lg">
-      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-700">Pricing & Logistics</h3>
-      <div className="grid md:grid-cols-3 gap-6">
-        
-        {/* Price */}
-        <div>
-          <Label htmlFor="price-input" className="text-sm font-semibold text-gray-600">Selling Price (₹) *</Label>
-          <Input
-            id="price-input"
-            type="number"
-            min="1"
-            value={formData.price || ""}
-            onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-            required
-            placeholder="599"
-            className="mt-1"
-          />
-        </div>
-        
-        {/* Original Price */}
-        <div>
-          <Label htmlFor="original-price-input" className="text-sm font-semibold text-gray-600">Original Price (₹)</Label>
-          <Input
-            id="original-price-input"
-            type="number"
-            min="1"
-            value={formData.originalPrice || ""}
-            onChange={(e) => setFormData({ ...formData, originalPrice: Number(e.target.value) })}
-            placeholder="999 (for discount calculation)"
-            className="mt-1"
-            required
-          />
-        </div>
-        
-        {/* Delivery Charge */}
-        <div>
-          <Label htmlFor="delivery-charge-input" className="text-sm font-semibold text-gray-600">Delivery Charge (₹)</Label>
-          <Input
-            id="delivery-charge-input"
-            type="number"
-            value={formData.deliveryCharge || ""}
-            onChange={(e) => setFormData({ ...formData, deliveryCharge: Number(e.target.value) })}
-            placeholder="0 for free delivery"
-            min="0"
-            className="mt-1"
-          />
-        </div>
+                        {/* Product Description */}
+                        <div className="md:col-span-2">
+                          <Label htmlFor="description-input" className="text-sm font-semibold text-gray-600">Product Description *</Label>
+                          <textarea
+                            id="description-input"
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            required
+                            rows={4}
+                            className="w-full px-3 py-2 border rounded-lg bg-background resize-none mt-1 focus:ring-2 focus:ring-accent"
+                            placeholder="A detailed description of the product features, materials, and benefits. Minimum 50 characters."
+                          />
+                        </div>
+                      </div>
+                    </Card>
 
-        {/* Quantity Available */}
-        <div>
-          <Label htmlFor="quantity-input" className="text-sm font-semibold text-gray-600">Quantity Available (pieces)</Label>
-          <Input
-            id="quantity-input"
-            type="number"
-            value={formData.quantity || ""}
-            onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
-            placeholder="Enter number of pieces available"
-            min="0"
-            className="mt-1"
-          />
-        </div>
+                    {/* --- 2. Pricing & Logistics --- */}
+                    <Card className="p-6 border-l-4 border-accent/70 shadow-lg">
+                      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-700">Pricing & Logistics</h3>
+                      <div className="grid md:grid-cols-3 gap-6">
 
-        {/* Stock Status */}
-        <div className="flex items-center justify-between p-4 border rounded-lg bg-gray-50">
-          <Label htmlFor="in-stock" className="text-sm font-semibold text-gray-600 cursor-pointer">
-            In Stock
-          </Label>
-          <Switch
-            id="in-stock"
-            checked={formData.inStock}
-            onCheckedChange={(checked) => setFormData({ ...formData, inStock: checked })}
-          />
-        </div>
-      </div>
-    </Card>
+                        {/* Price */}
+                        <div>
+                          <Label htmlFor="price-input" className="text-sm font-semibold text-gray-600">Selling Price (₹) *</Label>
+                          <Input
+                            id="price-input"
+                            type="number"
+                            min="1"
+                            value={formData.price || ""}
+                            onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                            required
+                            placeholder="599"
+                            className="mt-1"
+                          />
+                        </div>
 
-    {/* --- 3. Media Upload --- */}
-    <Card className="p-6 border-l-4 border-blue-500/70 shadow-lg">
-      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-700">Product Media</h3>
+                        {/* Original Price */}
+                        <div>
+                          <Label htmlFor="original-price-input" className="text-sm font-semibold text-gray-600">Original Price (₹)</Label>
+                          <Input
+                            id="original-price-input"
+                            type="number"
+                            min="1"
+                            value={formData.originalPrice || ""}
+                            onChange={(e) => setFormData({ ...formData, originalPrice: Number(e.target.value) })}
+                            placeholder="999 (for discount calculation)"
+                            className="mt-1"
+                            required
+                          />
+                        </div>
 
-      {/* Main Image */}
-      <div className="mb-8 p-4 border rounded-xl bg-blue-50/50">
-        <Label className="block mb-3 font-bold text-blue-700 flex items-center gap-1">
-            Main Image (Required) 🖼️
-        </Label>
-        <div className="flex flex-col sm:flex-row gap-4 items-start">
-          
-          <div className="w-full sm:flex-1 space-y-3">
-            <input
-              type="file"
-              accept="image/*"
-              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                try {
-                  toast({ title: 'Uploading image...', description: 'Please wait' });
-                  const cloudinaryUrl = await uploadToCloudinary(file);
-                  setFormData({ ...formData, mainImage: cloudinaryUrl });
-                  toast({ title: 'Image uploaded successfully!' });
-                } catch (error) {
-                  // Error already handled in uploadToCloudinary
-                }
-              }}
-            />
-            <Input
-              placeholder="Or paste image URL"
-              value={formData.mainImage}
-              onChange={(e) => setFormData({ ...formData, mainImage: e.target.value })}
-            />
-          </div>
-          
-          {/* Main Image Preview - Large and Rounded */}
-          <div className="shrink-0">
-            {formData.mainImage ? (
-              (((formData.mainImage as string).startsWith("data:") ||
-                (formData.mainImage as string).startsWith("http")) ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={formData.mainImage}
-                  alt="main-preview"
-                  className="w-32 h-32 object-cover rounded-2xl border-4 border-blue-300 shadow-xl transition-transform hover:scale-[1.02]"
-                />
-              ) : (
-                <div className="w-32 h-32 flex items-center justify-center text-5xl bg-blue-100 rounded-2xl border-4 border-blue-300">
-                  {formData.mainImage}
-                </div>
-              ))
-            ) : (
-              <div className="w-32 h-32 flex items-center justify-center bg-gray-100 rounded-2xl text-gray-400 border-4 border-dashed border-gray-300">
-                <Package className="h-8 w-8" />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+                        {/* Delivery Charge */}
+                        <div>
+                          <Label htmlFor="delivery-charge-input" className="text-sm font-semibold text-gray-600">Delivery Charge (₹)</Label>
+                          <Input
+                            id="delivery-charge-input"
+                            type="number"
+                            value={formData.deliveryCharge || ""}
+                            onChange={(e) => setFormData({ ...formData, deliveryCharge: Number(e.target.value) })}
+                            placeholder="0 for free delivery"
+                            min="0"
+                            className="mt-1"
+                          />
+                        </div>
 
-      {/* Gallery Images (Multiple) */}
-      <div>
-        <Label className="block mb-3 font-bold text-gray-700">Gallery Images (Optional)</Label>
-        <div className="space-y-3">
-          
-          {/* File Input */}
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
-            onChange={async (e) => {
-              const files = Array.from(e.target.files || []);
-              if (files.length === 0) return;
-              try {
-                toast({ title: `Uploading ${files.length} image(s)...`, description: 'Please wait' });
-                const cloudinaryUrls = await uploadMultipleToCloudinary(files);
-                setFormData({ ...formData, images: [...(formData.images || []), ...cloudinaryUrls] });
-                toast({ title: 'Images uploaded successfully!' });
-              } catch (error) {
-                // Error already handled in uploadMultipleToCloudinary
-              }
-            }}
-          />
+                        {/* Quantity Available */}
+                        <div>
+                          <Label htmlFor="quantity-input" className="text-sm font-semibold text-gray-600">Quantity Available (pieces)</Label>
+                          <Input
+                            id="quantity-input"
+                            type="number"
+                            value={formData.quantity || ""}
+                            onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+                            placeholder="Enter number of pieces available"
+                            min="0"
+                            className="mt-1"
+                          />
+                        </div>
 
-          {/* URL Input with Add Button */}
-          <div className="flex gap-2">
-            <Input
-              placeholder="Paste image URL and click 'Add to Gallery'"
-              id="gallery-url-input"
-            />
-            <Button
-              type="button"
-              variant="secondary"
-              className="shrink-0"
-              onClick={() => {
-                const el = document.getElementById("gallery-url-input") as HTMLInputElement | null;
-                const url = el?.value?.trim();
-                if (!url) return;
-                setFormData({ ...formData, images: [...(formData.images || []), url] });
-                if (el) el.value = "";
-              }}
-            >
-              <Plus className="h-4 w-4 mr-1" /> Add to Gallery
-            </Button>
-          </div>
-          
-          {/* Gallery Image Previews - Interactive */}
-          <div className="flex gap-4 mt-4 flex-wrap p-2 rounded-lg border border-dashed border-gray-200 min-h-[50px]">
-            {(formData.images || []).filter(src => src !== formData.mainImage).map((src: string, idx: number) => (
-              <div key={idx} className="relative group">
-                <div className="w-20 h-20 bg-muted rounded-xl overflow-hidden flex items-center justify-center border-2 border-gray-300 hover:border-red-500 transition-all">
-                  {src.startsWith('data:') || src.startsWith('http') ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={src} alt={`gallery-img-${idx}`} className="object-cover w-full h-full" />
-                  ) : (
-                    <span className="text-xl">{src}</span>
-                  )}
-                </div>
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  className="absolute -top-3 -right-3 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                  onClick={() => setFormData({ ...formData, images: (formData.images || []).filter((_, i) => i !== idx) })}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </div>
-            ))}
-            {/* Placeholder for empty gallery */}
-            {(formData.images || []).filter(src => src !== formData.mainImage).length === 0 && (
-                <p className="text-sm text-gray-400 p-4">Add 1-4 more images for the product gallery.</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </Card>
+                        {/* Stock Status */}
+                        <div className="flex items-center justify-between p-4 border rounded-lg bg-gray-50">
+                          <Label htmlFor="in-stock" className="text-sm font-semibold text-gray-600 cursor-pointer">
+                            In Stock
+                          </Label>
+                          <Switch
+                            id="in-stock"
+                            checked={formData.inStock}
+                            onCheckedChange={(checked) => setFormData({ ...formData, inStock: checked })}
+                          />
+                        </div>
+                      </div>
+                    </Card>
 
-    {/* --- Submit Button (Stays prominent) --- */}
-    <Button type="submit" className="w-full h-12 text-lg font-bold shadow-lg hover:shadow-xl transition-all">
-      {editingProduct ? "💾 Update Product Listing" : "🚀 Publish New Product"}
-    </Button>
-  </form>
-</DialogContent>
+                    {/* --- 3. Media Upload --- */}
+                    <Card className="p-6 border-l-4 border-blue-500/70 shadow-lg">
+                      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-700">Product Media</h3>
+
+                      {/* Main Image */}
+                      <div className="mb-8 p-4 border rounded-xl bg-blue-50/50">
+                        <Label className="block mb-3 font-bold text-blue-700 flex items-center gap-1">
+                          Main Image (Required) 🖼️
+                        </Label>
+                        <div className="flex flex-col sm:flex-row gap-4 items-start">
+
+                          <div className="w-full sm:flex-1 space-y-3">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                try {
+                                  toast({ title: 'Uploading image...', description: 'Please wait' });
+                                  const cloudinaryUrl = await uploadToCloudinary(file);
+                                  setFormData({ ...formData, mainImage: cloudinaryUrl });
+                                  toast({ title: 'Image uploaded successfully!' });
+                                } catch (error) {
+                                  // Error already handled in uploadToCloudinary
+                                }
+                              }}
+                            />
+                            <Input
+                              placeholder="Or paste image URL"
+                              value={formData.mainImage}
+                              onChange={(e) => setFormData({ ...formData, mainImage: e.target.value })}
+                            />
+                          </div>
+
+                          {/* Main Image Preview - Large and Rounded */}
+                          <div className="shrink-0">
+                            {formData.mainImage ? (
+                              (((formData.mainImage as string).startsWith("data:") ||
+                                (formData.mainImage as string).startsWith("http")) ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={formData.mainImage}
+                                  alt="main-preview"
+                                  className="w-32 h-32 object-cover rounded-2xl border-4 border-blue-300 shadow-xl transition-transform hover:scale-[1.02]"
+                                />
+                              ) : (
+                                <div className="w-32 h-32 flex items-center justify-center text-5xl bg-blue-100 rounded-2xl border-4 border-blue-300">
+                                  {formData.mainImage}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="w-32 h-32 flex items-center justify-center bg-gray-100 rounded-2xl text-gray-400 border-4 border-dashed border-gray-300">
+                                <Package className="h-8 w-8" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Gallery Images (Multiple) */}
+                      <div>
+                        <Label className="block mb-3 font-bold text-gray-700">Gallery Images (Optional)</Label>
+                        <div className="space-y-3">
+
+                          {/* File Input */}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+                            onChange={async (e) => {
+                              const files = Array.from(e.target.files || []);
+                              if (files.length === 0) return;
+                              try {
+                                toast({ title: `Uploading ${files.length} image(s)...`, description: 'Please wait' });
+                                const cloudinaryUrls = await uploadMultipleToCloudinary(files);
+                                setFormData({ ...formData, images: [...(formData.images || []), ...cloudinaryUrls] });
+                                toast({ title: 'Images uploaded successfully!' });
+                              } catch (error) {
+                                // Error already handled in uploadMultipleToCloudinary
+                              }
+                            }}
+                          />
+
+                          {/* URL Input with Add Button */}
+                          <div className="flex gap-2">
+                            <Input
+                              placeholder="Paste image URL and click 'Add to Gallery'"
+                              id="gallery-url-input"
+                            />
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              className="shrink-0"
+                              onClick={() => {
+                                const el = document.getElementById("gallery-url-input") as HTMLInputElement | null;
+                                const url = el?.value?.trim();
+                                if (!url) return;
+                                setFormData({ ...formData, images: [...(formData.images || []), url] });
+                                if (el) el.value = "";
+                              }}
+                            >
+                              <Plus className="h-4 w-4 mr-1" /> Add to Gallery
+                            </Button>
+                          </div>
+
+                          {/* Gallery Image Previews - Interactive */}
+                          <div className="flex gap-4 mt-4 flex-wrap p-2 rounded-lg border border-dashed border-gray-200 min-h-[50px]">
+                            {(formData.images || []).filter(src => src !== formData.mainImage).map((src: string, idx: number) => (
+                              <div key={idx} className="relative group">
+                                <div className="w-20 h-20 bg-muted rounded-xl overflow-hidden flex items-center justify-center border-2 border-gray-300 hover:border-red-500 transition-all">
+                                  {src.startsWith('data:') || src.startsWith('http') ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={src} alt={`gallery-img-${idx}`} className="object-cover w-full h-full" />
+                                  ) : (
+                                    <span className="text-xl">{src}</span>
+                                  )}
+                                </div>
+                                <Button
+                                  size="icon"
+                                  variant="destructive"
+                                  className="absolute -top-3 -right-3 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                  onClick={() => setFormData({ ...formData, images: (formData.images || []).filter((_, i) => i !== idx) })}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ))}
+                            {/* Placeholder for empty gallery */}
+                            {(formData.images || []).filter(src => src !== formData.mainImage).length === 0 && (
+                              <p className="text-sm text-gray-400 p-4">Add 1-4 more images for the product gallery.</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* --- Submit Button (Stays prominent) --- */}
+                    <Button type="submit" className="w-full h-12 text-lg font-bold shadow-lg hover:shadow-xl transition-all">
+                      {editingProduct ? "💾 Update Product Listing" : "🚀 Publish New Product"}
+                    </Button>
+                  </form>
+                </DialogContent>
               </Dialog>
             </div>
 
@@ -1206,11 +1269,13 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                           <p className="text-sm text-gray-500">{order.user?.email || 'No Email'}</p>
                         </div>
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'Confirmed'
-                              ? 'bg-green-100 text-green-800'
-                              : order.status === 'Pending'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-red-100 text-red-800'
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'Shipped'
+                              ? 'bg-blue-100 text-blue-800'
+                              : order.status === 'Confirmed'
+                                ? 'bg-green-100 text-green-800'
+                                : order.status === 'Pending'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-red-100 text-red-800'
                             }`}
                         >
                           {order.status}
@@ -1244,6 +1309,51 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
                         <p>Payment: {order.paymentMethod}</p>
                         <p className="font-semibold">Total: ₹{order.total}</p>
                       </div>
+
+                      {/* Tracking ID Section */}
+                      <div className="mt-4 border-t pt-4">
+                        <h3 className="font-semibold mb-2 flex items-center gap-2">
+                          📦 Tracking Information
+                          {(order as any).trackingId && (
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                              Shipped
+                            </span>
+                          )}
+                        </h3>
+                        <div className="flex gap-2">
+                          <Input
+                            type="text"
+                            placeholder="Enter Tracking ID"
+                            value={trackingIds[order._id] || ""}
+                            onChange={(e) =>
+                              setTrackingIds({
+                                ...trackingIds,
+                                [order._id]: e.target.value,
+                              })
+                            }
+                            className="flex-1"
+                            disabled={updatingTracking === order._id}
+                          />
+                          <Button
+                            onClick={() => handleUpdateTracking(order._id)}
+                            disabled={updatingTracking === order._id}
+                            className="bg-primary hover:bg-primary/90"
+                          >
+                            {updatingTracking === order._id ? (
+                              <>⏳ Updating...</>
+                            ) : (order as any).trackingId ? (
+                              <>✏️ Update</>
+                            ) : (
+                              <>➕ Add</>
+                            )}
+                          </Button>
+                        </div>
+                        {(order as any).trackingId && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            Current: <span className="font-mono font-semibold text-blue-600">{(order as any).trackingId}</span>
+                          </p>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1255,41 +1365,41 @@ const handleLoginSubmit = async (e: React.FormEvent) => {
 
 
           {/* Users */}
-<TabsContent value="users">
-  <h2 className="text-2xl font-bold mb-6">Users Management</h2>
-  <Card className="p-6 rounded-2xl">
-    {users.length === 0 ? (
-      <p className="text-muted-foreground">No users found.</p>
-    ) : (
-      users.map((user: any) => {
-        // Count how many orders this user has
-        const userOrderCount = orders.filter(
-          (o) => o.user && o.user._id.toString() === user._id.toString()
-        ).length;
+          <TabsContent value="users">
+            <h2 className="text-2xl font-bold mb-6">Users Management</h2>
+            <Card className="p-6 rounded-2xl">
+              {users.length === 0 ? (
+                <p className="text-muted-foreground">No users found.</p>
+              ) : (
+                users.map((user: any) => {
+                  // Count how many orders this user has
+                  const userOrderCount = orders.filter(
+                    (o) => o.user && o.user._id.toString() === user._id.toString()
+                  ).length;
 
-        return (
-          <div
-            key={user._id}
-            className="flex items-center justify-between p-4 border rounded-xl mb-3"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <Users className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold">{user.name || "Customer"}</p>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
-              </div>
-            </div>
-            <p className="text-sm font-semibold">
-              Orders: {userOrderCount}
-            </p>
-          </div>
-        );
-      })
-    )}
-  </Card>
-</TabsContent>
+                  return (
+                    <div
+                      key={user._id}
+                      className="flex items-center justify-between p-4 border rounded-xl mb-3"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                          <Users className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{user.name || "Customer"}</p>
+                          <p className="text-sm text-muted-foreground">{user.email}</p>
+                        </div>
+                      </div>
+                      <p className="text-sm font-semibold">
+                        Orders: {userOrderCount}
+                      </p>
+                    </div>
+                  );
+                })
+              )}
+            </Card>
+          </TabsContent>
 
 
         </Tabs>

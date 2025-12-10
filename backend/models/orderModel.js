@@ -61,6 +61,12 @@ const orderSchema = mongoose.Schema(
       required: true,
       default: "Confirmed",
     },
+    trackingId: {
+      type: String,
+    },
+    trackingUpdatedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

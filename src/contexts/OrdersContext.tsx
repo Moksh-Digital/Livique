@@ -61,6 +61,8 @@ export interface Order {
   deliveryCharges: number;
   total: number;
   status: string;
+  trackingId?: string;
+  trackingUpdatedAt?: string;
   createdAt: string;
   updatedAt?: string;
 }

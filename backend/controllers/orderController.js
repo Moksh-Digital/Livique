@@ -139,4 +139,62 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
+// @desc    Admin: Update order tracking ID
+// @route   PUT /api/orders/:orderId/tracking
+// @access  Admin
+export const updateOrderTracking = asyncHandler(async (req, res) => {
+  const { trackingId } = req.body;
+  const { orderId } = req.params;
+
+  if (!trackingId) {
+    res.status(400);
+    throw new Error("Tracking ID is required");
+  }
+
+  // Find the order and populate user info
+  const order = await Order.findById(orderId).populate("user", "name email");
+
+  if (!order) {
+    res.status(404);
+    throw new Error("Order not found");
+  }
+
+  // Update order with tracking information
+  order.trackingId = trackingId;
+  order.trackingUpdatedAt = new Date();
+  order.status = "Shipped"; // Update status to Shipped
+
+  const updatedOrder = await order.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Tracking ID updated successfully",
+    order: updatedOrder,
+  });
+
+  // Send tracking email to customer (non-blocking - after response)
+  if (order.user && order.user.email) {
+    try {
+      console.log("📧 Sending tracking email to customer:", order.user.email);
+
+      const { generateTrackingEmail } = await import("../utils/orderEmailTemplate.js");
+      const emailHtml = generateTrackingEmail(order, order.user, order.items);
+
+      const emailResult = await sendEmail({
+        to: order.user.email,
+        subject: `Your Order Has Been Shipped! 📦 Tracking ID: ${trackingId}`,
+        html: emailHtml,
+      });
+
+      if (emailResult && emailResult.success) {
+        console.log("✅ Tracking email sent successfully");
+      } else {
+        console.warn("⚠️ Failed to send tracking email");
+      }
+    } catch (emailError) {
+      console.error("❌ Error sending tracking email:", emailError.message);
+    }
+  }
+});
+
 export { addOrderItems, getMyOrders };

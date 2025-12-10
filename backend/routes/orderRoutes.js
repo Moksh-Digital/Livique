@@ -1,5 +1,5 @@
 import express from "express";
-import { addOrderItems, getMyOrders, getAllOrders } from "../controllers/orderController.js";
+import { addOrderItems, getMyOrders, getAllOrders, updateOrderTracking } from "../controllers/orderController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import Order from '../models/orderModel.js';
 
@@ -22,5 +22,8 @@ router.get('/', async (req, res) => {
 // Authenticated routes
 router.post("/", protect, addOrderItems);
 router.get("/my-orders", protect, getMyOrders);
+
+// Admin route: Update tracking ID
+router.put("/:orderId/tracking", updateOrderTracking);
 
 export default router;

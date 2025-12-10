@@ -666,3 +666,321 @@ export const generateOwnerNotificationEmail = (order, user, items) => {
     </html>
   `;
 };
+
+/**
+ * Tracking ID Notification Email Template
+ * Generates HTML email for shipping notification with tracking ID
+ */
+export const generateTrackingEmail = (order, user, items) => {
+  // Safe item handling
+  const itemsHtml = items && Array.isArray(items)
+    ? items
+      .map(
+        (item) => `
+      <tr>
+        <td style="padding: 12px; border-bottom: 1px solid #ddd; font-size: 14px;">
+          ${item.name || "Product"}
+        </td>
+        <td style="padding: 12px; border-bottom: 1px solid #ddd; text-align: center; font-size: 14px;">
+          ${item.quantity || 1}
+        </td>
+        <td style="padding: 12px; border-bottom: 1px solid #ddd; text-align: right; font-size: 14px;">
+          ₹${(item.price || 0).toFixed(2)}
+        </td>
+      </tr>
+    `
+      )
+      .join("")
+    : "";
+
+  const addressHtml = order.address
+    ? `
+      <h3 style="color: #5D4037; margin-bottom: 10px; font-size: 16px;">Delivery Address</h3>
+      <p style="margin: 0; color: #333; font-size: 14px;">
+        ${order.address.fullName || ""}<br/>
+        ${order.address.street || ""}<br/>
+        ${order.address.city || ""}, ${order.address.state || ""} ${order.address.pincode || ""}<br/>
+        Phone: ${order.address.mobile || ""}
+      </p>
+    `
+    : "";
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Order Shipped - Tracking Information</title>
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f5f5f5;
+          margin: 0;
+          padding: 0;
+          color: #333;
+        }
+        .container {
+          max-width: 600px;
+          margin: 0 auto;
+          background-color: #ffffff;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+          background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+          color: white;
+          padding: 40px 20px;
+          text-align: center;
+        }
+        .header h1 {
+          margin: 0;
+          font-size: 28px;
+          font-weight: 600;
+        }
+        .header p {
+          margin: 10px 0 0 0;
+          font-size: 14px;
+          opacity: 0.9;
+        }
+        .content {
+          padding: 30px 20px;
+        }
+        .tracking-box {
+          background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+          padding: 25px;
+          border-radius: 8px;
+          margin-bottom: 25px;
+          text-align: center;
+          border-left: 5px solid #4CAF50;
+        }
+        .tracking-box p {
+          margin: 0;
+          font-size: 14px;
+          color: #666;
+          font-weight: 500;
+        }
+        .tracking-box strong {
+          display: block;
+          font-size: 26px;
+          color: #2E7D32;
+          margin-top: 10px;
+          font-weight: 700;
+          letter-spacing: 2px;
+          font-family: 'Courier New', monospace;
+          background-color: white;
+          padding: 15px;
+          border-radius: 5px;
+          margin-top: 15px;
+          border: 2px dashed #4CAF50;
+        }
+        .order-number {
+          background-color: #F3ECE5;
+          padding: 15px;
+          border-radius: 5px;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+        .order-number p {
+          margin: 0;
+          font-size: 14px;
+          color: #666;
+        }
+        .order-number strong {
+          display: block;
+          font-size: 18px;
+          color: #5D4037;
+          margin-top: 5px;
+          font-weight: 700;
+        }
+        .section {
+          margin-bottom: 30px;
+        }
+        .section h3 {
+          color: #5D4037;
+          border-bottom: 2px solid #4CAF50;
+          padding-bottom: 10px;
+          margin-bottom: 15px;
+          font-size: 16px;
+          font-weight: 600;
+        }
+        .items-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 20px;
+        }
+        .items-table thead {
+          background-color: #E8F5E9;
+        }
+        .items-table th {
+          padding: 12px;
+          text-align: left;
+          color: #2E7D32;
+          font-weight: 600;
+          font-size: 13px;
+          border-bottom: 2px solid #4CAF50;
+        }
+        .items-table td {
+          padding: 12px;
+          border-bottom: 1px solid #ddd;
+          font-size: 14px;
+        }
+        .alert-box {
+          background-color: #FFF9C4;
+          border-left: 4px solid #FBC02D;
+          padding: 15px;
+          margin: 20px 0;
+          border-radius: 4px;
+        }
+        .alert-box h4 {
+          margin: 0 0 8px 0;
+          color: #F57F17;
+          font-size: 14px;
+          font-weight: 600;
+        }
+        .alert-box p {
+          margin: 5px 0;
+          color: #333;
+          font-size: 13px;
+          line-height: 1.6;
+        }
+        .success-box {
+          background-color: #E8F5E9;
+          border-left: 4px solid #4CAF50;
+          padding: 15px;
+          margin: 20px 0;
+          border-radius: 4px;
+        }
+        .success-box h4 {
+          margin: 0 0 8px 0;
+          color: #2E7D32;
+          font-size: 14px;
+          font-weight: 600;
+        }
+        .success-box p {
+          margin: 5px 0;
+          color: #333;
+          font-size: 13px;
+          line-height: 1.6;
+        }
+        .footer {
+          background-color: #F3ECE5;
+          padding: 20px;
+          text-align: center;
+          border-top: 1px solid #ddd;
+        }
+        .footer p {
+          margin: 5px 0;
+          font-size: 12px;
+          color: #666;
+        }
+        .footer a {
+          color: #4CAF50;
+          text-decoration: none;
+        }
+        .footer a:hover {
+          text-decoration: underline;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <!-- Header -->
+        <div class="header">
+          <h1>📦 Your Order Has Been Shipped!</h1>
+          <p>Track your package with the details below</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+          <!-- Greeting -->
+          <p style="font-size: 16px; color: #333;">
+            Hi <strong>${user.name || "Valued Customer"}</strong>,
+          </p>
+          <p style="color: #666; font-size: 14px; line-height: 1.6;">
+            Great news! Your order has been shipped and is on its way to you. You can track your package using the tracking ID below.
+          </p>
+
+          <!-- Tracking ID Box -->
+          <div class="tracking-box">
+            <p>📍 TRACKING ID</p>
+            <strong>${order.trackingId || "N/A"}</strong>
+            <p style="margin-top: 15px; font-size: 12px; color: #2E7D32;">
+              Copy this tracking ID to track your shipment
+            </p>
+          </div>
+
+          <!-- Order Number -->
+          <div class="order-number">
+            <p>Order ID</p>
+            <strong>#${order._id.toString().substring(0, 8).toUpperCase()}</strong>
+          </div>
+
+          <!-- Order Items -->
+          <div class="section">
+            <h3>Order Items</h3>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Delivery Address -->
+          ${addressHtml ? `<div class="section">${addressHtml}</div>` : ""}
+
+          <!-- Delivery Timeline -->
+          <div class="success-box">
+            <h4>📦 Delivery Status</h4>
+            <p>✓ Order confirmed and processed</p>
+            <p>✓ Package has been shipped</p>
+            <p>🚚 In transit to your delivery address</p>
+            <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #4CAF50; color: #2E7D32;">
+              <strong>Expected delivery within 5-7 business days</strong>
+            </p>
+          </div>
+
+          <!-- Tracking Instructions -->
+          <div class="alert-box">
+            <h4>💡 How to Track Your Order</h4>
+            <p>1. Copy your tracking ID from above</p>
+            <p>2. Visit your courier company's website or contact customer support</p>
+            <p>3. Enter your tracking ID to see real-time updates</p>
+            <p>4. Keep this email for reference</p>
+          </div>
+
+          <!-- Contact -->
+          <div class="section" style="text-align: center; background-color: #F3ECE5; padding: 20px; border-radius: 5px;">
+            <h3 style="margin-top: 0;">Need Help?</h3>
+            <p style="margin: 5px 0; font-size: 14px; color: #666;">
+              📧 Email: support@livique.co.in<br/>
+              🌐 Visit: www.livique.co.in<br/>
+              💬 Chat with us anytime!
+            </p>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          <p><strong>Livique</strong> - Your Fashion & Lifestyle Store</p>
+          <p>🏠 Premium fashion accessories and lifestyle products</p>
+          <p style="margin-top: 15px; font-size: 11px; color: #999;">
+            This is an automated email. Please do not reply to this email. If you have any questions, visit our website or contact our support team.
+          </p>
+          <p style="margin-top: 10px;">
+            © 2025 Livique. All rights reserved. | <a href="https://www.livique.co.in">Visit Store</a>
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
