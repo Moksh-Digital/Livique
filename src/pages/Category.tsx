@@ -249,7 +249,7 @@ const Category = () => {
     <div className="min-h-screen bg-[#FFF8F0]">
       <Header />
 
-      <main className="max-w-[1400px] mx-auto px-6 py-8 pb-32 md:pb-12">
+      <main className="max-w-[1400px] mx-auto px-6 py-8 pb-40 md:pb-12">
         <div className="flex gap-8">
           {/* LEFT: Filters (desktop visible) */}
           <aside className="hidden lg:block w-64 shrink-0">
