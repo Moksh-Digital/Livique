@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { CATEGORIES } from "@/data/categories"
-import PromoBanner from "@/components/Banner"
 import { useState, useRef, useEffect,} from "react"
 import BannerSlider from "./BannerSlider"
 const Home = () => {
@@ -322,7 +321,6 @@ const Home = () => {
           scrollbar-width: none;
         }
       `}</style>
-      <PromoBanner />
       <Header />
 
       <main className="w-full p-0 pb-24 md:pb-8">

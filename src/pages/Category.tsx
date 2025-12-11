@@ -20,7 +20,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { getCategoryBySlug } from "@/data/categories";
-import PromoBanner from "@/components/Banner"
 // ✅ AUTO SWITCH API BASE URL
 const isLocalhost =
   window.location.hostname === "localhost" ||
@@ -195,7 +194,6 @@ const Category = () => {
   // 🧩 Main UI
   return (
     <div className="min-h-screen bg-background">
-      <PromoBanner />
       <Header />
 
       <main className="max-w-[1400px] mx-auto px-4 pt-6 md:pt-10 pb-24 md:pb-10">

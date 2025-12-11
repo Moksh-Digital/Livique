@@ -5,7 +5,6 @@ import { Star, Truck, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
-import PromoBanner from "@/components/Banner"
 
 interface Product {
   _id: string
@@ -76,7 +75,6 @@ const SearchResultsPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <PromoBanner />
       <Header />
 
       <main className="flex-grow pb-24 md:pb-8">

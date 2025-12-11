@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useCart } from "@/contexts/CartContext";
 import Header from "@/components/Header";
-import PromoBanner from "@/components/Banner"
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart, getTotalPrice } = useCart();
   const navigate = useNavigate();
@@ -39,7 +38,6 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <PromoBanner/>
       <Header />
 
       <main className="max-w-[1400px] mx-auto px-4 py-8 pb-24 md:pb-8">
