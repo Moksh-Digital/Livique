@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   CreditCard,
   X,
+  MessageSquare,
 } from "lucide-react";
 
 // NEW INTERFACE for Order
@@ -80,6 +81,19 @@ const ProfilePage = () => {
   const [editSuccess, setEditSuccess] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [trackingOrder, setTrackingOrder] = useState<Order | null>(null);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [userQueries, setUserQueries] = useState<any[]>([]);
+  const [loadingQueries, setLoadingQueries] = useState(false);
+  const [selectedQuery, setSelectedQuery] = useState<any | null>(null);
+  const [contactFormData, setContactFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    query: "",
+  });
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactError, setContactError] = useState<string | null>(null);
+  const [contactSuccess, setContactSuccess] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -123,16 +137,18 @@ useEffect(() => {
       };
 
       try {
-        // Fetch User Profile and Orders concurrently using Promise.all
-        const [userResponse, ordersResponse] = await Promise.all([
+        // Fetch User Profile, Orders, and Queries concurrently using Promise.all
+        const [userResponse, ordersResponse, queriesResponse] = await Promise.all([
             axios.get<UserProfile>(`${API_BASE_URL}/users/profile`, config),
             
             axios.get<Order[]>(`${API_BASE_URL}/orders/my-orders`, config), // 👈 API call to fetch user's orders
             
+            axios.get(`${API_BASE_URL}/queries/user/my-queries`, config), // 👈 API call to fetch user's queries
         ]);
 
         setUser(userResponse.data);
         setOrders(ordersResponse.data); // Save fetched orders
+        setUserQueries(queriesResponse.data); // Save fetched queries
         setEditingName(userResponse.data.name); // Initialize editing name
 
       } catch (err: any) { 
@@ -196,8 +212,71 @@ useEffect(() => {
     }
   };
 
+  // -------- HANDLE CONTACT FORM SUBMISSION --------
+  const handleSubmitContactForm = async () => {
+    if (!contactFormData.phone.trim() || !contactFormData.query.trim()) {
+      setContactError("Phone number and query are required.");
+      return;
+    }
 
-  // ---------------- ORDER STATISTICS CALCULATION ----------------
+    setContactLoading(true);
+    setContactError(null);
+    setContactSuccess(false);
+
+    try {
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      await axios.post(
+        `${API_BASE_URL}/queries`,
+        {
+          orderId: selectedOrder?._id,
+          name: contactFormData.name,
+          email: contactFormData.email,
+          phone: contactFormData.phone,
+          query: contactFormData.query,
+        },
+        config
+      );
+
+      setContactSuccess(true);
+      setShowContactForm(false);
+      setContactFormData({ name: "", email: "", phone: "", query: "" });
+
+      // Close after 2 seconds
+      setTimeout(() => {
+        setSelectedOrder(null);
+      }, 2000);
+    } catch (err: any) {
+      setContactError(
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to submit query. Please try again."
+      );
+    } finally {
+      setContactLoading(false);
+    }
+  };
+
+  // Open contact form with pre-filled user data
+  const openContactForm = () => {
+    if (user) {
+      setContactFormData({
+        name: user.name || "",
+        email: user.email || "",
+        phone: "",
+        query: "",
+      });
+      setShowContactForm(true);
+      setContactError(null);
+      setContactSuccess(false);
+      console.log("Contact form opened");
+    }
+  };
   const totalOrders = orders.length;
 
   // Assumes backend returns orders sorted by createdAt descending
@@ -445,6 +524,84 @@ useEffect(() => {
               </button>
             </div>
           </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+{/* My Queries Section */}
+<div className="bg-white rounded-2xl shadow-lg border border-[#E8D5C4]">
+  <div className="border-b border-[#E8D5C4] p-6 flex justify-between items-center">
+    <h3 className="text-2xl font-semibold text-[#5D4037]">My Queries</h3>
+    <span className="text-[#8B7355] text-sm">({userQueries.length} queries)</span>
+  </div>
+
+  {userQueries.length === 0 ? (
+    <div className="p-8 text-center text-[#8B7355]">
+      <MessageSquare className="mx-auto h-12 w-12 text-[#D4AF76] mb-3" />
+      <p className="text-lg font-medium">You haven't submitted any queries yet.</p>
+      <p className="text-sm text-[#8B7355] mt-1">
+        Submit a query through the Contact Us button on your orders.
+      </p>
+    </div>
+  ) : (
+    <div className="divide-y divide-gray-100">
+      {userQueries.map((query) => (
+        <div key={query._id} className="p-6 hover:bg-[#FFF8F0] transition-colors">
+          {/* Query Header */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4">
+            <div>
+              <p className="text-sm text-[#8B7355]">
+                Order ID: <span className="text-[#5D4037] font-medium">{query.order._id.substring(0, 8)}...</span>
+              </p>
+              <p className="text-sm text-[#8B7355] mt-1">
+                Submitted on{" "}
+                <span className="text-[#5D4037] font-medium">
+                  {new Date(query.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </p>
+            </div>
+            <div className="mt-3 sm:mt-0">
+              <span
+                className={`inline-block px-3 py-1 text-sm font-semibold rounded-full ${
+                  query.status === "Resolved"
+                    ? "bg-green-100 text-green-700"
+                    : query.status === "Open"
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {query.status}
+              </span>
+            </div>
+          </div>
+
+          {/* Query Text */}
+          <div className="bg-[#FFF8F0] rounded-lg p-4 mb-4 border border-[#E8D5C4]">
+            <p className="text-sm text-[#8B7355] font-semibold mb-1">Your Query:</p>
+            <p className="text-[#5D4037]">{query.query}</p>
+          </div>
+
+          {/* Admin Reply (if available) */}
+          {query.adminReply && (
+            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+              <p className="text-sm text-green-900 font-semibold mb-1">🎯 Our Reply:</p>
+              <p className="text-green-800">{query.adminReply}</p>
+            </div>
+          )}
+
+          {/* View More Button */}
+          <button
+            onClick={() => setSelectedQuery(query)}
+            className="mt-4 text-[#8B4513] font-semibold text-sm hover:underline"
+          >
+            View Full Details
+          </button>
         </div>
       ))}
     </div>
@@ -905,13 +1062,134 @@ useEffect(() => {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#E8D5C4]">
-                <button className="flex-1 px-4 md:px-6 py-2.5 md:py-3 bg-[#8B4513] text-white rounded-lg font-semibold hover:bg-[#5D4037] transition-colors text-sm md:text-base">
-                  Download Invoice
+                <button 
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openContactForm();
+                  }}
+                  className="flex-1 px-4 md:px-6 py-2.5 md:py-3 bg-[#8B4513] text-white rounded-lg font-semibold hover:bg-[#5D4037] transition-colors text-sm md:text-base flex items-center justify-center gap-2"
+                >
+                  <MessageSquare className="h-5 w-5" />
+                  Contact Us
                 </button>
-                <button className="flex-1 px-4 md:px-6 py-2.5 md:py-3 border-2 border-[#8B4513] text-[#8B4513] rounded-lg font-semibold hover:bg-[#FFF8F0] transition-colors text-sm md:text-base">
-                  Need Help?
+                <button type="button" className="flex-1 px-4 md:px-6 py-2.5 md:py-3 border-2 border-[#8B4513] text-[#8B4513] rounded-lg font-semibold hover:bg-[#FFF8F0] transition-colors text-sm md:text-base">
+                  View Tracking
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contact Us Modal */}
+      {showContactForm && selectedOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999] overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border-2 border-[#E8D5C4] my-8 z-[10000]">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[#5D4037]">Contact Us</h2>
+              <button
+                onClick={() => {
+                  setShowContactForm(false);
+                  setContactError(null);
+                }}
+                className="text-[#8B7355] hover:text-[#5D4037] transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Order Summary */}
+            <div className="mb-6 p-4 bg-[#FFF8F0] rounded-lg border border-[#E8D5C4]">
+              <p className="text-xs text-[#8B7355] font-semibold mb-1">Order ID</p>
+              <p className="text-sm font-semibold text-[#5D4037] mb-3">{selectedOrder._id}</p>
+              <p className="text-xs text-[#8B7355] font-semibold mb-1">Order Amount</p>
+              <p className="text-lg font-bold text-[#8B4513]">₹{selectedOrder.total}</p>
+            </div>
+
+            {contactError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {contactError}
+              </div>
+            )}
+
+            {contactSuccess && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                Query submitted successfully! We'll contact you soon.
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {/* Name Field */}
+              <div>
+                <label className="block text-sm font-semibold text-[#5D4037] mb-2">Full Name</label>
+                <input
+                  type="text"
+                  value={contactFormData.name}
+                  disabled
+                  className="w-full px-4 py-2 border border-[#E8D5C4] rounded-lg bg-[#FFF8F0] text-[#5D4037] font-medium"
+                />
+              </div>
+
+              {/* Email Field */}
+              <div>
+                <label className="block text-sm font-semibold text-[#5D4037] mb-2">Email</label>
+                <input
+                  type="email"
+                  value={contactFormData.email}
+                  disabled
+                  className="w-full px-4 py-2 border border-[#E8D5C4] rounded-lg bg-[#FFF8F0] text-[#5D4037] font-medium"
+                />
+              </div>
+
+              {/* Phone Field */}
+              <div>
+                <label className="block text-sm font-semibold text-[#5D4037] mb-2">Phone Number *</label>
+                <input
+                  type="tel"
+                  value={contactFormData.phone}
+                  onChange={(e) => setContactFormData({ ...contactFormData, phone: e.target.value })}
+                  placeholder="Enter your phone number"
+                  className="w-full px-4 py-2 border border-[#E8D5C4] rounded-lg text-[#5D4037] placeholder-[#8B7355] focus:outline-none focus:ring-2 focus:ring-[#8B4513]"
+                />
+              </div>
+
+              {/* Query Field */}
+              <div>
+                <label className="block text-sm font-semibold text-[#5D4037] mb-2">Your Query *</label>
+                <textarea
+                  value={contactFormData.query}
+                  onChange={(e) => setContactFormData({ ...contactFormData, query: e.target.value })}
+                  placeholder="Please describe your query regarding this order..."
+                  rows={4}
+                  className="w-full px-4 py-2 border border-[#E8D5C4] rounded-lg text-[#5D4037] placeholder-[#8B7355] focus:outline-none focus:ring-2 focus:ring-[#8B4513] resize-none"
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => setShowContactForm(false)}
+                className="flex-1 px-4 py-2.5 border-2 border-[#8B4513] text-[#8B4513] rounded-lg font-semibold hover:bg-[#FFF8F0] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitContactForm}
+                disabled={contactLoading}
+                className="flex-1 px-4 py-2.5 bg-[#8B4513] text-white rounded-lg font-semibold hover:bg-[#5D4037] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {contactLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit Query"
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -1004,6 +1282,88 @@ useEffect(() => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Query Details Modal */}
+      {selectedQuery && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 border-2 border-[#E8D5C4] my-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[#5D4037]">Query Details</h2>
+              <button
+                onClick={() => setSelectedQuery(null)}
+                className="text-[#8B7355] hover:text-[#5D4037] transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Order Info */}
+            <div className="bg-[#FFF8F0] rounded-lg p-4 mb-6 border border-[#E8D5C4]">
+              <h3 className="text-lg font-bold text-[#5D4037] mb-3">Order Information</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-xs text-[#8B7355] font-semibold">Order ID</p>
+                  <p className="text-[#5D4037] font-mono text-sm">{selectedQuery.order._id}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#8B7355] font-semibold">Amount</p>
+                  <p className="text-[#8B4513] font-bold">₹{selectedQuery.order.total}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#8B7355] font-semibold">Status</p>
+                  <p className="text-[#5D4037]">{selectedQuery.order.status}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Query Status */}
+            <div className="mb-6">
+              <p className="text-sm text-[#8B7355] font-semibold mb-2">Query Status</p>
+              <span
+                className={`inline-block px-4 py-2 text-sm font-semibold rounded-full ${
+                  selectedQuery.status === "Resolved"
+                    ? "bg-green-100 text-green-700"
+                    : selectedQuery.status === "Open"
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {selectedQuery.status}
+              </span>
+            </div>
+
+            {/* Your Query */}
+            <div className="bg-blue-50 rounded-lg p-4 mb-6 border border-blue-200">
+              <h3 className="text-lg font-bold text-blue-900 mb-2">Your Query</h3>
+              <p className="text-blue-800 whitespace-pre-wrap">{selectedQuery.query}</p>
+            </div>
+
+            {/* Admin Reply */}
+            {selectedQuery.adminReply && (
+              <div className="bg-green-50 rounded-lg p-4 mb-6 border border-green-200">
+                <h3 className="text-lg font-bold text-green-900 mb-2">✓ Our Response</h3>
+                <p className="text-green-800 whitespace-pre-wrap">{selectedQuery.adminReply}</p>
+              </div>
+            )}
+
+            {!selectedQuery.adminReply && (
+              <div className="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200">
+                <p className="text-amber-800">
+                  ⏳ We're reviewing your query. Our team will respond shortly.
+                </p>
+              </div>
+            )}
+
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedQuery(null)}
+              className="w-full px-4 py-2.5 bg-[#8B4513] text-white rounded-lg font-semibold hover:bg-[#5D4037] transition-colors"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

@@ -8,6 +8,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import addressRoutes from "./routes/addressRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import queryRoutes from "./routes/queryRoutes.js";
 import session from "express-session";
 import passport from "./config/passport.js"; 
 
@@ -119,6 +120,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/address", addressRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/queries", queryRoutes);
 
 // ================== Product Meta Tags for Social Sharing ==================
 app.get("/product/:id", async (req, res) => {

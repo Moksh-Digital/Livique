@@ -10,6 +10,7 @@ import {
   Trash2,
   Gift,
   LogIn,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -39,6 +40,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CATEGORIES } from "@/data/categories";
 // import { useOrders } from "@/contexts/OrdersContext";
 import { Order, useOrders } from "../contexts/OrdersContext";
+import AdminQueries from "./AdminQueries";
 import axios from "axios";
 
 const isLocalhost =
@@ -723,6 +725,10 @@ const Admin = () => {
               <ShoppingBag className="h-4 w-4" />
               Orders
             </TabsTrigger>
+            <TabsTrigger value="queries" className="gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Queries
+            </TabsTrigger>
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" />
               Users
@@ -1401,6 +1407,10 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          {/* Queries Tab */}
+          <TabsContent value="queries">
+            <AdminQueries />
+          </TabsContent>
 
         </Tabs>
 
