@@ -104,6 +104,51 @@ const ProductDetail = () => {
     window.scrollTo(0, 0);
   }, [id]);
 
+  // Update meta tags for sharing when product loads
+  useEffect(() => {
+    if (!product) return;
+
+    const productImage = product.mainImage || (product.images && product.images[0]) || product.image;
+    const productTitle = product.name;
+    const productDescription = product.description || `₹${product.price.toLocaleString()} - Buy ${product.name} on Livique`;
+    const productUrl = window.location.href;
+
+    // Update Open Graph meta tags
+    document.title = `${productTitle} - Livique`;
+
+    const updateMetaTag = (property: string, content: string) => {
+      let tag = document.querySelector(`meta[property="${property}"]`);
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("property", property);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    };
+
+    const updateMetaAttribute = (name: string, content: string) => {
+      let tag = document.querySelector(`meta[name="${name}"]`);
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("name", name);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    };
+
+    updateMetaTag("og:title", productTitle);
+    updateMetaTag("og:description", productDescription);
+    updateMetaTag("og:image", productImage);
+    updateMetaTag("og:url", productUrl);
+    updateMetaTag("og:type", "product");
+
+    updateMetaAttribute("twitter:title", productTitle);
+    updateMetaAttribute("twitter:description", productDescription);
+    updateMetaAttribute("twitter:image", productImage);
+    updateMetaAttribute("twitter:card", "summary_large_image");
+
+  }, [product]);
+
   // ---------------- CONDITIONAL UI ----------------
   if (loading) {
     return (
