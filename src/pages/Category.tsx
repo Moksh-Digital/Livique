@@ -198,7 +198,7 @@ const Category = () => {
       <PromoBanner />
       <Header />
 
-      <main className="max-w-[1400px] mx-auto px-4 py-6 pb-24 md:pb-8">
+      <main className="max-w-[1400px] mx-auto px-4 pt-6 md:pt-10 pb-24 md:pb-10">
         {/* Breadcrumb */}
         <div className="text-sm text-muted-foreground mb-4">
           <Link to="/" className="hover:text-foreground">
