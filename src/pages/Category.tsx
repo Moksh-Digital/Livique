@@ -274,7 +274,7 @@ const Category = () => {
 <SheetContent
   side="left"
   className="w-80 overflow-y-auto"
-  style={{ top: "110px", height: "calc(100vh - 70px)" }}
+  style={{ top: "100px", height: "calc(100vh - 70px)" }}
 >
 
                     <SheetHeader>
