@@ -46,8 +46,12 @@ const Category = () => {
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // useCart context - expected helpers
-  const { cartItems, addToCart, removeFromCart, updateQuantity, totalItems } = useCart();
+  // useCart context - destructured names you said you have
+  // We will handle if any of these are undefined (defensive)
+  const { cart, addToCart, removeFromCart, updateQuantity, getTotalItems } = useCart() as any || {};
+
+  // ensure we have an array to work with
+  const cartItems = Array.isArray(cart) ? cart : [];
 
   const currentCategory = getCategoryBySlug(category || "");
   let breadcrumb = "All Products";
@@ -96,7 +100,7 @@ const Category = () => {
         <div>
           <h3 className="font-semibold mb-3 text-sm">Subcategories</h3>
           <div className="space-y-2">
-            {currentCategory.subcategories.map((sub) => (
+            {currentCategory.subcategories.map((sub: any) => (
               <Link
                 key={sub.slug}
                 to={`/category/${currentCategory.slug}/${sub.slug}`}
@@ -170,49 +174,71 @@ const Category = () => {
     );
   }
 
-  // helper to get quantity in cart
+  // helper to get quantity in cart (robust to item.id or item._id)
   const getQuantity = (productId: string) => {
-    const item = cartItems?.find((i: any) => i._id === productId);
-    return item ? item.quantity : 0;
+    const item = cartItems.find((i: any) => (i && (i.id === productId || i._id === productId)));
+    return item ? (item.quantity ?? 0) : 0;
   };
 
+  // Add to cart - defensive
   const handleAdd = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
     e.preventDefault();
-    addToCart({
-      _id: product._id,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-      image: product.mainImage || product.images?.[0] || "/placeholder.svg",
-    });
+    if (typeof addToCart === "function") {
+      addToCart({
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.mainImage || product.images?.[0] || "/placeholder.svg",
+        quantity: 1,
+        delivery: "Standard",
+      });
+    } else {
+      // fallback: if addToCart isn't available, try updateQuantity or push into cart array (best-effort)
+      console.warn("addToCart not available in useCart context");
+    }
   };
 
+  // increment (defensive)
   const handleIncrement = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
     e.preventDefault();
     const current = getQuantity(product._id);
-    // If you have updateQuantity, prefer that; else call addToCart to add 1 more
     if (typeof updateQuantity === "function") {
       updateQuantity(product._id, current + 1);
+    } else if (typeof addToCart === "function") {
+      // fallback: call addToCart to add another
+      addToCart({
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.mainImage || product.images?.[0] || "/placeholder.svg",
+        quantity: 1,
+      });
     } else {
-      addToCart({ _id: product._id, name: product.name, price: product.price, quantity: 1, image: product.mainImage || product.images?.[0] || "/placeholder.svg" });
+      console.warn("no updateQuantity or addToCart available");
     }
   };
 
+  // decrement (defensive)
   const handleDecrement = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
     e.preventDefault();
     const current = getQuantity(product._id);
     if (current <= 1) {
-      // remove item
-      if (typeof removeFromCart === "function") removeFromCart(product._id);
-      else updateQuantity(product._id, 0);
+      if (typeof removeFromCart === "function") {
+        // remove by id (support both id/_id)
+        removeFromCart(product._id);
+      } else if (typeof updateQuantity === "function") {
+        updateQuantity(product._id, 0);
+      } else {
+        console.warn("no removeFromCart/updateQuantity available");
+      }
     } else {
-      if (typeof updateQuantity === "function") updateQuantity(product._id, current - 1);
-      else {
-        // fallback: set quantity by removing then adding (not ideal)
+      if (typeof updateQuantity === "function") {
         updateQuantity(product._id, current - 1);
+      } else {
+        console.warn("updateQuantity not available to decrement");
       }
     }
   };
@@ -260,6 +286,7 @@ const Category = () => {
         <section className="grid grid-cols-2 gap-3">
           {displayProducts.map((p) => {
             const qty = getQuantity(p._id);
+            const isOOS = p.inStock === false;
             return (
               <div
                 key={p._id}
@@ -267,8 +294,15 @@ const Category = () => {
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => { if (e.key === "Enter") navigate(`/product/${p._id}`); }}
-                className={`bg-white rounded-lg border border-[#f0e6e2] shadow-sm overflow-hidden ${p.inStock === false ? "opacity-60" : ""}`}
+                className={`relative bg-white rounded-lg border border-[#f0e6e2] shadow-sm overflow-hidden ${isOOS ? "opacity-75" : ""}`}
               >
+                {/* Out of stock overlay */}
+                {isOOS && (
+                  <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+                    <div className="bg-black/40 text-white px-3 py-1 rounded-md font-semibold">Out of Stock</div>
+                  </div>
+                )}
+
                 <div className="bg-white p-3 flex items-center justify-center aspect-square">
                   <img
                     src={p.mainImage || p.images?.[0] || "/placeholder.svg"}
@@ -298,12 +332,17 @@ const Category = () => {
                       )}
                     </div>
 
-                    {/* Add or quantity controls */}
-                    {qty > 0 ? (
+                    {/* Add or quantity controls; disabled when out of stock */}
+                    {isOOS ? (
+                      <div className="flex items-center gap-2 px-3 py-1 rounded-md text-sm text-gray-400 border border-[#eee] bg-[#fff]">
+                        <ShoppingCart className="w-4 h-4" />
+                        <span>Unavailable</span>
+                      </div>
+                    ) : qty > 0 ? (
                       <div className="flex items-center gap-2 bg-white border border-[#e9e2de] rounded-md shadow-sm px-2 py-1">
                         <button
                           onClick={(e) => handleDecrement(e, p)}
-                          className="p-1 rounded"
+                          className="p-1 rounded disabled:opacity-50"
                           aria-label="Decrease quantity"
                           title="Decrease"
                         >
@@ -342,8 +381,6 @@ const Category = () => {
           </div>
         )}
       </main>
-
-
     </div>
   );
 };
