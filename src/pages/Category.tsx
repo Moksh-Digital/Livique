@@ -273,17 +273,29 @@ const Category = () => {
                   </SheetTrigger>
 <SheetContent
   side="left"
-  className="w-80 overflow-y-auto"
-  style={{ top: "100px", height: "calc(100vh - 70px)" }}
+  className="w-80"
+  style={{
+    position: "fixed",                     // be fixed to viewport
+    top: "100px",                          // same as your navbar height
+    left: 0,                               // stick to left
+    height: "calc(100vh - 100px)",         // use same value as top
+    overflowY: "auto",                     // enable vertical scrolling
+    WebkitOverflowScrolling: "touch",      // momentum scroll on iOS
+    touchAction: "pan-y",                  // allow vertical pan
+    zIndex: 1000,                          // ensure it's above page content
+  }}
 >
+  <div className="p-4">
+    <SheetHeader>
+      <SheetTitle>Filters</SheetTitle>
+    </SheetHeader>
 
-                    <SheetHeader>
-                      <SheetTitle>Filters</SheetTitle>
-                    </SheetHeader>
-                    <div className="mt-6">
-                      <FilterSidebar />
-                    </div>
-                  </SheetContent>
+    <div className="mt-6">
+      <FilterSidebar />
+    </div>
+  </div>
+</SheetContent>
+
                 </Sheet>
 
                 {/* <Button variant="outline" size="sm">
