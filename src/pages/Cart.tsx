@@ -49,78 +49,81 @@ const Cart = () => {
             {cart.map((item, index) => {
               const key = item.id || item.id || `${item.name || "item"}-${index}`;
               return (
-                <Card key={key} className="p-4 rounded-2xl">
-                <div className="flex gap-4">
-                  <div className="w-24 h-24 bg-gradient-to-br from-muted to-muted/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    {typeof item.image === "string" &&
-                    (item.image.startsWith?.("data:") ||
-                      item.image.startsWith?.("http")) ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="object-cover w-full h-full"
-                      />
-                    ) : (
-                      <span className="text-4xl">{item.image}</span>
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0 space-y-3">
-                    {/* top row: name + price */}
-                    <div className="flex items-start justify-between gap-3">
-                      <h3 className="font-semibold truncate">{item.name}</h3>
-                      <span className="font-bold text-lg whitespace-nowrap">
-                        ₹{(item.price * item.quantity).toLocaleString()}
-                      </span>
+                <Card key={key} className="p-5 rounded-2xl border border-[#f0e6e2]">
+                  <div className="flex gap-4 sm:gap-5">
+                    {/* Image */}
+                    <div className="w-20 h-20 sm:w-28 sm:h-28 bg-gradient-to-br from-muted to-muted/50 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      {typeof item.image === "string" &&
+                      (item.image.startsWith?.("data:") ||
+                        item.image.startsWith?.("http")) ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-3xl sm:text-5xl">{item.image}</span>
+                      )}
                     </div>
 
-                    <div className="text-sm text-muted-foreground">
-                      Delivery: {item.delivery}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Delivery Charge: ₹{item.deliveryCharge?.toLocaleString() || 0}
-                    </div>
-
-                    {/* Quantity + delete inline */}
-                    <div className="flex items-center justify-between flex-wrap gap-3">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 rounded-lg"
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
-                          }
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <span className="w-8 text-center font-semibold">
-                          {item.quantity}
-                        </span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 rounded-lg"
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1)
-                          }
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+                      {/* Top: Name + Price */}
+                      <div>
+                        <h3 className="font-semibold text-sm sm:text-base text-[#2b2b2b] mb-3 break-words line-clamp-2">
+                          {item.name}
+                        </h3>
+                        
+                        <div className="text-xs sm:text-sm text-[#8B7355] space-y-1 mb-3">
+                          <div>Delivery: <span className="font-medium text-[#5D4037]">{item.delivery}</span></div>
+                          <div>Delivery Charge: <span className="font-medium text-[#5D4037]">₹{item.deliveryCharge?.toLocaleString() || 0}</span></div>
+                        </div>
                       </div>
 
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => removeFromCart(item.id)}
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </Button>
+                      {/* Bottom: Quantity + Price + Delete */}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 rounded hover:bg-white"
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity - 1)
+                            }
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="w-6 text-center text-sm font-semibold">
+                            {item.quantity}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 rounded hover:bg-white"
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity + 1)
+                            }
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <span className="font-bold text-lg sm:text-xl text-[#172021] whitespace-nowrap">
+                            ₹{(item.price * item.quantity).toLocaleString()}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-red-500 hover:bg-red-50"
+                            onClick={() => removeFromCart(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
                 </Card>
               );
             })}
