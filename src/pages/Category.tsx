@@ -27,6 +27,7 @@ interface Product {
   rating?: number;
   reviews?: number;
   inStock?: boolean;
+  delivery?: string;
 }
 
 const isLocalhost =
@@ -46,12 +47,13 @@ const Category = () => {
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // useCart context - destructured names you said you have
-  // We will handle if any of these are undefined (defensive)
-  const { cart, addToCart, removeFromCart, updateQuantity, getTotalItems } = useCart() as any || {};
-
-  // ensure we have an array to work with
-  const cartItems = Array.isArray(cart) ? cart : [];
+  // useCart context — defensive handling in case names differ
+  const cartCtx: any = useCart() || {};
+  const cart = Array.isArray(cartCtx.cart) ? cartCtx.cart : cartCtx.items || [];
+  const addToCart = cartCtx.addToCart || cartCtx.addItem || cartCtx.add;
+  const removeFromCart = cartCtx.removeFromCart || cartCtx.removeItem || cartCtx.remove;
+  const updateQuantity = cartCtx.updateQuantity || cartCtx.setQuantity;
+  const getTotalItems = cartCtx.getTotalItems || cartCtx.totalItems || (() => (cart || []).reduce((s: any, it: any) => s + (it.quantity || 0), 0));
 
   const currentCategory = getCategoryBySlug(category || "");
   let breadcrumb = "All Products";
@@ -95,8 +97,8 @@ const Category = () => {
   });
 
   const FilterSidebar = () => (
-    <div className="space-y-6">
-      {currentCategory && currentCategory.subcategories.length > 0 && (
+    <div className="space-y-6 p-4">
+      {currentCategory && currentCategory.subcategories?.length > 0 && (
         <div>
           <h3 className="font-semibold mb-3 text-sm">Subcategories</h3>
           <div className="space-y-2">
@@ -104,9 +106,7 @@ const Category = () => {
               <Link
                 key={sub.slug}
                 to={`/category/${currentCategory.slug}/${sub.slug}`}
-                className={`block text-sm py-1 hover:text-primary ${
-                  subcategory === sub.slug ? "text-primary font-semibold" : ""
-                }`}
+                className={`block text-sm py-1 hover:text-primary ${subcategory === sub.slug ? "text-primary font-semibold" : ""}`}
               >
                 {sub.name}
               </Link>
@@ -158,25 +158,9 @@ const Category = () => {
     </div>
   );
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
-        <div className="text-[#8B7355] font-medium">Loading products...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500 bg-[#FFF8F0]">
-        {error}
-      </div>
-    );
-  }
-
-  // helper to get quantity in cart (robust to item.id or item._id)
+  // helper to get quantity in cart (robust)
   const getQuantity = (productId: string) => {
-    const item = cartItems.find((i: any) => (i && (i.id === productId || i._id === productId)));
+    const item = (cart || []).find((i: any) => i && (i.id === productId || i._id === productId));
     return item ? (item.quantity ?? 0) : 0;
   };
 
@@ -191,10 +175,9 @@ const Category = () => {
         price: product.price,
         image: product.mainImage || product.images?.[0] || "/placeholder.svg",
         quantity: 1,
-        delivery: "Standard",
+        delivery: product.delivery || "Standard",
       });
     } else {
-      // fallback: if addToCart isn't available, try updateQuantity or push into cart array (best-effort)
       console.warn("addToCart not available in useCart context");
     }
   };
@@ -207,7 +190,6 @@ const Category = () => {
     if (typeof updateQuantity === "function") {
       updateQuantity(product._id, current + 1);
     } else if (typeof addToCart === "function") {
-      // fallback: call addToCart to add another
       addToCart({
         id: product._id,
         name: product.name,
@@ -227,7 +209,6 @@ const Category = () => {
     const current = getQuantity(product._id);
     if (current <= 1) {
       if (typeof removeFromCart === "function") {
-        // remove by id (support both id/_id)
         removeFromCart(product._id);
       } else if (typeof updateQuantity === "function") {
         updateQuantity(product._id, 0);
@@ -243,143 +224,187 @@ const Category = () => {
     }
   };
 
-  // discount percent helper
   const discountPercent = (orig?: number, cur?: number) => {
     if (!orig || !cur || orig <= cur) return null;
     return Math.round(((orig - cur) / orig) * 100);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
+        <div className="text-[#8B7355] font-medium">Loading products...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500 bg-[#FFF8F0]">
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FFF8F0]">
-      {/* announcement is in Header - don't duplicate */}
       <Header />
 
-      <main className="pb-28 max-w-[420px] mx-auto px-3">
-        <div className="flex items-center justify-between mt-4 mb-2">
-          <div>
-            <h1 className="text-lg font-semibold text-[#5d4037]">{breadcrumb === "All Products" ? "Gift Items" : breadcrumb}</h1>
-            <div className="text-xs text-[#8B7355]">Showing {displayProducts.length} Products</div>
-          </div>
-
-          <Sheet open={showFilters} onOpenChange={setShowFilters}>
-            <SheetTrigger asChild>
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-white border rounded-md shadow-sm text-sm">
-                <Filter className="w-4 h-4" />
-                Filters
-              </button>
-            </SheetTrigger>
-
-            <SheetContent side="right" className="w-72">
+      <main className="max-w-[1400px] mx-auto px-6 py-8">
+        <div className="flex gap-8">
+          {/* LEFT: Filters (desktop visible) */}
+          <aside className="hidden lg:block w-64 shrink-0">
+            <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
               <div className="p-4">
-                <SheetHeader>
-                  <SheetTitle>Filters</SheetTitle>
-                </SheetHeader>
-
-                <div className="mt-6">
-                  <FilterSidebar />
-                </div>
+                <h2 className="font-semibold text-lg mb-2">Filters</h2>
+                <FilterSidebar />
               </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+            </div>
+          </aside>
 
-        <section className="grid grid-cols-2 gap-3">
-          {displayProducts.map((p) => {
-            const qty = getQuantity(p._id);
-            const isOOS = p.inStock === false;
-            return (
-              <div
-                key={p._id}
-                onClick={() => navigate(`/product/${p._id}`)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === "Enter") navigate(`/product/${p._id}`); }}
-                className={`relative bg-white rounded-lg border border-[#f0e6e2] shadow-sm overflow-hidden ${isOOS ? "opacity-75" : ""}`}
-              >
-                {/* Out of stock overlay */}
-                {isOOS && (
-                  <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-                    <div className="bg-black/40 text-white px-3 py-1 rounded-md font-semibold">Out of Stock</div>
-                  </div>
-                )}
+          {/* RIGHT: Product grid */}
+          <section className="flex-1">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h1 className="text-3xl font-bold text-[#3b2b28]">{breadcrumb === "All Products" ? "Home Decor" : breadcrumb}</h1>
+                <div className="text-sm text-[#8B7355] mt-1">Showing {displayProducts.length} Products</div>
+              </div>
 
-                <div className="bg-white p-3 flex items-center justify-center aspect-square">
-                  <img
-                    src={p.mainImage || p.images?.[0] || "/placeholder.svg"}
-                    alt={p.name}
-                    className="w-full h-full object-cover rounded-md"
-                    onError={(e) => (e.currentTarget.src = "/placeholder.svg")}
-                  />
-                </div>
+              {/* Filters button for smaller screens */}
+              <div className="lg:hidden">
+                <Sheet open={showFilters} onOpenChange={setShowFilters}>
+                  <SheetTrigger asChild>
+                    <button className="flex items-center gap-2 px-3 py-2 bg-white border rounded-md shadow-sm text-sm">
+                      <Filter className="w-4 h-4" /> Filters
+                    </button>
+                  </SheetTrigger>
 
-                <div className="px-3 py-2">
-                  <h3 className="text-sm font-medium text-[#2b2b2b] line-clamp-2 mb-1">{p.name}</h3>
-
-                  <div className="flex items-center gap-2 text-xs mb-2">
-                    <span className="text-sm font-semibold text-[#2b2b2b]">{(p.rating ?? 0).toFixed(1)}</span>
-                    <Star size={14} className="fill-green-600 text-green-600" />
-                    <span className="text-xs text-[#6b6b6b]">({p.reviews ?? 0})</span>
-                  </div>
-
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <div className="text-base font-bold text-[#172021]">₹{p.price?.toLocaleString()}</div>
-                      {p.originalPrice && p.originalPrice > p.price && (
-                        <div className="text-xs text-[#8B7355] line-through">₹{p.originalPrice?.toLocaleString()}</div>
-                      )}
-                      {discountPercent(p.originalPrice, p.price) && (
-                        <div className="text-xs text-[#8B7355]">{discountPercent(p.originalPrice, p.price)}% off</div>
-                      )}
+                  <SheetContent side="right" className="w-80">
+                    <div className="p-4">
+                      <SheetHeader>
+                        <SheetTitle>Filters</SheetTitle>
+                      </SheetHeader>
+                      <div className="mt-6">
+                        <FilterSidebar />
+                      </div>
                     </div>
-
-                    {/* Add or quantity controls; disabled when out of stock */}
-                    {isOOS ? (
-                      <div className="flex items-center gap-2 px-3 py-1 rounded-md text-sm text-gray-400 border border-[#eee] bg-[#fff]">
-                        <ShoppingCart className="w-4 h-4" />
-                        <span>Unavailable</span>
-                      </div>
-                    ) : qty > 0 ? (
-                      <div className="flex items-center gap-2 bg-white border border-[#e9e2de] rounded-md shadow-sm px-2 py-1">
-                        <button
-                          onClick={(e) => handleDecrement(e, p)}
-                          className="p-1 rounded disabled:opacity-50"
-                          aria-label="Decrease quantity"
-                          title="Decrease"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <div className="px-2 text-sm font-medium">{qty}</div>
-                        <button
-                          onClick={(e) => handleIncrement(e, p)}
-                          className="p-1 rounded"
-                          aria-label="Increase quantity"
-                          title="Increase"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={(e) => handleAdd(e, p)}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#e9e2de] rounded-md shadow-sm text-sm hover:shadow-md"
-                        aria-label={`Add ${p.name} to cart`}
-                      >
-                        <ShoppingCart className="w-4 h-4" />
-                        <span>Add</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
+                  </SheetContent>
+                </Sheet>
               </div>
-            );
-          })}
-        </section>
+            </div>
 
-        {displayProducts.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-[#8B7355]">No products found matching your filters</p>
+            {/* Desktop grid: 4 columns on xl, 3 on lg, 2 on md */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+
+{displayProducts.map((product) => {
+  const isOOS = product.inStock === false;
+  const isAdded = cart?.some((item) => item._id === product._id);
+
+  return (
+    <div
+      key={product._id}
+      onClick={() => navigate(`/product/${product._id}`)}
+      className="relative bg-white rounded-lg border border-[#f0e6e2] shadow-sm overflow-hidden"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter") navigate(`/product/${product._id}`); }}
+    >
+
+      {/* IMAGE AREA */}
+      <div className="relative bg-white p-3 flex items-center justify-center aspect-square">
+        <img
+          src={product.mainImage || product.images?.[0] || "/placeholder.svg"}
+          alt={product.name}
+          className={`w-full h-full object-cover rounded-md ${isOOS ? "grayscale" : ""}`}
+          onError={(e) => e.currentTarget.src = "/placeholder.svg"}
+        />
+
+        {/* OUT OF STOCK LABEL */}
+        {isOOS && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+            <span className="bg-red-600 text-white px-3 py-1 rounded-md font-semibold shadow">
+              Out of Stock
+            </span>
           </div>
         )}
+      </div>
+
+      {/* CONTENT */}
+      <div className="px-3 py-2">
+        <h3 className="text-sm font-medium text-[#2b2b2b] line-clamp-2 mb-1">
+          {product.name}
+        </h3>
+
+        <div className="flex items-center gap-2 text-xs mb-2">
+          <span className="text-sm font-semibold text-[#2b2b2b]">
+            {(product.rating ?? 0).toFixed(1)}
+          </span>
+          <Star size={14} className="fill-green-600 text-green-600" />
+          <span className="text-xs text-[#6b6b6b]">({product.reviews ?? 0})</span>
+        </div>
+
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="text-base font-bold text-[#172021]">
+              ₹{product.price?.toLocaleString()}
+            </div>
+
+            {product.originalPrice && product.originalPrice > product.price && (
+              <div className="text-xs text-[#8B7355] line-through">
+                ₹{product.originalPrice?.toLocaleString()}
+              </div>
+            )}
+          </div>
+
+          {/* BUTTON - Add / Added / Disabled */}
+{isOOS ? (
+  <button
+    disabled
+    className="flex items-center gap-2 px-3 py-1.5 bg-gray-200 text-gray-500 border border-gray-300 rounded-md text-sm"
+  >
+    {/* Cart icon always visible */}
+    <ShoppingCart className="w-4 h-4" />
+
+    {/* Text hidden on mobile, shown on desktop */}
+    <span className="hidden md:block">Unavailable</span>
+  </button>
+) : isAdded ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); }}
+              className="flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white border border-green-600 rounded-md text-sm"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              <span>Added</span>
+            </button>
+          ) : (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                addToCart({
+                  _id: product._id,
+                  name: product.name,
+                  price: product.price,
+                  quantity: 1,
+                  image: product.mainImage || product.images?.[0] || "/placeholder.svg",
+                });
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#e9e2de] rounded-md shadow-sm text-sm hover:shadow-md"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              <span>Add</span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+})}
+
+
+            </div>
+          </section>
+        </div>
       </main>
     </div>
   );
