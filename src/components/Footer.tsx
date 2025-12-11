@@ -91,7 +91,7 @@ const Footer = () => {
 
 
                 {/* Bottom copyright */}
-        <div className="mt-12 pt-8 border-t border-[#D4AF76] text-sm text-[#8B7355] flex flex-col items-center md:flex-row md:items-center md:justify-between">
+        <div className="mt-12 pt-8 pb-16 border-t border-[#D4AF76] text-sm text-[#8B7355] flex flex-col items-center md:flex-row md:items-center md:justify-between">
           {/* Left on desktop / top on mobile */}
           <p className="mb-2 md:mb-0 md:text-left">
             Powered By <a href="https://mokshdigital.app" target="_blank" className="underline hover:text-blue-500">Moksh Digital</a>
