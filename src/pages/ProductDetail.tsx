@@ -99,6 +99,11 @@ const ProductDetail = () => {
     if (selectedImage >= images.length) setSelectedImage(0);
   }, [images, selectedImage]);
 
+  // Scroll to top when product changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
   // ---------------- CONDITIONAL UI ----------------
   if (loading) {
     return (
