@@ -248,6 +248,13 @@ const Category = () => {
   return (
     <div className="min-h-screen bg-[#FFF8F0]">
       <Header />
+      <style>{`
+        [data-side="left"] {
+          top: 64px !important;
+          height: calc(100vh - 64px) !important;
+          left: 0 !important;
+        }
+      `}</style>
 
       <main className="max-w-[1400px] mx-auto px-6 py-8 pb-40 md:pb-12">
         <div className="flex gap-8">
@@ -278,16 +285,26 @@ const Category = () => {
                     </button>
                   </SheetTrigger>
 
-                  <SheetContent side="right" className="w-80">
-                    <div className="p-4">
-                      <SheetHeader>
-                        <SheetTitle>Filters</SheetTitle>
-                      </SheetHeader>
-                      <div className="mt-6">
-                        <FilterSidebar />
-                      </div>
-                    </div>
-                  </SheetContent>
+                  <SheetContent
+  side="left"
+  className="w-80 fixed left-0"
+  style={{
+    top: "112px",                        // navbar + promo bar height
+    height: "calc(100vh - 70px)",       // remaining height
+    overflowY: "auto",                  // scrollable content
+    WebkitOverflowScrolling: "touch",   // smooth scroll for mobile
+  }}
+>
+  <SheetHeader>
+    <SheetTitle>Filters</SheetTitle>
+  </SheetHeader>
+
+  {/* Remove overflow-y-auto from inside */}
+  <div className="mt-6 px-4 pb-6">
+    <FilterSidebar />
+  </div>
+</SheetContent>
+
                 </Sheet>
               </div>
             </div>
