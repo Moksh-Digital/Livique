@@ -161,9 +161,8 @@ const ProductDetail = () => {
               {images.map((src, idx) => (
                 <Card
                   key={idx}
-                  className={`cursor-pointer rounded-xl overflow-hidden ${
-                    selectedImage === idx ? "ring-2 ring-primary" : ""
-                  }`}
+                  className={`cursor-pointer rounded-xl overflow-hidden ${selectedImage === idx ? "ring-2 ring-primary" : ""
+                    }`}
                   onClick={() => setSelectedImage(idx)}
                 >
                   <div className="aspect-square bg-muted/50 flex items-center justify-center">
@@ -193,9 +192,8 @@ const ProductDetail = () => {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`h-4 w-4 ${
-                      i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-muted"
-                    }`}
+                    className={`h-4 w-4 ${i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-muted"
+                      }`}
                   />
                 ))}
               </div>
@@ -211,19 +209,19 @@ const ProductDetail = () => {
 
             {/* ---------------- DELIVERY OPTIONS ---------------- */}
             {/* ---------------- DELIVERY OPTION ---------------- */}
-<div className="mb-6">
-  <h3 className="font-semibold mb-3">Delivery</h3>
-  <Card className="p-4 rounded-xl shadow-md">
-    <div className="text-center">
-      <p className="font-semibold text-sm mb-1">
-        Delivery ₹{(product.deliveryCharge ?? 499).toLocaleString()}
-      </p>
-      <p className="text-xs text-muted-foreground">
-        Expected by {product.deliveryDate || "2 days"}
-      </p>
-    </div>
-  </Card>
-</div>
+            <div className="mb-6">
+              <h3 className="font-semibold mb-3">Delivery</h3>
+              <Card className="p-4 rounded-xl shadow-md">
+                <div className="text-center">
+                  <p className="font-semibold text-sm mb-1">
+                    Delivery ₹{(product.deliveryCharge ?? 499).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Expected by {product.deliveryDate || "2 days"}
+                  </p>
+                </div>
+              </Card>
+            </div>
 
             {/* ---------------- DELIVERY INFORMATION ---------------- */}
             <div className="mb-8 bg-gray-50 rounded-xl p-6 border border-gray-200">

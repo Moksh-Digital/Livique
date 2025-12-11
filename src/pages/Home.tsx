@@ -1002,7 +1002,7 @@ const Home = () => {
             <div className="flex items-center justify-center gap-4 mb-2 px-4">
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
               <h2 className="text-2xl md:text-3xl font-serif text-[#3E2723] font-semibold">
-                Beauty & Fragrance Collection
+                Sunglasses and Eyewear
               </h2>
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
