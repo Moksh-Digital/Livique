@@ -260,8 +260,8 @@ const Category = () => {
         <div className="flex gap-8">
           {/* LEFT: Filters (desktop visible) */}
           <aside className="hidden lg:block w-64 shrink-0">
-            <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
-              <div className="p-4">
+            <div className="bg-white border rounded-lg shadow-sm overflow-hidden sticky top-24">
+              <div className="p-4 max-h-[calc(100vh-120px)] overflow-y-auto">
                 <h2 className="font-semibold text-lg mb-2">Filters</h2>
                 <FilterSidebar />
               </div>
