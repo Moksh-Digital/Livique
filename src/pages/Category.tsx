@@ -289,7 +289,7 @@ const Category = () => {
   side="left"
   className="w-80 fixed left-0"
   style={{
-    top: "112px",                        // navbar + promo bar height
+    top: "110px",                        // navbar + promo bar height
     height: "calc(100vh - 70px)",       // remaining height
     overflowY: "auto",                  // scrollable content
     WebkitOverflowScrolling: "touch",   // smooth scroll for mobile
