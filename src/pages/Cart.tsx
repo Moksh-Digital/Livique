@@ -46,8 +46,10 @@ const Cart = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* ---------------- CART ITEMS ---------------- */}
           <div className="lg:col-span-2 space-y-4">
-            {cart.map((item) => (
-              <Card key={item.id} className="p-4 rounded-2xl">
+            {cart.map((item, index) => {
+              const key = item.id || item.id || `${item.name || "item"}-${index}`;
+              return (
+                <Card key={key} className="p-4 rounded-2xl">
                 <div className="flex gap-4">
                   <div className="w-24 h-24 bg-gradient-to-br from-muted to-muted/50 rounded-xl flex items-center justify-center flex-shrink-0">
                     {typeof item.image === "string" &&
@@ -64,16 +66,24 @@ const Cart = () => {
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold mb-1 truncate">{item.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Delivery: {item.delivery}
-                    </p>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      Delivery Charge: ₹{item.deliveryCharge?.toLocaleString() || 0}
-                    </p>
+                  <div className="flex-1 min-w-0 space-y-3">
+                    {/* top row: name + price */}
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="font-semibold truncate">{item.name}</h3>
+                      <span className="font-bold text-lg whitespace-nowrap">
+                        ₹{(item.price * item.quantity).toLocaleString()}
+                      </span>
+                    </div>
 
-                    <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="text-sm text-muted-foreground">
+                      Delivery: {item.delivery}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Delivery Charge: ₹{item.deliveryCharge?.toLocaleString() || 0}
+                    </div>
+
+                    {/* Quantity + delete inline */}
+                    <div className="flex items-center justify-between flex-wrap gap-3">
                       <div className="flex items-center gap-2">
                         <Button
                           variant="outline"
@@ -100,24 +110,20 @@ const Cart = () => {
                         </Button>
                       </div>
 
-                      <div className="flex items-center gap-4">
-                        <span className="font-bold text-lg">
-                          ₹{(item.price * item.quantity).toLocaleString()}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => removeFromCart(item.id)}
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </Button>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => removeFromCart(item.id)}
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </Button>
                     </div>
                   </div>
                 </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
 
           {/* ---------------- ORDER SUMMARY ---------------- */}

@@ -298,7 +298,7 @@ const Category = () => {
 
 {displayProducts.map((product) => {
   const isOOS = product.inStock === false;
-  const isAdded = cart?.some((item) => item._id === product._id);
+const isAdded = cart?.some((item) => item.id === product._id || (item as any)._id === product._id);
 
   return (
     <div
@@ -382,11 +382,12 @@ const Category = () => {
                 e.stopPropagation();
                 e.preventDefault();
                 addToCart({
-                  _id: product._id,
+                  id: product._id,
                   name: product.name,
                   price: product.price,
-                  quantity: 1,
                   image: product.mainImage || product.images?.[0] || "/placeholder.svg",
+                  delivery: product.delivery || "Standard",
+                  deliveryCharge: 0,
                 });
               }}
               className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#e9e2de] rounded-md shadow-sm text-sm hover:shadow-md"
