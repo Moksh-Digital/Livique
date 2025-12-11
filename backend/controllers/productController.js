@@ -307,13 +307,22 @@ export const getProductById = async (req, res) => {
 //for searching product i have i used this  searchbar functionality
 export const searchProducts = async (req, res) => {
   try {
-    const keyword = req.query.keyword
-      ? {
-          name: { $regex: req.query.keyword, $options: "i" }, // case-insensitive
-        }
-      : {};
+    const keyword = req.query.keyword || "";
 
-    const products = await Product.find({ ...keyword });
+    if (!keyword) {
+      return res.json([]);
+    }
+
+    // Search in name, description, category, and subcategory
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+        { category: { $regex: keyword, $options: "i" } },
+        { subcategory: { $regex: keyword, $options: "i" } },
+      ],
+    });
+
     res.json(products);
   } catch (error) {
     console.error("Error searching products:", error);
