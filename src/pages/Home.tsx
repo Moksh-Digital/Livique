@@ -77,20 +77,20 @@ const Home = () => {
 
   const beautyItems = [
     {
-      name: "Oversized Sunglasses",
-      image: "https://m.media-amazon.com/images/I/81U6qxkqKqL._AC_UY1100_.jpg",
+      name: "Brooches",
+      image: "https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/66474e1e12f40e3c7f9522ab589263f1.jpg?imageView2/2/w/800/q/70/format/webp",
     },
     {
-      name: "Cat-eye Sunglasses",
-      image: "https://m.media-amazon.com/images/I/41cCIOblYjL._AC_UY1100_.jpg",
+      name: "Key Chain , Bag Charms",
+      image: "https://m.media-amazon.com/images/I/610zXODDvML._AC_UY1000_.jpg",
     },
     {
-      name: "Fashion Specs",
-      image: "https://img.joomcdn.net/d684d2b6201227f5109327528c86cf7e931c9507_1024_1024.jpeg",
+      name: "Caps And Hats",
+      image: "https://ae01.alicdn.com/kf/S8730805a64dc4e7fa80ed41d7fcdeeafm.jpg",
     },
     {
-      name: "Round Frames",
-      image: "https://assets.myntassets.com/w_412,q_30,dpr_3,fl_progressive,f_webp/assets/images/30014421/2024/6/21/1641cc3e-75af-4290-9591-7bd36384ebf21718993451688SUNNIESUnisexRoundSunglasseswithUVProtectedLens6.jpg",
+      name: "Hand Gloves",
+      image: "https://m.media-amazon.com/images/I/61yGM1RTA9L._AC_UY1100_.jpg",
     },
   ]
 
@@ -1002,7 +1002,7 @@ const Home = () => {
             <div className="flex items-center justify-center gap-4 mb-2 px-4">
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
               <h2 className="text-2xl md:text-3xl font-serif text-[#3E2723] font-semibold">
-                Sunglasses and Eyewear
+                Fashion Accessories
               </h2>
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
