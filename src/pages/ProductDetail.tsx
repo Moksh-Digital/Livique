@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -30,6 +30,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [deliveryOption, setDeliveryOption] = useState<"hand" | "courier">("hand");
+  const [similarProducts, setSimilarProducts] = useState<any[]>([]);
 
   // ---------------- FETCH PRODUCT ----------------
   useEffect(() => {
@@ -39,6 +40,7 @@ const ProductDetail = () => {
         if (found) {
           setProduct(found);
           setLoading(false);
+          loadSimilarProducts(found.subcategory, found.id);
           return;
         }
 
@@ -46,6 +48,7 @@ const ProductDetail = () => {
         if (!res.ok) throw new Error("Product not found");
         const data = await res.json();
         setProduct(data);
+        loadSimilarProducts(data.subcategory, data._id || data.id);
       } catch (err) {
         console.error("Failed to load product:", err);
         setProduct(null);
@@ -56,6 +59,32 @@ const ProductDetail = () => {
 
     loadProduct();
   }, [id, getProductById]);
+
+  // ---------------- FETCH SIMILAR PRODUCTS ----------------
+  const loadSimilarProducts = async (subcategory: string, currentProductId: string) => {
+    try {
+      if (!subcategory) return;
+      
+      const res = await fetch(`${API_BASE_URL}/products?subcategory=${subcategory}`);
+      if (!res.ok) throw new Error("Failed to fetch similar products");
+      
+      const data = await res.json();
+      // Filter out current product and limit to 4 products
+      // Transform _id to id for consistency with Product interface
+      const filtered = data
+        .filter((p: any) => (p._id || p.id) !== currentProductId)
+        .map((p: any) => ({
+          ...p,
+          id: p._id || p.id, // Convert _id to id
+        }))
+        .slice(0, 4);
+      
+      setSimilarProducts(filtered);
+    } catch (err) {
+      console.error("Failed to load similar products:", err);
+      setSimilarProducts([]);
+    }
+  };
 
   // ---------------- IMAGE LOGIC ----------------
   const images = useMemo(() => {
@@ -308,6 +337,63 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* ---------------- SIMILAR PRODUCTS SECTION ---------------- */}
+        {similarProducts.length > 0 && (
+          <div className="mt-16 pt-8 border-t">
+            <h2 className="text-2xl font-bold mb-6">Similar Products</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {similarProducts.map((product) => (
+                <Link key={product.id} to={`/product/${product.id}`}>
+                  <Card className="rounded-xl overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+                    {/* Product Image */}
+                    <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center overflow-hidden">
+                      <img
+                        src={product.mainImage || (product.images && product.images[0]) || product.image}
+                        alt={product.name}
+                        className="object-contain w-full h-full hover:scale-105 transition-transform"
+                      />
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="p-3 flex flex-col flex-grow">
+                      <h3 className="font-semibold text-sm mb-2 line-clamp-2">{product.name}</h3>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-1 mb-2">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-3 w-3 ${i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-muted"
+                                }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs text-muted-foreground">({product.reviews})</span>
+                      </div>
+
+                      {/* Price */}
+                      <div className="flex items-center gap-2 mb-3 mt-auto">
+                        <span className="font-bold text-lg">₹{product.price.toLocaleString()}</span>
+                        {product.originalPrice && (
+                          <span className="text-xs text-muted-foreground line-through">
+                            ₹{product.originalPrice.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Stock Status */}
+                      {product.inStock === false && (
+                        <span className="text-xs text-red-600 font-semibold">Out of Stock</span>
+                      )}
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
