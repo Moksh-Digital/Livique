@@ -90,10 +90,10 @@ const Footer = () => {
         </div>
 
 
-                {/* Bottom copyright */}
-        <div className="mt-12 pt-8 border-t border-[#D4AF76] text-sm text-[#8B7355] flex flex-col items-center md:flex-row md:items-center md:justify-between">
+        {/* Bottom copyright */}
+        <div className="mt-8 pt-6 md:mt-12 md:pt-8 border-t border-[#D4AF76] text-sm text-[#8B7355] flex flex-col items-center md:flex-row md:items-center md:justify-between gap-2 md:gap-0">
           {/* Left on desktop / top on mobile */}
-          <p className="mb-2 md:mb-0 md:text-left">
+          <p className="md:text-left">
             Powered By <a href="https://mokshdigital.app" target="_blank" className="underline hover:text-blue-500">Moksh Digital</a>
           </p>
 
