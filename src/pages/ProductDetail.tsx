@@ -108,7 +108,14 @@ const ProductDetail = () => {
   useEffect(() => {
     if (!product) return;
 
-    const productImage = product.mainImage || (product.images && product.images[0]) || product.image;
+    let productImage = product.mainImage || (product.images && product.images[0]) || product.image;
+    
+    // Ensure absolute URL for image
+    if (productImage && !productImage.startsWith('http')) {
+      // If it's a relative URL, make it absolute
+      productImage = `https://api.livique.co.in${productImage.startsWith('/') ? '' : '/'}${productImage}`;
+    }
+    
     const productTitle = `${product.name} - Livique`;
     const productPrice = `₹${product.price.toLocaleString()}`;
     const productDescription = product.description ? `${product.description} | ${productPrice}` : `Buy ${product.name} on Livique | ${productPrice}`;
@@ -161,6 +168,8 @@ const ProductDetail = () => {
       document.head.appendChild(canonicalLink);
     }
     canonicalLink.setAttribute("href", productUrl);
+
+    console.log("Meta tags updated:", { productTitle, productImage, productUrl });
 
   }, [product, id]);
 

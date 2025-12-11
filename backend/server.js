@@ -120,7 +120,89 @@ app.use("/api/address", addressRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/upload", uploadRoutes);
 
-// ================== Logout ==================
+// ================== Product Meta Tags for Social Sharing ==================
+app.get("/product/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Fetch product from database
+    const response = await fetch(`http://localhost:5000/api/products/${id}`);
+    if (!response.ok) {
+      return res.redirect("https://www.livique.co.in");
+    }
+    
+    const product = await response.json();
+    
+    // Prepare meta tags
+    const productImage = product.mainImage || (product.images && product.images[0]) || product.image;
+    const absoluteImageUrl = productImage && !productImage.startsWith('http') 
+      ? `https://api.livique.co.in${productImage.startsWith('/') ? '' : '/'}${productImage}`
+      : productImage;
+    
+    const productTitle = `${product.name} - Livique`;
+    const productPrice = `₹${product.price.toLocaleString()}`;
+    const productDescription = product.description 
+      ? `${product.description} | ${productPrice}`
+      : `Buy ${product.name} on Livique | ${productPrice}`;
+    const productUrl = `https://www.livique.co.in/product/${product._id || product.id}`;
+    
+    // Build HTML with meta tags
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${escapeHtml(productTitle)}</title>
+          <meta name="description" content="${escapeHtml(productDescription)}">
+          
+          <!-- Open Graph Tags -->
+          <meta property="og:title" content="${escapeHtml(productTitle)}">
+          <meta property="og:description" content="${escapeHtml(productDescription)}">
+          <meta property="og:image" content="${escapeHtml(absoluteImageUrl)}">
+          <meta property="og:url" content="${escapeHtml(productUrl)}">
+          <meta property="og:type" content="product">
+          <meta property="og:site_name" content="Livique">
+          
+          <!-- Twitter Card Tags -->
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="${escapeHtml(productTitle)}">
+          <meta name="twitter:description" content="${escapeHtml(productDescription)}">
+          <meta name="twitter:image" content="${escapeHtml(absoluteImageUrl)}">
+          <meta name="twitter:site" content="@Livique">
+          
+          <!-- Redirect to actual app -->
+          <script>
+            window.location.href = '${productUrl}';
+          </script>
+        </head>
+        <body>
+          <p>Redirecting to Livique...</p>
+        </body>
+      </html>
+    `;
+    
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+    
+  } catch (error) {
+    console.error("Error fetching product meta tags:", error);
+    res.redirect("https://www.livique.co.in");
+  }
+});
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+  if (!text) return '';
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
 app.get("/logout", (req, res) => {
   req.logout(() => {
     req.session.destroy(() => {
