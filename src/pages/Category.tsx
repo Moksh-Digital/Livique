@@ -271,7 +271,12 @@ const Category = () => {
                       Filters
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="left" className="w-80 overflow-y-auto">
+<SheetContent
+  side="left"
+  className="w-80 overflow-y-auto"
+  style={{ top: "110px", height: "calc(100vh - 70px)" }}
+>
+
                     <SheetHeader>
                       <SheetTitle>Filters</SheetTitle>
                     </SheetHeader>
