@@ -92,9 +92,7 @@ const Header = () => {
 
             {/* Right: Icons */}
             <div className="flex items-center gap-2 md:gap-3 pr-2 md:pr-4">
-              {/* Search Icon (Mobile) */}
-
-              {/* Admin */}
+              {/* Admin - Desktop Only */}
               {user?.role === "admin" && (
                 <Link to="/admin">
                   <Button
@@ -107,26 +105,26 @@ const Header = () => {
                 </Link>
               )}
 
-                        <button
-            onClick={() => setShowSearch(true)}
-            className="flex flex-col items-center text-xs text-[#8B7355] hover:text-[#8B4513]"
-          >
-            <Search className="h-5 w-4" />
-            
-          </button>
+              {/* Search - Desktop Only */}
+              <button
+                onClick={() => setShowSearch(true)}
+                className="hidden md:flex flex-col items-center text-xs text-[#8B7355] hover:text-[#8B4513]"
+              >
+                <Search className="h-5 w-4" />
+              </button>
 
-                    <Link
-            to="/cart"
-            className="relative flex flex-col items-center text-xs text-[#8B7355] hover:text-[#8B4513]"
-          >
-            <ShoppingCart className="h-5 w-4" />
-          
-            {totalItems > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-[#D2691E] text-white text-xs rounded-full">
-                {totalItems}
-              </Badge>
-            )}
-          </Link>
+              {/* Cart - Desktop Only */}
+              <Link
+                to="/cart"
+                className="hidden md:flex relative flex-col items-center text-xs text-[#8B7355] hover:text-[#8B4513]"
+              >
+                <ShoppingCart className="h-5 w-4" />
+                {totalItems > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-[#D2691E] text-white text-xs rounded-full">
+                    {totalItems}
+                  </Badge>
+                )}
+              </Link>
 
               {/* Profile/Auth */}
               {user ? (
