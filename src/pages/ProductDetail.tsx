@@ -109,45 +109,60 @@ const ProductDetail = () => {
     if (!product) return;
 
     const productImage = product.mainImage || (product.images && product.images[0]) || product.image;
-    const productTitle = product.name;
-    const productDescription = product.description || `₹${product.price.toLocaleString()} - Buy ${product.name} on Livique`;
-    const productUrl = window.location.href;
+    const productTitle = `${product.name} - Livique`;
+    const productPrice = `₹${product.price.toLocaleString()}`;
+    const productDescription = product.description ? `${product.description} | ${productPrice}` : `Buy ${product.name} on Livique | ${productPrice}`;
+    const productUrl = `https://www.livique.co.in/product/${product.id || id}`;
 
-    // Update Open Graph meta tags
-    document.title = `${productTitle} - Livique`;
+    // Update page title
+    document.title = productTitle;
 
-    const updateMetaTag = (property: string, content: string) => {
-      let tag = document.querySelector(`meta[property="${property}"]`);
+    // Helper function to update or create meta tags
+    const setMetaTag = (property: string, content: string, isProperty = true) => {
+      let tag = document.querySelector(
+        isProperty ? `meta[property="${property}"]` : `meta[name="${property}"]`
+      ) as HTMLMetaElement;
+      
       if (!tag) {
         tag = document.createElement("meta");
-        tag.setAttribute("property", property);
+        if (isProperty) {
+          tag.setAttribute("property", property);
+        } else {
+          tag.setAttribute("name", property);
+        }
         document.head.appendChild(tag);
       }
       tag.setAttribute("content", content);
     };
 
-    const updateMetaAttribute = (name: string, content: string) => {
-      let tag = document.querySelector(`meta[name="${name}"]`);
-      if (!tag) {
-        tag = document.createElement("meta");
-        tag.setAttribute("name", name);
-        document.head.appendChild(tag);
-      }
-      tag.setAttribute("content", content);
-    };
+    // Update Open Graph tags (for Facebook, LinkedIn, WhatsApp, etc.)
+    setMetaTag("og:title", productTitle, true);
+    setMetaTag("og:description", productDescription, true);
+    setMetaTag("og:image", productImage, true);
+    setMetaTag("og:url", productUrl, true);
+    setMetaTag("og:type", "product", true);
+    setMetaTag("og:site_name", "Livique", true);
 
-    updateMetaTag("og:title", productTitle);
-    updateMetaTag("og:description", productDescription);
-    updateMetaTag("og:image", productImage);
-    updateMetaTag("og:url", productUrl);
-    updateMetaTag("og:type", "product");
+    // Update Twitter Card tags
+    setMetaTag("twitter:card", "summary_large_image", false);
+    setMetaTag("twitter:title", productTitle, false);
+    setMetaTag("twitter:description", productDescription, false);
+    setMetaTag("twitter:image", productImage, false);
+    setMetaTag("twitter:site", "@Livique", false);
 
-    updateMetaAttribute("twitter:title", productTitle);
-    updateMetaAttribute("twitter:description", productDescription);
-    updateMetaAttribute("twitter:image", productImage);
-    updateMetaAttribute("twitter:card", "summary_large_image");
+    // Update description and other common tags
+    setMetaTag("description", productDescription, false);
 
-  }, [product]);
+    // Update canonical URL
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (!canonicalLink) {
+      canonicalLink = document.createElement("link");
+      canonicalLink.setAttribute("rel", "canonical");
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.setAttribute("href", productUrl);
+
+  }, [product, id]);
 
   // ---------------- CONDITIONAL UI ----------------
   if (loading) {
