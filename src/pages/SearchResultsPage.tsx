@@ -209,85 +209,59 @@ const SearchResultsPage = () => {
                 </div>
               </div>
             ) : filteredResults.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {filteredResults.map((product) => (
-                  <div
+                  <Link
                     key={product._id}
-                    className="bg-white shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[6px] border-white rounded-none overflow-hidden"
+                    to={`/product/${product._id}`}
+                    className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col overflow-hidden border border-gray-200"
                   >
                     {/* Image Container */}
-                    <Link 
-                      to={`/product/${product._id}`}
-                      className="relative bg-white overflow-hidden h-40 md:h-56 flex items-center justify-center flex-shrink-0"
-                    >
+                    <div className="relative bg-gray-50 overflow-hidden aspect-square flex items-center justify-center">
                       <img
                         src={product.mainImage || "/placeholder.svg"}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400"
+                        className="w-full h-full object-cover"
                         onError={(e) => {
                           e.currentTarget.src = "/placeholder.svg"
                         }}
                       />
-                      {/* Discount Badge */}
-                      {product.originalPrice > product.price && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-lg flex items-center gap-1">
-                          <Zap size={11} />
-                          -{discountPercentage(
-                            product.originalPrice,
-                            product.price
-                          )}
-                          %
-                        </div>
-                      )}
-                    </Link>
+                    </div>
 
                     {/* Product Info */}
-                    <div className="p-3 md:p-4 flex flex-col flex-grow bg-white">
+                    <div className="p-4 flex flex-col">
                       {/* Product Name */}
-                      <h3 className="font-medium text-sm md:text-base text-[#5D4037] line-clamp-2 mb-3 min-h-[2.5rem]">
+                      <h3 className="font-medium text-sm text-gray-800 mb-2 line-clamp-2">
                         {product.name}
                       </h3>
 
+                      {/* Rating */}
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <span className="text-sm font-semibold text-gray-800">{product.rating}</span>
+                        <Star size={14} className="fill-green-600 text-green-600" />
+                        <span className="text-xs text-gray-500">({product.reviews})</span>
+                      </div>
+
                       {/* Price Section */}
-                      <div className="mb-3">
+                      <div className="mb-2">
                         <div className="flex items-baseline gap-2">
-                          <span className="text-lg md:text-xl font-bold text-[#5D4037]">
+                          <span className="text-lg font-bold text-gray-900">
                             ₹{product.price}
                           </span>
                           {product.originalPrice > product.price && (
-                            <span className="text-sm text-[#8B7355] line-through">
+                            <span className="text-sm text-gray-500 line-through">
                               ₹{product.originalPrice}
                             </span>
                           )}
                         </div>
                       </div>
 
-                      {/* Buttons Container - 50/50 Split */}
-                      <div className="flex gap-2 mt-auto">
-                        <button
-                          onClick={() => {
-                            addToCart({
-                              _id: product._id,
-                              name: product.name,
-                              price: product.price,
-                              quantity: 1,
-                              image: product.mainImage,
-                            })
-                          }}
-                          className="flex-1 bg-white hover:bg-[#FFF8F0] text-[#8B4513] border-2 border-[#8B4513] font-semibold py-2.5 px-2 rounded transition-colors flex items-center justify-center gap-1 text-sm"
-                        >
-                          <ShoppingCart size={16} />
-                          Cart
-                        </button>
-                        <Link
-                          to={`/product/${product._id}`}
-className="flex-1 bg-[#7C2A25] hover:bg-[#5D4037] text-white font-semibold py-2.5 px-2 rounded transition-colors flex items-center justify-center gap-1 text-sm"
-                        >
-                          Buy Now
-                        </Link>
-                      </div>
+                      {/* Delivery Info
+                      <div className="text-xs text-gray-600">
+                        Delivery: <span className="font-medium">{product.delivery}</span>
+                      </div> */}
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (
