@@ -81,11 +81,19 @@ export async function sendSubscriptionToBackend(
   userId: string
 ): Promise<boolean> {
   try {
+    // Get JWT token from localStorage if exists
+    const token = localStorage.getItem('token');
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/push/subscribe`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       credentials: 'include',
       body: JSON.stringify({
         subscription,
@@ -113,12 +121,20 @@ export async function unsubscribeFromPushNotifications(
   try {
     await subscription.unsubscribe();
     
+    // Get JWT token from localStorage if exists
+    const token = localStorage.getItem('token');
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
     // Optionally, remove from backend
     await fetch(`${import.meta.env.VITE_API_URL}/api/push/unsubscribe`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       credentials: 'include',
       body: JSON.stringify({ subscription }),
     });
