@@ -1,6 +1,7 @@
 import express from "express";
 import Query from "../models/queryModel.js";
 import Order from "../models/orderModel.js";
+import { sendToAdmins } from "../controllers/pushNotificationController.js";
 import { protect as authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -37,6 +38,14 @@ router.post("/", authMiddleware, async (req, res) => {
     });
 
     await newQuery.save();
+
+    // Push notification to admins (non-blocking)
+    sendToAdmins({
+      title: "❓ New Query",
+      body: `Order #${orderId} - ${name}`,
+      icon: "/logo.png",
+      url: "/admin",
+    }).catch((err) => console.error("Push notification failed (query)", err?.message || err));
 
     res.status(201).json({
       message: "Query submitted successfully",

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { initializePushNotifications } from '@/utils/pushNotifications';
 
 const isLocalhost =
   window.location.hostname === "localhost" ||
@@ -114,6 +115,11 @@ const fetchGoogleUser = async () => {
     localStorage.setItem('isAdminLoggedIn', 'true');
     setUser({ name: 'Admin', email: 'admin@shop.com', verified: true, role: 'admin' });
     setLoading(false);
+
+      // Initialize push notifications for admin
+      setTimeout(() => {
+        initializePushNotifications('admin', true);
+      }, 1000);
   };
 
   const signOut = () => {
@@ -127,6 +133,13 @@ const fetchGoogleUser = async () => {
   };
 
   const isAdmin = user?.email === 'admin@shop.com';
+
+  // Initialize push notifications when user is admin
+  useEffect(() => {
+    if (user && isAdmin) {
+      initializePushNotifications(user._id || 'admin', true);
+    }
+  }, [user, isAdmin]);
 
   if (loading) {
     return (

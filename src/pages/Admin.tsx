@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Package,
@@ -42,6 +42,7 @@ import { CATEGORIES } from "@/data/categories";
 import { Order, useOrders } from "../contexts/OrdersContext";
 import AdminQueries from "./AdminQueries";
 import axios from "axios";
+import { PushNotificationButton } from "@/components/PushNotificationButton";
 
 const isLocalhost =
   window.location.hostname === "localhost" ||
@@ -88,6 +89,7 @@ const Admin = () => {
   const [users, setUsers] = useState([]);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const { signInAdmin } = useAuth();
+  const notificationToastShown = useRef(false);
 
 
 
@@ -680,6 +682,32 @@ const Admin = () => {
     );
   }
 
+  // Notify admin of current notification permission once per session
+  useEffect(() => {
+    if (!isAdmin || notificationToastShown.current) return;
+    notificationToastShown.current = true;
+
+    if (!("Notification" in window)) return;
+
+    if (Notification.permission === "granted") {
+      toast({
+        title: "🔔 Notifications enabled",
+        description: "You'll get new order and query alerts",
+      });
+    } else if (Notification.permission === "denied") {
+      toast({
+        title: "Notifications blocked",
+        description: "Enable browser notifications to receive admin alerts",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Enable admin alerts",
+        description: "Tap the bell to turn on push notifications",
+      });
+    }
+  }, [isAdmin, toast]);
+
 
   // 3. Render the full Admin Dashboard (only runs if user is authenticated and is admin)
   return (
@@ -696,6 +724,7 @@ const Admin = () => {
           </Link>
 
           <div className="flex items-center gap-4">
+            <PushNotificationButton userId={user?._id || "admin"} isAdmin={isAdmin} />
             <Link to="/">
               <Button variant="outline" size="sm">
                 View Store
