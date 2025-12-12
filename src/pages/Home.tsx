@@ -580,7 +580,7 @@ const Home = () => {
     {/* Left Big Image */}
     <div className="md:col-span-3 relative group">
       <img
-        src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwlai_rqgu8e.jpg"
+        src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0064_taynue.jpg"
         alt="Calendar"
         className="w-full h-[220px] md:h-[500px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
       />
@@ -598,7 +598,7 @@ const Home = () => {
       {/* Top right image */}
       <div className="relative group">
         <img
-          src="https://th.bing.com/th/id/OIP.d_QJ40b5g_sdKVShAFnR5wHaFP?w=259&h=150&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"
+          src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0062_c1egut.jpg"
           alt="New Year"
           className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
         />
@@ -615,7 +615,7 @@ const Home = () => {
 
         <div className="relative group">
           <img
-            src="https://th.bing.com/th/id/OIP.rXu2-mtvxmbMP_VoAPKHJAHaEQ?w=277&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"
+            src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519805/IMG-20251211-WA0057_dqpfik.jpg"
             alt="Season"
             className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
           />
@@ -630,7 +630,7 @@ const Home = () => {
 
         <div className="relative group">
           <img
-            src="https://th.bing.com/th/id/OIP.HZwQz7shWuiXcyGZGcowmgHaEK?w=254&h=150&c=6&o=7&dpr=1.3&pid=1.7&rm=3"
+            src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251212-WA0006_w3wnfw.jpg"
             alt="Corporate Gifts"
             className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
           />
