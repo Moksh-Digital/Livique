@@ -521,7 +521,7 @@ const Home = () => {
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
             <Link
-              to="/category/gifts"
+              to="/category/gift-items"
               className="text-sm text-[#B94C63] font-semibold underline-offset-2 hover:underline"
             >
               View All
@@ -539,7 +539,7 @@ const Home = () => {
             {featuredGifts.map((item, idx) => (
               <Link
                 key={idx}
-                to={`/category/gifts/${item.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/gift-items/${item.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 <div
                   key={idx}
@@ -661,7 +661,7 @@ const Home = () => {
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
             <Link
-              to="/category/home-decor-gifting"
+              to="/category/home-decor"
               className="text-sm text-[#B94C63] font-semibold underline-offset-2 hover:underline"
             >
               View All
@@ -680,7 +680,7 @@ const Home = () => {
             {homeDecorItems.map((cat, idx) => (
               <Link
                 key={idx}
-                to={`/category/home-decor-gifting/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/home-decor/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 <div
                   key={idx}
@@ -766,7 +766,7 @@ const Home = () => {
             {jewelryItems.map((cat, idx) => (
               <Link
                 key={idx}
-                to={`/category/jewelry-accessories/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/jewelry/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 <div
                   className="bg-[#FFFFFF] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[6px] border-white rounded-none h-[300px] md:h-[440px]"
@@ -908,12 +908,12 @@ const Home = () => {
             <div className="flex items-center justify-center gap-4 mb-2 px-4">
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#D4AF76]"></div>
               <h2 className="text-2xl md:text-3xl font-serif text-[#5D4037] font-semibold">
-                Gifting Stationery & More
+                Hair Accessories
               </h2>
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#D4AF76]"></div>
             </div>
             <Link
-              to="/category/jewelry"
+              to="/category/hair-accessories"
               className="text-sm text-[#ff0066] font-semibold underline-offset-2 hover:underline"
             >
               View All
@@ -932,7 +932,7 @@ const Home = () => {
             {stationaryItems.map((cat, idx) => (
               <Link
                 key={idx}
-                to={`/category/gifts/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/gift-items/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 <div
                   className="bg-[#FFFFFF] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[6px] border-white rounded-none h-[300px] md:h-[440px]"
@@ -1010,7 +1010,7 @@ const Home = () => {
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
             <Link
-              to="/category/beauty-self-care"
+              to="/category/bags-wallets"
               className="text-sm text-[#B94C63] font-semibold underline-offset-2 hover:underline"
             >
               View All
@@ -1029,7 +1029,7 @@ const Home = () => {
             {beautyItems.map((cat, idx) => (
               <Link
                 key={idx}
-                to={`/category/beauty-self-care/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/bags-wallets/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 <div
                   key={idx}
