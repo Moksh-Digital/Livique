@@ -5,11 +5,11 @@ import { Link } from "react-router-dom";
 const BANNER_IMAGES = [
   {
     id: 1,
-    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251211-WA0059_bu8jpb.jpg",
+    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765519951/IMG-20251211-WA0051_ftfyzo.jpg",
     alt: "Flat 25% OFF on Gifts",
     title: "",
     subtitle: "",
-    link: "/offers/diwali-sale",
+    link: "/category/home-decor",
   },
   {
     id: 2,
@@ -17,15 +17,15 @@ const BANNER_IMAGES = [
     alt: "Ajmal Luxury Perfumes",
     title: "",
     subtitle: "",
-    link: "/category/perfumes",
+    link: "/category/gifts",
   },
   {
     id: 3,
-    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765519951/IMG-20251211-WA0051_ftfyzo.jpg",
+    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765521801/Red_Elegant_Christmas_Gift_Banner_gvzi0b.png",
     alt: "Buy 2 Get 1 FREE",
     title: "",
     subtitle: "",
-    link: "/offers/buy-2-get-1-free",
+    link: "/category",
   },
   {
     id: 4,
@@ -33,15 +33,15 @@ const BANNER_IMAGES = [
     alt: "Jewelry Collection",
     title: "",
     subtitle: "",
-    link: "/category/jewelry",
+    link: "/category/perfume",
   },
   {
     id: 5,
-    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765521801/Red_Elegant_Christmas_Gift_Banner_gvzi0b.png",
+    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765522452/WhatsApp_Image_2025-12-12_at_11.12.20_d890c78e_nblboe.jpg",
     alt: "Fresh Flower Arrangements",
     title: "",
     subtitle: "",
-    link: "/category/flowers",
+    link: "/category/gifts",
   },
 ];
 

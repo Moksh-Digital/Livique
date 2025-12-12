@@ -86,7 +86,7 @@ const Home = () => {
     },
     {
       name: "Caps And Hats",
-      image: "https://ae01.alicdn.com/kf/S8730805a64dc4e7fa80ed41d7fcdeeafm.jpg",
+      image: "https://i5.walmartimages.com/asr/b3286d6a-a0c4-49fb-8302-6a2c7e48bee9_1.f039201c0336ccf0464e979c24ac54d8.jpeg?odnWidth=1000&odnHeight=1000&odnBg=ffffff",
     },
     {
       name: "Hand Gloves",
@@ -712,29 +712,21 @@ const Home = () => {
 
         {/* Offer Banner 2 - Full Width */}
         <div className="w-full mb-6">
-          <Card
-            className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
-          >
-            {/* Background Image */}
-            <img
-              src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwlai_rqgu8e.jpg"
-              alt="Buy 2 Get 1 FREE"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-black/30"></div>
-
-            {/* Text Content */}
-            <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
-              <h3 className="text-2xl sm:text-3xl font-bold mb-2">
-                💝 Buy 2 Get 1 FREE!
-              </h3>
-              <p className="text-sm sm:text-base">
-                On selected gift items | Limited time offer
-              </p>
-            </div>
-          </Card>
+    <Link
+    to="/category/flower"
+    className="block"
+  >
+    <Card
+      className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
+    >
+      {/* Background Image */}
+      <img
+        src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0055_u8qdql.jpg"
+        alt="Buy 2 Get 1 FREE"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+    </Card>
+  </Link>
         </div>
 
 
@@ -809,29 +801,35 @@ const Home = () => {
 
         {/* Final Offer Banner - 3 Full Width */}
         <div className="w-full mb-0">
+
+            <Link
+    to="/category/jewelry"
+    className="block"
+  >
           <Card
             className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
           >
             {/* Background Image */}
             <img
-              src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwali2_qdaxy2.jpg"
+              src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251212-WA0005_sfru9e.jpg"
               alt="FREE Shipping"
               className="absolute inset-0 w-full h-full object-cover"
             />
 
             {/* Overlay */}
-            <div className="absolute inset-0 bg-black/30"></div>
+            {/* <div className="absolute inset-0 bg-black/30"></div> */}
 
             {/* Text Content */}
-            <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
+            {/* <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
               <h3 className="text-2xl sm:text-3xl font-bold mb-2">
                 🚚 FREE Shipping Above ₹499!
               </h3>
               <p className="text-sm sm:text-base">
                 Shop now and save on delivery charges
               </p>
-            </div>
+            </div> */}
           </Card>
+          </Link>
         </div>
 
 
@@ -968,29 +966,34 @@ const Home = () => {
 
         {/* Final Offer Banner - 4 Full Width */}
         <div className="w-full mb-0">
+            <Link
+    to="/category/watches"
+    className="block"
+  >
           <Card
             className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
           >
             {/* Background Image */}
             <img
-              src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwali2_qdaxy2.jpg"
+              src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251211-WA0059_bu8jpb.jpg"
               alt="FREE Shipping"
               className="absolute inset-0 w-full h-full object-cover"
             />
 
             {/* Overlay */}
-            <div className="absolute inset-0 bg-black/30"></div>
+            {/* <div className="absolute inset-0 bg-black/30"></div> */}
 
             {/* Text Content */}
-            <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
+            {/* <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
               <h3 className="text-2xl sm:text-3xl font-bold mb-2">
                 🚚 FREE Shipping Above ₹499!
               </h3>
               <p className="text-sm sm:text-base">
                 Shop now and save on delivery charges
               </p>
-            </div>
+            </div> */}
           </Card>
+          </Link>
         </div>
 
 
