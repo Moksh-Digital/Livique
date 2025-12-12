@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Package,
@@ -42,6 +42,7 @@ import { CATEGORIES } from "@/data/categories";
 import { Order, useOrders } from "../contexts/OrdersContext";
 import AdminQueries from "./AdminQueries";
 import axios from "axios";
+import { PushNotificationButton } from "@/components/PushNotificationButton";
 
 const isLocalhost =
   window.location.hostname === "localhost" ||
@@ -88,6 +89,7 @@ const Admin = () => {
   const [users, setUsers] = useState([]);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const { signInAdmin } = useAuth();
+  const notificationToastShown = useRef(false);
 
 
 
@@ -680,64 +682,100 @@ const Admin = () => {
     );
   }
 
+  // Notify admin of current notification permission once per session
+  useEffect(() => {
+    if (!isAdmin || notificationToastShown.current) return;
+    notificationToastShown.current = true;
+
+    if (!("Notification" in window)) return;
+
+    if (Notification.permission === "granted") {
+      toast({
+        title: "🔔 Notifications enabled",
+        description: "You'll get new order and query alerts",
+      });
+    } else if (Notification.permission === "denied") {
+      toast({
+        title: "Notifications blocked",
+        description: "Enable browser notifications to receive admin alerts",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Enable admin alerts",
+        description: "Tap the bell to turn on push notifications",
+      });
+    }
+  }, [isAdmin, toast]);
+
 
   // 3. Render the full Admin Dashboard (only runs if user is authenticated and is admin)
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card">
-        <div className="max-w-[1400px] mx-auto px-4 py-4 flex items-center justify-between">
-          <Link
-            to="/"
-            className="flex items-center gap-2 text-2xl font-bold text-accent"
-          >
-            <Gift className="h-6 w-6" />
-            <span>Livique Admin</span>
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="outline" size="sm">
-                View Store
-              </Button>
+        <div className="max-w-[1400px] mx-auto px-4 py-3 md:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-xl md:text-2xl font-bold text-accent"
+            >
+              <Gift className="h-5 w-5 md:h-6 md:w-6" />
+              <span className="hidden sm:inline">Livique Admin</span>
+              <span className="sm:hidden">Admin</span>
             </Link>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              Logout
-            </Button>
+
+            <div className="flex items-center gap-1 md:gap-4">
+              <PushNotificationButton userId={user?._id || "admin"} isAdmin={isAdmin} />
+              <Link to="/">
+                <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+                  View Store
+                </Button>
+                <Button variant="outline" size="sm" className="sm:hidden px-2">
+                  Store
+                </Button>
+              </Link>
+              <Button variant="ghost" size="sm" onClick={signOut} className="hidden sm:inline-flex">
+                Logout
+              </Button>
+              <Button variant="ghost" size="sm" onClick={signOut} className="sm:hidden px-2">
+                Out
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main */}
-      <div className="max-w-[1400px] mx-auto px-4 py-8 pb-24 md:pb-8">
+      <div className="max-w-[1400px] mx-auto px-2 sm:px-4 py-4 md:py-8 pb-24 md:pb-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Tab List */}
-          <TabsList className="mb-8">
-            <TabsTrigger value="dashboard" className="gap-2">
+          <TabsList className="mb-4 md:mb-8 w-full justify-start overflow-x-auto flex-nowrap">
+            <TabsTrigger value="dashboard" className="gap-1 md:gap-2 flex-shrink-0">
               <BarChart3 className="h-4 w-4" />
-              Dashboard
+              <span className="hidden sm:inline">Dashboard</span>
             </TabsTrigger>
-            <TabsTrigger value="products" className="gap-2">
+            <TabsTrigger value="products" className="gap-1 md:gap-2 flex-shrink-0">
               <Package className="h-4 w-4" />
-              Products
+              <span className="hidden sm:inline">Products</span>
             </TabsTrigger>
-            <TabsTrigger value="orders" className="gap-2">
+            <TabsTrigger value="orders" className="gap-1 md:gap-2 flex-shrink-0">
               <ShoppingBag className="h-4 w-4" />
-              Orders
+              <span className="hidden sm:inline">Orders</span>
             </TabsTrigger>
-            <TabsTrigger value="queries" className="gap-2">
+            <TabsTrigger value="queries" className="gap-1 md:gap-2 flex-shrink-0">
               <MessageSquare className="h-4 w-4" />
-              Queries
+              <span className="hidden sm:inline">Queries</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="gap-2">
+            <TabsTrigger value="users" className="gap-1 md:gap-2 flex-shrink-0">
               <Users className="h-4 w-4" />
-              Users
+              <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Dashboard */}
           <TabsContent value="dashboard">
-            <div className="grid md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-8">
               {[
 
                 { icon: <Package />, label: "Total Products", value: products.length },
@@ -745,56 +783,43 @@ const Admin = () => {
                 { icon: <Users />, label: "Total Users", value: users.length },
                 { icon: <BarChart3 />, label: "Revenue", value: formattedRevenue },
               ].map((item, i) => (
-                <Card key={i} className="p-6 rounded-2xl">
-                  <div className="flex items-center justify-between mb-4 text-primary text-xl">
+                <Card key={i} className="p-4 md:p-6 rounded-xl md:rounded-2xl">
+                  <div className="flex items-center justify-between mb-2 md:mb-4 text-primary text-lg md:text-xl">
                     {item.icon}
                   </div>
-                  <p className="text-sm text-muted-foreground mb-1">{item.label}</p>
-                  <p className="text-3xl font-bold">{item.value}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground mb-1">{item.label}</p>
+                  <p className="text-xl md:text-3xl font-bold">{item.value}</p>
                 </Card>
               ))}
 
             </div>
 
-            <Card className="p-6 rounded-2xl">
-              <h2 className="text-xl font-bold mb-4">Recent Orders</h2>
+            <Card className="p-4 md:p-6 rounded-xl md:rounded-2xl">
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">Recent Orders</h2>
 
-              <div className="space-y-4">
+              <div className="space-y-3 md:space-y-4">
                 {orders.length === 0 ? (
-                  <p className="text-muted-foreground">No recent orders available.</p>
+                  <p className="text-muted-foreground text-sm">No recent orders available.</p>
                 ) : (
                   orders
                     .slice(0, 5) // Show only last 5 orders
                     .map((order) => (
                       <div
                         key={order._id}
-                        className="p-4 border rounded-xl flex flex-col md:flex-row justify-between gap-4 hover:shadow-md transition-shadow"
+                        className="p-3 md:p-4 border rounded-lg md:rounded-xl flex flex-col gap-3 hover:shadow-md transition-shadow"
                       >
-                        {/* Left: Order & Customer Info */}
-                        <div>
-                          <p className="font-semibold">Order #{order._id.slice(-6)}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {order.user?.name || "Customer"} ({order.user?.email || "No Email"})
-                          </p>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {order.address.fullName}, {order.address.street}, {order.address.city}
-                          </p>
-                        </div>
-
-                        {/* Middle: Items */}
-                        <div className="text-sm text-gray-700">
-                          {order.items.map((item) => (
-                            <p key={item.id}>
-                              {item.name} × {item.quantity} = ₹{item.price * item.quantity}
+                        {/* Top: Order & Customer Info */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-sm md:text-base truncate">Order #{order._id.slice(-6)}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground truncate">
+                              {order.user?.name || "Customer"}
                             </p>
-                          ))}
-                        </div>
-
-                        {/* Right: Total & Status */}
-                        <div className="text-right">
-                          <p className="font-semibold text-lg">₹{order.total.toLocaleString()}</p>
+                          </div>
+                          
+                          {/* Status Badge */}
                           <span
-                            className={`text-xs font-medium px-2 py-1 rounded-full ${order.status === "Confirmed"
+                            className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${order.status === "Confirmed"
                               ? "bg-green-100 text-green-800"
                               : order.status === "Pending"
                                 ? "bg-yellow-100 text-yellow-800"
@@ -803,6 +828,26 @@ const Admin = () => {
                           >
                             {order.status}
                           </span>
+                        </div>
+
+                        {/* Middle: Items */}
+                        <div className="text-xs md:text-sm text-gray-700 space-y-1">
+                          {order.items.slice(0, 2).map((item) => (
+                            <p key={item.id} className="truncate">
+                              {item.name} × {item.quantity} = ₹{item.price * item.quantity}
+                            </p>
+                          ))}
+                          {order.items.length > 2 && (
+                            <p className="text-xs text-muted-foreground">+{order.items.length - 2} more items</p>
+                          )}
+                        </div>
+
+                        {/* Bottom: Address & Total */}
+                        <div className="flex items-center justify-between gap-2 pt-2 border-t">
+                          <p className="text-xs text-gray-600 truncate flex-1">
+                            {order.address.city}
+                          </p>
+                          <p className="font-semibold text-base md:text-lg whitespace-nowrap">₹{order.total.toLocaleString()}</p>
                         </div>
                       </div>
                     ))
@@ -815,13 +860,13 @@ const Admin = () => {
 
           {/* Products */}
           <TabsContent value="products">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Products</h2>
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+              <h2 className="text-xl md:text-2xl font-bold">Products</h2>
 
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="gap-2 bg-primary hover:bg-primary/90"
+                    className="gap-1 md:gap-2 bg-primary hover:bg-primary/90 text-sm md:text-base px-3 md:px-4"
                     onClick={() => {
                       setEditingProduct(null);
                       setFormData({
@@ -841,7 +886,9 @@ const Admin = () => {
                       });
                     }}
                   >
-                    <Plus className="h-4 w-4" /> Add Product
+                    <Plus className="h-4 w-4" /> 
+                    <span className="hidden sm:inline">Add Product</span>
+                    <span className="sm:hidden">Add</span>
                   </Button>
                 </DialogTrigger>
 
@@ -1165,14 +1212,14 @@ const Admin = () => {
               </Dialog>
             </div>
 
-            <Card className="p-6 rounded-2xl">
-              <div className="space-y-4">
+            <Card className="p-3 md:p-6 rounded-xl md:rounded-2xl">
+              <div className="space-y-3 md:space-y-4">
                 {products.map((product) => (
                   <div
                     key={product.id}
-                    className="flex items-center gap-4 p-4 border rounded-xl"
+                    className="flex items-center gap-3 md:gap-4 p-3 md:p-4 border rounded-lg md:rounded-xl"
                   >
-                    <div className="w-20 h-20 bg-muted rounded-xl flex items-center justify-center overflow-hidden">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-muted rounded-lg md:rounded-xl flex items-center justify-center overflow-hidden">
                       {(((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith("data:") ||
                         (((product as any).mainImage || (product as any).images?.[0] || product.image) as string).startsWith("http") ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -1188,25 +1235,26 @@ const Admin = () => {
                       )}
                     </div>
 
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm md:text-base truncate">{product.name}</h3>
+                      <p className="text-xs md:text-sm text-muted-foreground truncate">
                         {product.category}
                       </p>
-                      <p className="text-sm font-semibold mt-1">
+                      <p className="text-sm md:text-base font-semibold mt-1">
                         ₹ {product.price.toLocaleString()}
                       </p>
-                      <div className="mt-2">
+                      <div className="mt-1 md:mt-2">
                         <span className={`text-xs font-bold px-2 py-1 rounded ${(product as any).inStock ?? true ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
                           {(product as any).inStock ?? true ? `In Stock (${(product as any).quantity ?? 0})` : "Out of Stock"}
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col md:flex-row gap-1 md:gap-2 flex-shrink-0">
                       <Button
                         variant="outline"
                         size="icon"
+                        className="h-8 w-8 md:h-10 md:w-10"
                         onClick={() => {
                           setEditingProduct(product);
                           setFormData({
@@ -1233,7 +1281,7 @@ const Admin = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        className={isTogglingStock === product.id ? "opacity-50" : (product as any).inStock ?? true ? "text-green-600 border-green-600 hover:bg-green-50" : "text-orange-600 border-orange-600 hover:bg-orange-50"}
+                        className={`h-8 w-8 md:h-10 md:w-10 ${isTogglingStock === product.id ? "opacity-50" : (product as any).inStock ?? true ? "text-green-600 border-green-600 hover:bg-green-50" : "text-orange-600 border-orange-600 hover:bg-orange-50"}`}
                         onClick={() => handleQuickToggleStock(product)}
                         disabled={isTogglingStock === product.id}
                         title={(product as any).inStock ?? true ? "In Stock - Click to mark Out of Stock" : "Out of Stock - Click to mark In Stock"}
@@ -1243,10 +1291,10 @@ const Admin = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="text-destructive"
+                        className="text-destructive h-8 w-8 md:h-10 md:w-10"
                         onClick={() => handleDelete(product.id.toString())} // ✅ convert to string
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
                       </Button>
                     </div>
                   </div>
@@ -1257,25 +1305,25 @@ const Admin = () => {
 
           {/* Orders */}
           <TabsContent value="orders">
-            <h2 className="text-2xl font-bold mb-6">Orders Management</h2>
-            <Card className="p-6 rounded-2xl">
+            <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Orders Management</h2>
+            <Card className="p-3 md:p-6 rounded-xl md:rounded-2xl">
               {orders.length === 0 ? (
-                <p className="text-muted-foreground">No orders found.</p>
+                <p className="text-muted-foreground text-sm">No orders found.</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {orders.map((order) => (
                     <div
                       key={order._id}
-                      className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300"
+                      className="bg-white shadow-lg rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300"
                     >
                       {/* Header */}
-                      <div className="flex justify-between items-center mb-4">
-                        <div>
-                          <h2 className="text-lg font-semibold">{order.user?.name || 'Unknown User'}</h2>
-                          <p className="text-sm text-gray-500">{order.user?.email || 'No Email'}</p>
+                      <div className="flex justify-between items-start gap-2 mb-3 md:mb-4">
+                        <div className="flex-1 min-w-0">
+                          <h2 className="text-base md:text-lg font-semibold truncate">{order.user?.name || 'Unknown User'}</h2>
+                          <p className="text-xs md:text-sm text-gray-500 truncate">{order.user?.email || 'No Email'}</p>
                         </div>
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'Shipped'
+                          className={`px-2 md:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${order.status === 'Shipped'
                               ? 'bg-blue-100 text-blue-800'
                               : order.status === 'Confirmed'
                                 ? 'bg-green-100 text-green-800'
@@ -1289,25 +1337,28 @@ const Admin = () => {
                       </div>
 
                       {/* Items */}
-                      <div className="mb-4">
-                        <h3 className="font-semibold mb-2">Items:</h3>
-                        <ul className="text-sm text-gray-700">
-                          {order.items.map((item) => (
-                            <li key={item.id} className="flex justify-between mb-1">
-                              <span>{item.name} × {item.quantity}</span>
-                              <span>₹{item.price * item.quantity}</span>
+                      <div className="mb-3 md:mb-4">
+                        <h3 className="font-semibold text-sm md:text-base mb-2">Items:</h3>
+                        <ul className="text-xs md:text-sm text-gray-700 space-y-1">
+                          {order.items.slice(0, 3).map((item) => (
+                            <li key={item.id} className="flex justify-between gap-2">
+                              <span className="truncate flex-1">{item.name} × {item.quantity}</span>
+                              <span className="whitespace-nowrap">₹{item.price * item.quantity}</span>
                             </li>
                           ))}
+                          {order.items.length > 3 && (
+                            <li className="text-xs text-muted-foreground">+{order.items.length - 3} more</li>
+                          )}
                         </ul>
                       </div>
 
                       {/* Address */}
-                      <div className="mb-4 text-sm text-gray-700">
+                      <div className="mb-3 md:mb-4 text-xs md:text-sm text-gray-700">
                         <p className="font-semibold mb-1">Shipping Address:</p>
-                        <p>
-                          {order.address.fullName}, {order.address.street}, {order.address.city}, {order.address.state} - {order.address.zipCode}
+                        <p className="break-words">
+                          {order.address.fullName}, {order.address.city}, {order.address.state} - {order.address.zipCode}
                         </p>
-                        <p>Mobile: {order.address.mobile}</p>
+                        <p className="truncate">Mobile: {order.address.mobile}</p>
                       </div>
 
                       {/* Payment */}
@@ -1317,9 +1368,9 @@ const Admin = () => {
                       </div>
 
                       {/* Tracking ID Section */}
-                      <div className="mt-4 border-t pt-4">
-                        <h3 className="font-semibold mb-2 flex items-center gap-2">
-                          📦 Tracking Information
+                      <div className="mt-3 md:mt-4 border-t pt-3 md:pt-4">
+                        <h3 className="font-semibold text-sm md:text-base mb-2 flex items-center gap-2">
+                          <span className="text-sm md:text-base">📦 Tracking</span>
                           {(order as any).trackingId && (
                             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
                               Shipped
@@ -1372,10 +1423,10 @@ const Admin = () => {
 
           {/* Users */}
           <TabsContent value="users">
-            <h2 className="text-2xl font-bold mb-6">Users Management</h2>
-            <Card className="p-6 rounded-2xl">
+            <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Users Management</h2>
+            <Card className="p-3 md:p-6 rounded-xl md:rounded-2xl">
               {users.length === 0 ? (
-                <p className="text-muted-foreground">No users found.</p>
+                <p className="text-muted-foreground text-sm">No users found.</p>
               ) : (
                 users.map((user: any) => {
                   // Count how many orders this user has
@@ -1386,18 +1437,18 @@ const Admin = () => {
                   return (
                     <div
                       key={user._id}
-                      className="flex items-center justify-between p-4 border rounded-xl mb-3"
+                      className="flex items-center justify-between gap-3 p-3 md:p-4 border rounded-lg md:rounded-xl mb-2 md:mb-3"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                          <Users className="h-6 w-6 text-primary" />
+                      <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Users className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                         </div>
-                        <div>
-                          <p className="font-semibold">{user.name || "Customer"}</p>
-                          <p className="text-sm text-muted-foreground">{user.email}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm md:text-base truncate">{user.name || "Customer"}</p>
+                          <p className="text-xs md:text-sm text-muted-foreground truncate">{user.email}</p>
                         </div>
                       </div>
-                      <p className="text-sm font-semibold">
+                      <p className="text-xs md:text-sm font-semibold whitespace-nowrap">
                         Orders: {userOrderCount}
                       </p>
                     </div>

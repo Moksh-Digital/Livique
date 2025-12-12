@@ -1,53 +1,55 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
 const BANNER_IMAGES = [
   {
     id: 1,
-    src: "./image1.png",
+    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765519951/IMG-20251211-WA0051_ftfyzo.jpg",
     alt: "Flat 25% OFF on Gifts",
     title: "",
     subtitle: "",
-    link: "/offers/diwali-sale",
+    link: "/category/home-decor",
   },
   {
     id: 2,
-    src: "./image2.png",
+    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765521675/Red_White_and_Gold_Elegant_Christmas_Banner_Landscape_1_vxi2lx.png",
     alt: "Ajmal Luxury Perfumes",
     title: "",
     subtitle: "",
-    link: "/category/perfumes",
+    link: "/category/gifts",
   },
   {
     id: 3,
-    src: "./image3.png",
+    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765521801/Red_Elegant_Christmas_Gift_Banner_gvzi0b.png",
     alt: "Buy 2 Get 1 FREE",
     title: "",
     subtitle: "",
-    link: "/offers/buy-2-get-1-free",
+    link: "/category",
   },
   {
     id: 4,
-    src: "./image4.png",
+    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765521337/Black_Elegant_Minimalist_Perfume_Presentation_bnbsle.png",
     alt: "Jewelry Collection",
     title: "",
     subtitle: "",
-    link: "/category/jewelry",
+    link: "/category/perfume",
   },
   {
     id: 5,
-    src: "./image5.png",
+    src: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765522452/WhatsApp_Image_2025-12-12_at_11.12.20_d890c78e_nblboe.jpg",
     alt: "Fresh Flower Arrangements",
     title: "",
     subtitle: "",
-    link: "/category/flowers",
+    link: "/category/gifts",
   },
 ];
 
 const BannerSlider: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const totalSlides = BANNER_IMAGES.length;
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
 
   const goToNext = useCallback(() => {
     setActiveIndex((prev) => (prev + 1) % totalSlides);
@@ -57,6 +59,28 @@ const BannerSlider: React.FC = () => {
     setActiveIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
   }, [totalSlides]);
 
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = null;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = useCallback(() => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    const deltaX = touchStartX.current - touchEndX.current;
+    const threshold = 40;
+    if (deltaX > threshold) {
+      goToNext();
+    } else if (deltaX < -threshold) {
+      goToPrev();
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  }, [goToNext, goToPrev]);
+
   // Auto slide every 6 seconds
   useEffect(() => {
     const interval = setInterval(goToNext, 6000);
@@ -64,7 +88,12 @@ const BannerSlider: React.FC = () => {
   }, [goToNext]);
 
   return (
-<div className="relative w-full h-[150px] sm:h-[220px] md:h-[500px] overflow-hidden mt-11 sm:mt-4 md:mt-6 rounded-md">
+<div
+      className="relative w-full h-[150px] sm:h-[220px] md:h-[500px] overflow-hidden mt-11 sm:mt-4 md:mt-6 rounded-md"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Slides with fade animation */}
       {BANNER_IMAGES.map((banner, idx) => (
         <Link key={banner.id} to={banner.link}>
@@ -76,7 +105,7 @@ const BannerSlider: React.FC = () => {
             <img
               src={banner.src}
               alt={banner.alt}
-              className="w-full h-full object-contain md:object-cover bg-black transition-all"
+              className="w-full h-full object-cover bg-black transition-all"
             />
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-3 sm:px-6">

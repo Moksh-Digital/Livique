@@ -248,13 +248,20 @@ const Category = () => {
   return (
     <div className="min-h-screen bg-[#FFF8F0]">
       <Header />
+      <style>{`
+        [data-side="left"] {
+          top: 64px !important;
+          height: calc(100vh - 64px) !important;
+          left: 0 !important;
+        }
+      `}</style>
 
       <main className="max-w-[1400px] mx-auto px-6 py-8 pb-40 md:pb-12">
         <div className="flex gap-8">
           {/* LEFT: Filters (desktop visible) */}
           <aside className="hidden lg:block w-64 shrink-0">
-            <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
-              <div className="p-4">
+            <div className="bg-white border rounded-lg shadow-sm overflow-hidden sticky top-24">
+              <div className="p-4 max-h-[calc(100vh-120px)] overflow-y-auto">
                 <h2 className="font-semibold text-lg mb-2">Filters</h2>
                 <FilterSidebar />
               </div>
@@ -278,16 +285,26 @@ const Category = () => {
                     </button>
                   </SheetTrigger>
 
-                  <SheetContent side="right" className="w-80">
-                    <div className="p-4">
-                      <SheetHeader>
-                        <SheetTitle>Filters</SheetTitle>
-                      </SheetHeader>
-                      <div className="mt-6">
-                        <FilterSidebar />
-                      </div>
-                    </div>
-                  </SheetContent>
+                  <SheetContent
+  side="left"
+  className="w-80 fixed left-0"
+  style={{
+    top: "100px",                        // navbar + promo bar height
+    height: "calc(100vh - 70px)",       // remaining height
+    overflowY: "auto",                  // scrollable content
+    WebkitOverflowScrolling: "touch",   // smooth scroll for mobile
+  }}
+>
+  <SheetHeader>
+    <SheetTitle>Filters</SheetTitle>
+  </SheetHeader>
+
+  {/* Remove overflow-y-auto from inside */}
+  <div className="mt-6 px-4 pb-6">
+    <FilterSidebar />
+  </div>
+</SheetContent>
+
                 </Sheet>
               </div>
             </div>
@@ -298,7 +315,7 @@ const Category = () => {
 
 {displayProducts.map((product) => {
   const isOOS = product.inStock === false;
-  const isAdded = cart?.some((item) => item._id === product._id);
+const isAdded = cart?.some((item) => item.id === product._id || (item as any)._id === product._id);
 
   return (
     <div
@@ -382,11 +399,12 @@ const Category = () => {
                 e.stopPropagation();
                 e.preventDefault();
                 addToCart({
-                  _id: product._id,
+                  id: product._id,
                   name: product.name,
                   price: product.price,
-                  quantity: 1,
                   image: product.mainImage || product.images?.[0] || "/placeholder.svg",
+                  delivery: product.delivery || "Standard",
+                  deliveryCharge: 0,
                 });
               }}
               className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#e9e2de] rounded-md shadow-sm text-sm hover:shadow-md"

@@ -5,6 +5,7 @@ import User from "../models/userModel.js";
 import Product from "../models/productModel.js";
 import sendEmail from "../utils/sendEmail.js";
 import { generateOrderConfirmationEmail, generateOwnerNotificationEmail } from "../utils/orderEmailTemplate.js";
+import { sendToAdmins } from "./pushNotificationController.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -67,6 +68,27 @@ const addOrderItems = asyncHandler(async (req, res) => {
   }
 
   res.status(201).json(createdOrder);
+
+  // Push notification to admins (non-blocking)
+  try {
+    await sendToAdmins({
+      title: "🛒 New Order",
+      body: `Order #${createdOrder._id.toString().slice(-6)} • ₹${createdOrder.total?.toFixed(0) || "0"}`,
+      icon: "/logo.png",
+      url: "/admin",
+    });
+  } catch (err) {
+    console.error("Push notification failed (order)", err?.message || err);
+  }
+
+  // Send push notification to admin (non-blocking)
+  sendToAdmins({
+    title: '🛒 New Order Received!',
+    body: `Order #${createdOrder._id.toString().substring(0, 8)} - ₹${createdOrder.total} from ${user.name || 'Customer'}`,
+    icon: '/logo.png',
+    url: '/admin',
+    tag: 'new-order',
+  }).catch(err => console.error('Failed to send push notification:', err));
 
   // Send order confirmation emails (non-blocking - after response)
   if (user) {

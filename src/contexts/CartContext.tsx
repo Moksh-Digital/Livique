@@ -27,23 +27,23 @@ const getInitialCart = (): CartItem[] => {
     try {
         const storedCart = localStorage.getItem('ecomCart');
         if (storedCart) {
-            return JSON.parse(storedCart) as CartItem[];
+            const parsed = JSON.parse(storedCart) as CartItem[];
+            // sanitize legacy items missing id by upgrading _id → id or dropping
+            const cleaned = (parsed || [])
+              .map((item) => {
+                if (!item) return null;
+                const id = (item as any).id || (item as any)._id;
+                if (!id) return null;
+                return { ...item, id } as CartItem;
+              })
+              .filter(Boolean) as CartItem[];
+
+            if (cleaned.length > 0) return cleaned;
         }
     } catch (error) {
         console.error("Error loading cart from storage:", error);
     }
-    // Return a default mock item for easy testing if storage is empty
-    return [
-        {
-            id: "mock-prod-1",
-            name: "Default Test Item",
-            price: 1500,
-            image: "📦",
-            delivery: "2 days",
-            quantity: 1,
-            deliveryCharge: 59,
-        }
-    ];
+    return [];
 };
 
 
@@ -61,21 +61,28 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [cart]);
 
 
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
-      
-      if (existingItem) {
-        return prevCart.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      }
-      
-      return [...prevCart, { ...item, quantity: 1 }];
-    });
-  };
+    const addToCart = (item: Omit<CartItem, 'quantity'>) => {
+        // Normalize id to avoid collapsing different products into the same entry
+        const normalizedId = (item as any).id || (item as any)._id;
+        if (!normalizedId) {
+            console.warn('addToCart called without an id/_id');
+            return;
+        }
+
+        setCart((prevCart) => {
+            const existingItem = prevCart.find((cartItem) => cartItem.id === normalizedId);
+      
+            if (existingItem) {
+                return prevCart.map((cartItem) =>
+                    cartItem.id === normalizedId
+                        ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                        : cartItem
+                );
+            }
+      
+            return [...prevCart, { ...item, id: normalizedId, quantity: 1 }];
+        });
+    };
 
   const removeFromCart = (id: string) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id));

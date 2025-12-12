@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useSearchParams, Link, useNavigate } from "react-router-dom"
 import axios from "axios"
-import { Star, Truck, Heart, Search, AlertCircle, ShoppingCart, Zap } from "lucide-react"
+import { Star, Truck, Heart, Search, AlertCircle, ShoppingCart, Zap, Plus, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
@@ -44,7 +44,12 @@ const SearchResultsPage = () => {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set())
   const [searchInput, setSearchInput] = useState(keyword)
   const [sortBy, setSortBy] = useState("relevance")
-  const { addToCart } = useCart()
+  const cartCtx: any = useCart() || {}
+  const cart = Array.isArray(cartCtx.cart) ? cartCtx.cart : cartCtx.items || []
+  const addToCart = cartCtx.addToCart || cartCtx.addItem || cartCtx.add
+  const updateQuantity = cartCtx.updateQuantity || cartCtx.setQuantity
+  const removeFromCart = cartCtx.removeFromCart || cartCtx.removeItem || cartCtx.remove
+  const getTotalItems = cartCtx.getTotalItems || cartCtx.totalItems || (() => (cart || []).reduce((s: any, it: any) => s + (it.quantity || 0), 0))
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -120,6 +125,65 @@ const SearchResultsPage = () => {
 
   const discountPercentage = (original: number, current: number) => {
     return Math.round(((original - current) / original) * 100)
+  }
+
+  // helper to get quantity in cart
+  const getQuantity = (productId: string) => {
+    const item = (cart || []).find((i: any) => i && (i.id === productId || i._id === productId))
+    return item ? (item.quantity ?? 0) : 0
+  }
+
+  // Handle add to cart
+  const handleAdd = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (typeof addToCart === "function") {
+      addToCart({
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.mainImage || product.images?.[0] || "/placeholder.svg",
+        delivery: product.delivery || "Standard",
+        deliveryCharge: 0,
+      })
+    }
+  }
+
+  // Handle increment
+  const handleIncrement = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation()
+    e.preventDefault()
+    const current = getQuantity(product._id)
+    if (typeof updateQuantity === "function") {
+      updateQuantity(product._id, current + 1)
+    } else if (typeof addToCart === "function") {
+      addToCart({
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.mainImage || product.images?.[0] || "/placeholder.svg",
+        delivery: product.delivery || "Standard",
+        deliveryCharge: 0,
+      })
+    }
+  }
+
+  // Handle decrement
+  const handleDecrement = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation()
+    e.preventDefault()
+    const current = getQuantity(product._id)
+    if (current <= 1) {
+      if (typeof removeFromCart === "function") {
+        removeFromCart(product._id)
+      } else if (typeof updateQuantity === "function") {
+        updateQuantity(product._id, 0)
+      }
+    } else {
+      if (typeof updateQuantity === "function") {
+        updateQuantity(product._id, current - 1)
+      }
+    }
   }
 
   return (
@@ -209,60 +273,83 @@ const SearchResultsPage = () => {
                 </div>
               </div>
             ) : filteredResults.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                {filteredResults.map((product) => (
-                  <Link
-                    key={product._id}
-                    to={`/product/${product._id}`}
-                    className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col overflow-hidden border border-gray-200"
-                  >
-                    {/* Image Container */}
-                    <div className="relative bg-gray-50 overflow-hidden aspect-square flex items-center justify-center">
-                      <img
-                        src={product.mainImage || "/placeholder.svg"}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = "/placeholder.svg"
-                        }}
-                      />
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="p-4 flex flex-col">
-                      {/* Product Name */}
-                      <h3 className="font-medium text-sm text-gray-800 mb-2 line-clamp-2">
-                        {product.name}
-                      </h3>
-
-                      {/* Rating */}
-                      <div className="flex items-center gap-1.5 mb-2">
-                        <span className="text-sm font-semibold text-gray-800">{product.rating}</span>
-                        <Star size={14} className="fill-green-600 text-green-600" />
-                        <span className="text-xs text-gray-500">({product.reviews})</span>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredResults.map((product) => {
+                  const isAdded = cart?.some((item) => item.id === product._id || (item as any)._id === product._id)
+                  
+                  return (
+                    <div
+                      key={product._id}
+                      onClick={() => navigate(`/product/${product._id}`)}
+                      className="relative bg-white rounded-lg border border-[#f0e6e2] shadow-sm overflow-hidden"
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => { if (e.key === "Enter") navigate(`/product/${product._id}`); }}
+                    >
+                      {/* IMAGE AREA */}
+                      <div className="relative bg-white p-3 flex items-center justify-center aspect-square">
+                        <img
+                          src={product.mainImage || product.images?.[0] || "/placeholder.svg"}
+                          alt={product.name}
+                          className="w-full h-full object-cover rounded-md"
+                          onError={(e) => e.currentTarget.src = "/placeholder.svg"}
+                        />
                       </div>
 
-                      {/* Price Section */}
-                      <div className="mb-2">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-lg font-bold text-gray-900">
-                            ₹{product.price}
+                      {/* CONTENT */}
+                      <div className="px-3 py-2">
+                        <h3 className="text-sm font-medium text-[#2b2b2b] line-clamp-2 mb-1">
+                          {product.name}
+                        </h3>
+
+                        <div className="flex items-center gap-2 text-xs mb-2">
+                          <span className="text-sm font-semibold text-[#2b2b2b]">
+                            {(product.rating ?? 0).toFixed(1)}
                           </span>
-                          {product.originalPrice > product.price && (
-                            <span className="text-sm text-gray-500 line-through">
-                              ₹{product.originalPrice}
-                            </span>
+                          <Star size={14} className="fill-green-600 text-green-600" />
+                          <span className="text-xs text-[#6b6b6b]">({product.reviews ?? 0})</span>
+                        </div>
+
+                        <div className="flex items-end justify-between">
+                          <div>
+                            <div className="text-base font-bold text-[#172021]">
+                              ₹{product.price?.toLocaleString()}
+                            </div>
+
+                            {product.originalPrice && product.originalPrice > product.price && (
+                              <div className="text-xs text-[#8B7355] line-through">
+                                ₹{product.originalPrice?.toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* BUTTON - Add / Added */}
+                          {isAdded ? (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); }}
+                              className="flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white border border-green-600 rounded-md text-sm"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              <span>Added</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                e.preventDefault()
+                                handleAdd(e, product)
+                              }}
+                              className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#e9e2de] rounded-md shadow-sm text-sm hover:shadow-md"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              <span>Add</span>
+                            </button>
                           )}
                         </div>
                       </div>
-
-                      {/* Delivery Info
-                      <div className="text-xs text-gray-600">
-                        Delivery: <span className="font-medium">{product.delivery}</span>
-                      </div> */}
                     </div>
-                  </Link>
-                ))}
+                  )
+                })}
               </div>
             ) : (
               <div className="text-center py-16 bg-white rounded-lg border border-[#E8D5C4] shadow-sm">

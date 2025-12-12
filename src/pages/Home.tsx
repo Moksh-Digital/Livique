@@ -77,20 +77,20 @@ const Home = () => {
 
   const beautyItems = [
     {
-      name: "Oversized Sunglasses",
-      image: "https://m.media-amazon.com/images/I/81U6qxkqKqL._AC_UY1100_.jpg",
+      name: "Brooches",
+      image: "https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/66474e1e12f40e3c7f9522ab589263f1.jpg?imageView2/2/w/800/q/70/format/webp",
     },
     {
-      name: "Cat-eye Sunglasses",
-      image: "https://m.media-amazon.com/images/I/41cCIOblYjL._AC_UY1100_.jpg",
+      name: "Key Chain , Bag Charms",
+      image: "https://m.media-amazon.com/images/I/610zXODDvML._AC_UY1000_.jpg",
     },
     {
-      name: "Fashion Specs",
-      image: "https://img.joomcdn.net/d684d2b6201227f5109327528c86cf7e931c9507_1024_1024.jpeg",
+      name: "Caps And Hats",
+      image: "https://i5.walmartimages.com/asr/b3286d6a-a0c4-49fb-8302-6a2c7e48bee9_1.f039201c0336ccf0464e979c24ac54d8.jpeg?odnWidth=1000&odnHeight=1000&odnBg=ffffff",
     },
     {
-      name: "Round Frames",
-      image: "https://assets.myntassets.com/w_412,q_30,dpr_3,fl_progressive,f_webp/assets/images/30014421/2024/6/21/1641cc3e-75af-4290-9591-7bd36384ebf21718993451688SUNNIESUnisexRoundSunglasseswithUVProtectedLens6.jpg",
+      name: "Hand Gloves",
+      image: "https://m.media-amazon.com/images/I/61yGM1RTA9L._AC_UY1100_.jpg",
     },
   ]
 
@@ -580,7 +580,7 @@ const Home = () => {
     {/* Left Big Image */}
     <div className="md:col-span-3 relative group">
       <img
-        src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwlai_rqgu8e.jpg"
+        src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0064_taynue.jpg"
         alt="Calendar"
         className="w-full h-[220px] md:h-[500px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
       />
@@ -598,7 +598,7 @@ const Home = () => {
       {/* Top right image */}
       <div className="relative group">
         <img
-          src="https://th.bing.com/th/id/OIP.d_QJ40b5g_sdKVShAFnR5wHaFP?w=259&h=150&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"
+          src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0062_c1egut.jpg"
           alt="New Year"
           className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
         />
@@ -615,7 +615,7 @@ const Home = () => {
 
         <div className="relative group">
           <img
-            src="https://th.bing.com/th/id/OIP.rXu2-mtvxmbMP_VoAPKHJAHaEQ?w=277&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"
+            src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519805/IMG-20251211-WA0057_dqpfik.jpg"
             alt="Season"
             className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
           />
@@ -630,7 +630,7 @@ const Home = () => {
 
         <div className="relative group">
           <img
-            src="https://th.bing.com/th/id/OIP.HZwQz7shWuiXcyGZGcowmgHaEK?w=254&h=150&c=6&o=7&dpr=1.3&pid=1.7&rm=3"
+            src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251212-WA0006_w3wnfw.jpg"
             alt="Corporate Gifts"
             className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
           />
@@ -712,29 +712,21 @@ const Home = () => {
 
         {/* Offer Banner 2 - Full Width */}
         <div className="w-full mb-6">
-          <Card
-            className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
-          >
-            {/* Background Image */}
-            <img
-              src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwlai_rqgu8e.jpg"
-              alt="Buy 2 Get 1 FREE"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-black/30"></div>
-
-            {/* Text Content */}
-            <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
-              <h3 className="text-2xl sm:text-3xl font-bold mb-2">
-                💝 Buy 2 Get 1 FREE!
-              </h3>
-              <p className="text-sm sm:text-base">
-                On selected gift items | Limited time offer
-              </p>
-            </div>
-          </Card>
+    <Link
+    to="/category/flower"
+    className="block"
+  >
+    <Card
+      className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
+    >
+      {/* Background Image */}
+      <img
+        src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0055_u8qdql.jpg"
+        alt="Buy 2 Get 1 FREE"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+    </Card>
+  </Link>
         </div>
 
 
@@ -809,29 +801,35 @@ const Home = () => {
 
         {/* Final Offer Banner - 3 Full Width */}
         <div className="w-full mb-0">
+
+            <Link
+    to="/category/jewelry"
+    className="block"
+  >
           <Card
             className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
           >
             {/* Background Image */}
             <img
-              src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwali2_qdaxy2.jpg"
+              src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251212-WA0005_sfru9e.jpg"
               alt="FREE Shipping"
               className="absolute inset-0 w-full h-full object-cover"
             />
 
             {/* Overlay */}
-            <div className="absolute inset-0 bg-black/30"></div>
+            {/* <div className="absolute inset-0 bg-black/30"></div> */}
 
             {/* Text Content */}
-            <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
+            {/* <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
               <h3 className="text-2xl sm:text-3xl font-bold mb-2">
                 🚚 FREE Shipping Above ₹499!
               </h3>
               <p className="text-sm sm:text-base">
                 Shop now and save on delivery charges
               </p>
-            </div>
+            </div> */}
           </Card>
+          </Link>
         </div>
 
 
@@ -968,29 +966,34 @@ const Home = () => {
 
         {/* Final Offer Banner - 4 Full Width */}
         <div className="w-full mb-0">
+            <Link
+    to="/category/watches"
+    className="block"
+  >
           <Card
             className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
           >
             {/* Background Image */}
             <img
-              src="https://res.cloudinary.com/dtbelwhff/image/upload/v1760863231/diwali2_qdaxy2.jpg"
+              src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251211-WA0059_bu8jpb.jpg"
               alt="FREE Shipping"
               className="absolute inset-0 w-full h-full object-cover"
             />
 
             {/* Overlay */}
-            <div className="absolute inset-0 bg-black/30"></div>
+            {/* <div className="absolute inset-0 bg-black/30"></div> */}
 
             {/* Text Content */}
-            <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
+            {/* <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
               <h3 className="text-2xl sm:text-3xl font-bold mb-2">
                 🚚 FREE Shipping Above ₹499!
               </h3>
               <p className="text-sm sm:text-base">
                 Shop now and save on delivery charges
               </p>
-            </div>
+            </div> */}
           </Card>
+          </Link>
         </div>
 
 
@@ -1002,7 +1005,7 @@ const Home = () => {
             <div className="flex items-center justify-center gap-4 mb-2 px-4">
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
               <h2 className="text-2xl md:text-3xl font-serif text-[#3E2723] font-semibold">
-                Sunglasses and Eyewear
+                Fashion Accessories
               </h2>
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
