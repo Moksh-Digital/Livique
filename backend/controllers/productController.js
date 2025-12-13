@@ -190,8 +190,8 @@ export const getProducts = async (req, res) => {
             const flexibleSub = subcategory.replace(/-/g, "\\s*");
             const subFilter = {
                 $or: [
-                    { subcategorySlug: { $regex: new RegExp(flexibleSub, "i") } },
-                    { subcategory: { $regex: new RegExp(flexibleSub, "i") } },
+                    { subcategorySlug: { $regex: new RegExp(`^${flexibleSub}$`, "i") } },
+                    { subcategory: { $regex: new RegExp(`^${flexibleSub}$`, "i") } },
                 ],
             };
 
