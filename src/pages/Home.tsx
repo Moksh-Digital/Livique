@@ -615,7 +615,7 @@ const Home = () => {
 
         <div className="relative group">
           <img
-            src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519805/IMG-20251211-WA0057_dqpfik.jpg"
+            src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765603483/WhatsApp_Image_2025-12-13_at_10.02.54_87367fb0_jjbvwx.jpg"
             alt="Season"
             className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
           />
@@ -975,7 +975,7 @@ const Home = () => {
           >
             {/* Background Image */}
             <img
-              src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251211-WA0059_bu8jpb.jpg"
+              src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765603485/WhatsApp_Image_2025-12-13_at_10.12.09_29934d58_btrost.jpg"
               alt="FREE Shipping"
               className="absolute inset-0 w-full h-full object-cover"
             />
