@@ -310,8 +310,8 @@ const ProductDetail = () => {
                 `Experience premium quality with our ${product.name}. Excellent build and high performance for daily use.`}
             </p>
 
-            {/* ---------------- DELIVERY OPTIONS ---------------- */}
-            {/* ---------------- DELIVERY OPTION ---------------- */}
+            {/* ---------------- Action buttons ---------------- */}
+            
             <div className="mb-6">
               <h3 className="font-semibold mb-3">Delivery</h3>
               <Card className="p-4 rounded-xl shadow-md">
@@ -324,6 +324,34 @@ const ProductDetail = () => {
                   </p>
                 </div>
               </Card>
+            </div>
+
+              <div className="grid grid-cols-2 gap-3">
+              {product.inStock === false ? (
+                <div className="col-span-2">
+                  <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 text-center">
+                    <p className="text-red-600 font-bold text-lg">Out of Stock</p>
+                    <p className="text-red-500 text-sm mt-1">This product is currently unavailable</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    className="h-12 rounded-xl border-primary text-primary hover:bg-primary/10"
+                    onClick={handleAddToCart}
+                  >
+                    🛒 Add To Cart
+                  </Button>
+
+                  <Button
+                    className="h-12 rounded-xl bg-gradient-to-br from-[#A7443F] via-[#7C2A25] to-[#3A1916] hover:bg-primary/90"
+                    onClick={handleBuyNow}
+                  >
+                    🛍️ Buy Now
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* ---------------- DELIVERY INFORMATION ---------------- */}
@@ -381,34 +409,7 @@ const ProductDetail = () => {
               </ul>
             </div>
 
-            {/* ---------------- ACTION BUTTONS ---------------- */}
-            <div className="grid grid-cols-2 gap-3">
-              {product.inStock === false ? (
-                <div className="col-span-2">
-                  <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 text-center">
-                    <p className="text-red-600 font-bold text-lg">Out of Stock</p>
-                    <p className="text-red-500 text-sm mt-1">This product is currently unavailable</p>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <Button
-                    variant="outline"
-                    className="h-12 rounded-xl border-primary text-primary hover:bg-primary/10"
-                    onClick={handleAddToCart}
-                  >
-                    🛒 Add To Cart
-                  </Button>
 
-                  <Button
-                    className="h-12 rounded-xl bg-gradient-to-br from-[#A7443F] via-[#7C2A25] to-[#3A1916] hover:bg-primary/90"
-                    onClick={handleBuyNow}
-                  >
-                    🛍️ Buy Now
-                  </Button>
-                </>
-              )}
-            </div>
           </div>
         </div>
 
