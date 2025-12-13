@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Trash2, Plus, Minus } from "lucide-react";
+import { Trash2, Plus, Minus, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -196,13 +196,31 @@ const Cart = () => {
 
       {/* Login Modal */}
       <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Login Required</DialogTitle>
-            <DialogDescription className="text-base mt-2">
-              Please login to your account to proceed with checkout.
+        <DialogContent className="sm:max-w-md border-0 rounded-3xl shadow-2xl">
+          <div className="flex flex-col items-center text-center px-2 py-4">
+            {/* Icon */}
+            <div className="mb-6 w-16 h-16 bg-gradient-to-br from-[#A7443F] via-[#7C2A25] to-[#3A1916] rounded-full flex items-center justify-center">
+              <Lock className="w-8 h-8 text-white" />
+            </div>
+
+            {/* Title */}
+            <DialogTitle className="text-3xl font-bold text-[#1a1a1a] mb-3">
+              Login Required
+            </DialogTitle>
+
+            {/* Description */}
+            <DialogDescription className="text-base text-[#666] leading-relaxed">
+              Please login to your account to proceed with checkout and complete your order.
             </DialogDescription>
-          </DialogHeader>
+
+            {/* Decorative line */}
+            <div className="w-12 h-1 bg-gradient-to-r from-[#A7443F] to-[#3A1916] rounded-full mt-6 mb-6"></div>
+
+            {/* Message */}
+            <p className="text-sm text-[#888] mb-2">
+              🎁 Sign in to access your cart and exclusive offers
+            </p>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
