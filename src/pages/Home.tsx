@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { CATEGORIES } from "@/data/categories"
-import { useState, useRef, useEffect,} from "react"
+import { useState, useRef, useEffect, } from "react"
 import BannerSlider from "./BannerSlider"
 const Home = () => {
   const navigate = useNavigate()
@@ -272,132 +272,62 @@ const Home = () => {
           {/* Super tight horizontal grid */}
 
           {/* Mobile View */}
-          <div className="md:hidden space-y-4">
-
-            {/* First Row */}
-            <div className="flex gap-2 overflow-x-auto no-scrollbar px-1">
-              {CATEGORIES.slice(0, 6).map((cat) => (
-                <div key={cat.id} className="flex-shrink-0 text-center">
-                  <Link to={`/category/${cat.slug}`}>
-                    <div
-                      className="relative rounded-lg overflow-hidden page-card mb-1
-                      w-[80px] h-[80px]"
-                      style={{
-                        border: "1.5px solid #D0D0D0",
-                        transition: "all 0.3s ease",
-                      }}
-                    >
-                      <img
-                        src={cat.image || "/placeholder.svg"}
-                        alt={cat.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  <div className="text-[14px] font-semibold text-center leading-tight text-[#5D4037]">
-            {(() => {
-              const words = cat.name.split(" ");
-              const lines = [];
-              let temp = "";
-
-              words.forEach((word) => {
-                if (word.length <= 3) {
-                  // chote words previous ke saath join karo
-                  temp += (temp ? " " : "") + word;
-                } else {
-                  if (temp) lines.push(temp); // previous temp push karo
-                  temp = word; // current word store karo
-                }
-              });
-
-              if (temp) lines.push(temp); // last temp push karo
-
-              return lines.map((line, i) => <div key={i}>{line}</div>);
-            })()}
+          <div className="md:hidden grid grid-cols-4 gap-2 px-1">
+            {CATEGORIES.map((cat) => (
+              <div key={cat.id} className="text-center">
+                <Link to={`/category/${cat.slug}`}>
+                  <div
+                    className="relative rounded-lg overflow-hidden page-card mb-1
+                    w-full aspect-square"
+                    style={{
+                      border: "1.5px solid #D0D0D0",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    <img
+                      src={cat.image || "/placeholder.svg"}
+                      alt={cat.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="text-[11px] font-semibold text-center leading-tight text-[#5D4037]">
+                    {cat.name}
+                  </div>
+                </Link>
+              </div>
+            ))}
           </div>
 
-                  </Link>
-                </div>
-              ))}
-            </div>
-
-            {/* Second Row */}
-            <div className="flex gap-2 overflow-x-auto no-scrollbar px-1">
-              {CATEGORIES.slice(6, 12).map((cat) => (
-                <div key={cat.id} className="flex-shrink-0 text-center">
-                  <Link to={`/category/${cat.slug}`}>
-                    <div
-                      className="relative rounded-lg overflow-hidden page-card mb-1
-                      w-[80px] h-[80px]"
-                      style={{
-                        border: "1.5px solid #D0D0D0",
-                        transition: "all 0.3s ease",
-                      }}
-                    >
-                      <img
-                        src={cat.image || "/placeholder.svg"}
-                        alt={cat.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  <div className="text-[14px] font-semibold text-center leading-tight text-[#5D4037]">
-
-                    {(() => {
-                      const words = cat.name.split(" ");
-                      const lines = [];
-                      let temp = "";
-
-                      words.forEach((word) => {
-                        if (word.length <= 3) {
-                          // chote words previous ke saath join karo
-                          temp += (temp ? " " : "") + word;
-                        } else {
-                          if (temp) lines.push(temp); // previous temp push karo
-                          temp = word; // current word store karo
-                        }
-                      });
-
-                      if (temp) lines.push(temp); // last temp push karo
-
-                      return lines.map((line, i) => <div key={i}>{line}</div>);
-                    })()}
+          {/* Desktop View */}
+          <div className="hidden md:grid grid-cols-[repeat(auto-fit,110px)] gap-y-6 gap-x-10 justify-center">
+            {CATEGORIES.map((cat) => (
+              <div
+                key={cat.id}
+                className="text-center transition-transform duration-300 ease-out hover:-translate-y-2"
+              >
+                <Link to={`/category/${cat.slug}`}>
+                  <div
+                    className="relative rounded-lg overflow-hidden page-card mb-2
+                w-[100px] h-[100px] hover:shadow-lg"
+                    style={{
+                      border: "1.5px solid #D0D0D0",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    <img
+                      src={cat.image || "/placeholder.svg"}
+                      alt={cat.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
 
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-            {/* Desktop View */}
-           <div className="hidden md:grid grid-cols-[repeat(auto-fit,minmax(110px,1fr))] gap-y-6 gap-x-1 justify-items-center">
-        {CATEGORIES.map((cat) => (
-          <div
-            key={cat.id}
-            className="text-center transition-transform duration-300 ease-out hover:-translate-y-2"
-          >
-            <Link to={`/category/${cat.slug}`}>
-              <div
-                className="relative rounded-lg overflow-hidden page-card mb-2
-                w-[100px] h-[100px] hover:shadow-lg"
-                style={{
-                  border: "1.5px solid #D0D0D0",
-                  transition: "all 0.3s ease",
-                }}
-              >
-                <img
-                  src={cat.image || "/placeholder.svg"}
-                  alt={cat.name}
-                  className="w-full h-full object-cover"
-                />
+                  <div className="text-[12px] font-semibold text-center leading-tight text-[#5D4037]">
+                    {cat.name}
+                  </div>
+                </Link>
               </div>
-
-              <div className="text-[12px] font-semibold text-center leading-tight text-[#5D4037]">
-                {cat.name}
-              </div>
-            </Link>
+            ))}
           </div>
-        ))}
-      </div> 
         </section>
 
 
@@ -470,80 +400,80 @@ const Home = () => {
           </div>
         </section>
 
-  {/* Banner grid*/} {/*bg-[#EDE5DF] */}
- <div className="w-full bg-white px-4 py-6">
-  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        {/* Banner grid*/} {/*bg-[#EDE5DF] */}
+        <div className="w-full bg-white px-4 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
 
-    {/* Left Big Image */}
-    <div className="md:col-span-3 relative group">
-      <img
-        src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0064_taynue.jpg"
-        alt="Calendar"
-        className="w-full h-[220px] md:h-[500px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
-      />
-      {/* <h2 className="absolute top-4 left-6 text-lg md:text-2xl font-semibold text-[#B67A43]">
+            {/* Left Big Image */}
+            <div className="md:col-span-3 relative group">
+              <img
+                src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0064_taynue.jpg"
+                alt="Calendar"
+                className="w-full h-[220px] md:h-[500px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+              {/* <h2 className="absolute top-4 left-6 text-lg md:text-2xl font-semibold text-[#B67A43]">
         Calendar
       </h2> */}
-      <button onClick={() => navigate('/category')} className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
-        Explore Now
-      </button>
-    </div>
+              <button onClick={() => navigate('/category')} className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
+                Explore Now
+              </button>
+            </div>
 
-    {/* Right Side */}
-    <div className="md:col-span-2 flex flex-col gap-4">
+            {/* Right Side */}
+            <div className="md:col-span-2 flex flex-col gap-4">
 
-      {/* Top right image */}
-      <div className="relative group">
-        <img
-          src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0062_c1egut.jpg"
-          alt="New Year"
-          className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
-        />
-        {/* <h2 className="absolute top-3 left-6 text-md md:text-xl font-semibold text-[#B67A43]">
+              {/* Top right image */}
+              <div className="relative group">
+                <img
+                  src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0062_c1egut.jpg"
+                  alt="New Year"
+                  className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
+                />
+                {/* <h2 className="absolute top-3 left-6 text-md md:text-xl font-semibold text-[#B67A43]">
           New Year & Christmas
         </h2> */}
-        <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
-          Explore Now
-        </button>
-      </div>
+                <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
+                  Explore Now
+                </button>
+              </div>
 
-      {/* Bottom side — 2 images side-by-side on desktop, full width on mobile */}
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+              {/* Bottom side — 2 images side-by-side on desktop, full width on mobile */}
+              <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
 
-        <div className="relative group">
-          <img
-            src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765603483/WhatsApp_Image_2025-12-13_at_10.02.54_87367fb0_jjbvwx.jpg"
-            alt="Season"
-            className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
-          />
-          {/* <h2 className="absolute top-3 left-4 text-md md:text-lg font-semibold text-[#B67A43]">
+                <div className="relative group">
+                  <img
+                    src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765603483/WhatsApp_Image_2025-12-13_at_10.02.54_87367fb0_jjbvwx.jpg"
+                    alt="Season"
+                    className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                  {/* <h2 className="absolute top-3 left-4 text-md md:text-lg font-semibold text-[#B67A43]">
             Seasons Greetings Card
           </h2> */}
-         <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
-          Explore Now
-        </button>
+                  <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
+                    Explore Now
+                  </button>
 
-        </div>
+                </div>
 
-        <div className="relative group">
-          <img
-            src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251212-WA0006_w3wnfw.jpg"
-            alt="Corporate Gifts"
-            className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
-          />
-          {/* <h2 className="absolute top-3 left-4 text-md md:text-lg font-semibold text-[#B67A43]">
+                <div className="relative group">
+                  <img
+                    src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251212-WA0006_w3wnfw.jpg"
+                    alt="Corporate Gifts"
+                    className="w-full h-[180px] md:h-[240px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                  {/* <h2 className="absolute top-3 left-4 text-md md:text-lg font-semibold text-[#B67A43]">
             Corporate Gifts
           </h2> */}
-         <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
-          Explore Now
-        </button>
+                  <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
+                    Explore Now
+                  </button>
 
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
-
-      </div>
-    </div>
-  </div>
-</div>
 
 
         {/* Home Decor Section */}
@@ -609,21 +539,21 @@ const Home = () => {
 
         {/* Offer Banner 2 - Full Width */}
         <div className="w-full mb-6">
-    <Link
-    to="/category/flowers"
-    className="block"
-  >
-    <Card
-      className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
-    >
-      {/* Background Image */}
-      <img
-        src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0055_u8qdql.jpg"
-        alt="Buy 2 Get 1 FREE"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-    </Card>
-  </Link>
+          <Link
+            to="/category/flowers"
+            className="block"
+          >
+            <Card
+              className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
+            >
+              {/* Background Image */}
+              <img
+                src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519953/IMG-20251211-WA0055_u8qdql.jpg"
+                alt="Buy 2 Get 1 FREE"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </Card>
+          </Link>
         </div>
 
 
@@ -699,25 +629,25 @@ const Home = () => {
         {/* Final Offer Banner - 3 Full Width */}
         <div className="w-full mb-0">
 
-            <Link
-    to="/category/stanley-sippers"
-    className="block"
-  >
-          <Card
-            className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
+          <Link
+            to="/category/stanley-sippers"
+            className="block"
           >
-            {/* Background Image */}
-            <img
-              src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251212-WA0005_sfru9e.jpg"
-              alt="FREE Shipping"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
+            <Card
+              className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
+            >
+              {/* Background Image */}
+              <img
+                src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765519954/IMG-20251212-WA0005_sfru9e.jpg"
+                alt="FREE Shipping"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
 
-            {/* Overlay */}
-            {/* <div className="absolute inset-0 bg-black/30"></div> */}
+              {/* Overlay */}
+              {/* <div className="absolute inset-0 bg-black/30"></div> */}
 
-            {/* Text Content */}
-            {/* <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
+              {/* Text Content */}
+              {/* <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
               <h3 className="text-2xl sm:text-3xl font-bold mb-2">
                 🚚 FREE Shipping Above ₹499!
               </h3>
@@ -725,7 +655,7 @@ const Home = () => {
                 Shop now and save on delivery charges
               </p>
             </div> */}
-          </Card>
+            </Card>
           </Link>
         </div>
 
@@ -863,25 +793,25 @@ const Home = () => {
 
         {/* Final Offer Banner - 4 Full Width */}
         <div className="w-full mb-0">
-            <Link
-    to="/category/watches"
-    className="block"
-  >
-          <Card
-            className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
+          <Link
+            to="/category/watches"
+            className="block"
           >
-            {/* Background Image */}
-            <img
-              src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765603485/WhatsApp_Image_2025-12-13_at_10.12.09_29934d58_btrost.jpg"
-              alt="FREE Shipping"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
+            <Card
+              className="relative overflow-hidden rounded-none h-[280px] sm:h-[380px] md:h-[450px] lg:h-[500px]"
+            >
+              {/* Background Image */}
+              <img
+                src="https://res.cloudinary.com/dkngwrebq/image/upload/v1765603485/WhatsApp_Image_2025-12-13_at_10.12.09_29934d58_btrost.jpg"
+                alt="FREE Shipping"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
 
-            {/* Overlay */}
-            {/* <div className="absolute inset-0 bg-black/30"></div> */}
+              {/* Overlay */}
+              {/* <div className="absolute inset-0 bg-black/30"></div> */}
 
-            {/* Text Content */}
-            {/* <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
+              {/* Text Content */}
+              {/* <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6 h-full">
               <h3 className="text-2xl sm:text-3xl font-bold mb-2">
                 🚚 FREE Shipping Above ₹499!
               </h3>
@@ -889,7 +819,7 @@ const Home = () => {
                 Shop now and save on delivery charges
               </p>
             </div> */}
-          </Card>
+            </Card>
           </Link>
         </div>
 
