@@ -100,7 +100,7 @@ export const CATEGORIES = [
     description: "Beautiful home decor items",
     subcategories: [
       { name: "Wall Clock", slug: "wall-clock" },
-      { name: "Candle Stand", slug: "candle-stand" },
+      // { name: "Candle Stand", slug: "candle-stand" },
       { name: "Flower Vase", slug: "flower-vase" },
       { name: "Table Lamp", slug: "table-lamp" },
       { name: "Photo Frame", slug: "photo-frame" },

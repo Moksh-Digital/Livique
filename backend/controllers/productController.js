@@ -90,7 +90,7 @@ export const createProduct = async (req, res) => {
 
             // Home Decor
             'wall clock': 'wall-clock',
-            'candle stand': 'candle-stand',
+            // 'candle stand': 'candle-stand',
             'flower vase': 'flower-vase',
             'table lamp': 'table-lamp',
             'photo frame': 'photo-frame',
@@ -156,7 +156,7 @@ export const getProducts = async (req, res) => {
 
             // Define category to subcategory mapping based on new fashion shop structure
             const categorySubcategoryMap = {
-                'home-decor': ['wall-clock', 'candle-stand', 'flower-vase', 'table-lamp', 'photo-frame', 'decorative-mirror', 'wall-art'],
+                'home-decor': ['wall-clock', 'flower-vase', 'table-lamp', 'photo-frame', 'decorative-mirror', 'wall-art'],
                 'gift-items': ['perfume-set', 'greeting-card', 'mini-plant-pot', 'gift-box', 'customized-mug'],
                 'toys': ['teddy-bear', 'remote-car', 'building-blocks', 'doll-set', 'puzzle-game', 'soft-toy-bunny', 'action-figure'],
                 'jewellary': ['earrings', 'necklaces', 'bracelets', 'bangles', 'rings', 'clutches', 'hair-accessories'],
@@ -164,7 +164,7 @@ export const getProducts = async (req, res) => {
                 'mens-accessories': ['wallet'],
                 'flowers': ['birthday-bouquets', 'anniversary-bouquet', 'relationship-based', 'occasionally'],
                 'stanley-sippers': ['stanley', 'sippers'],
-                'home-decor': ['wall-clock', 'candle-stand', 'flower-vase', 'table-lamp', 'photo-frame', 'decorative-mirror', 'wall-art']
+                'home-decor': ['wall-clock', 'flower-vase', 'table-lamp', 'photo-frame', 'decorative-mirror', 'wall-art']
             };
 
             // Get subcategories for this category
