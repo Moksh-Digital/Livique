@@ -18,118 +18,15 @@ const Home = () => {
   const beautyScrollRef = useRef<HTMLDivElement>(null)
   const toyScrollRef = useRef<HTMLDivElement>(null)
   const stationaryScrollRef = useRef<HTMLDivElement>(null)
-  const featuredGifts = [
-    {
-      name: "Customized Mug",
-      image: "https://www.fnp.com/images/pr/l/v20230918223819/personalized-mug-for-her_1.jpg",
-    },
-    {
-      name: "Scented Candle",
-      image: "https://m.media-amazon.com/images/I/81HSydTuXVL.jpg",
-    },
-    {
-      name: "Gift Box",
-      image: "https://m.media-amazon.com/images/I/51fgzRAZiRL.jpg",
-    },
-    {
-      name: "Perfume Set",
-      image: "https://m.media-amazon.com/images/I/61-x2-oHOvL._AC_UF1000,1000_QL80_.jpg",
-    },
-  ]
-
-  const homeDecorItems = [
-    {
-      name: "Wall Clock",
-      image: "https://www.titan.co.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw6ef4a954/images/Titan/Catalog/W0046PA01_1.jpg?sw=800&sh=800",
-    },
-    {
-      name: "Candle Stand",
-      image: "https://nestasia.in/cdn/shop/products/DSC6301.jpg?v=1680864642",
-    },
-    {
-      name: "Flower Vase",
-      image: "https://m.media-amazon.com/images/I/51LMse-rYWL._AC_UF894,1000_QL80_.jpg",
-    },
-    {
-      name: "Wall Art",
-      image: "https://artstreet.in/cdn/shop/files/71U0MNnAYJL._SL1300_f5e7a943-77ad-490d-a338-a1d81ab06ba3_700x700.jpg?v=1755503553",
-    },
-  ]
-
-  const jewelryItems = [
-    {
-      name: "Earrings",
-      image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSsNWsu2HAvJVxfLzEBWsMvwrSdyv675LhyQjLZR1s4WlnpjctXK27w1sAbp-gvvrdi1-eV12TzfjGj93wwnBcplArYPo8LocF2QukxitDjVKLI3IsGzr8j",
-    },
-    {
-      name: "Necklaces",
-      image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTea7KjYKz3mWBxrBGlOYgxIby1yw-fTfvzyXbxvsxOGF-7iS2HDjNJO8P5uE0XU4-dl88pbaU0_1ImIfZRBu1dRWnIBUBG3VH_BRO5e7o_bKgV-MgOoogd3A",
-    },
-    {
-      name: "Bracelets & Bangles",
-      image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQpVXo6_Tfea_8RqWRov8dIL2f6Q48kW4DWTCuE9rNVPDpJJWfav5FfawXvWXJpLx7b4Z63q4PuvogdBOjcWhKnisiAbzmbEuKJuwEipA9DK2V4CAE7tE-GP58",
-    },
-    {
-      name: "Rings",
-      image: "https://cdn-media.glamira.com/media/product/newgeneration/view/1/sku/sydney016-n1/diamond/diamond-Brillant_AAA/stone2/diamond-Brillant_AAA/alloycolour/yellow.jpg",
-    },
-  ]
-
-  const beautyItems = [
-    {
-      name: "Brooches",
-      image: "https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/66474e1e12f40e3c7f9522ab589263f1.jpg?imageView2/2/w/800/q/70/format/webp",
-    },
-    {
-      name: "Key Chain , Bag Charms",
-      image: "https://m.media-amazon.com/images/I/610zXODDvML._AC_UY1000_.jpg",
-    },
-    {
-      name: "Caps And Hats",
-      image: "https://i5.walmartimages.com/asr/b3286d6a-a0c4-49fb-8302-6a2c7e48bee9_1.f039201c0336ccf0464e979c24ac54d8.jpeg?odnWidth=1000&odnHeight=1000&odnBg=ffffff",
-    },
-    {
-      name: "Hand Gloves",
-      image: "https://m.media-amazon.com/images/I/61yGM1RTA9L._AC_UY1100_.jpg",
-    },
-  ]
-
-  const toyItems = [
-    {
-      name: "Teddy Bear",
-      image: "https://m.media-amazon.com/images/I/41xJambIv2L._AC_UF1000,1000_QL80_.jpg",
-    },
-    {
-      name: "Remote Car",
-      image: "https://m.media-amazon.com/images/I/61Ny+lQg+TL._AC_UF1000,1000_QL80_.jpg",
-    },
-    {
-      name: "Building Blocks",
-      image: "https://rukminim2.flixcart.com/image/480/480/xif0q/block-construction/h/u/3/200-piece-classic-big-building-bricks-large-toy-blocks-original-imahaeyp4qhn4vfy.jpeg?q=90",
-    },
-    {
-      name: "Doll Set",
-      image: "https://m.media-amazon.com/images/I/81DI+QuY4zL.jpg",
-    },
-  ]
-  const stationaryItems = [
-    {
-      name: "Hairbands",
-      image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQd_PGhzXxzKXmtvfXsYfeoW8MDhKP-7W8AgXt9HhMi14bShNmCxc-KBNxGVF4zrZBfGM9xiz1HOiN-IPRrzrYhVGhZj82_ZC3yvtHu1fR0_wNiIHOREcmI_KHY",
-    },
-    {
-      name: "Scrunchies",
-      image: "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQYxqdOXpmJKsBrtfbB7ePxzprCQUMGCa_OI13e9G0odceT4h_HFTY8FdCYbZ3_x3We2mFcM25iy0gxTNCvxzq-NWA4a9DCp4n-HK_jgDM34B_EdvI_WcLpaFfu",
-    },
-    {
-      name: "Claw Clips",
-      image: "https://jewelsmars.com/cdn/shop/files/3B9120E1-9779-4FD4-80CF-0C84013D746C.jpg?v=1729679011",
-    },
-    {
-      name: "Hair Pins & Barrettes",
-      image: "https://images-cdn.ubuy.co.in/66856064ad5d1a0d92061382-vintage-retro-hair-stick-hairpin-long.jpg",
-    },
-  ]
+  // Get subcategories for featured sections
+  const giftItemsCategory = CATEGORIES.find(c => c.slug === 'gift-items')
+  const homeDecorCategory = CATEGORIES.find(c => c.slug === 'home-decor')
+  const jewelaryCategory = CATEGORIES.find(c => c.slug === 'jewellary')
+  const toysCategory = CATEGORIES.find(c => c.slug === 'toys')
+  const hampersCategory = CATEGORIES.find(c => c.slug === 'hampers')
+  const flowersCategory = CATEGORIES.find(c => c.slug === 'flowers')
+  const stanleyCategory = CATEGORIES.find(c => c.slug === 'stanley-sippers')
+  const mensAccessoriesCategory = CATEGORIES.find(c => c.slug === 'mens-accessories')
   const handleScroll = (
     ref: React.RefObject<HTMLDivElement>,
     setActiveIndex: (index: number) => void,
@@ -148,11 +45,11 @@ const Home = () => {
     const jewelryRef = jewelryScrollRef.current
 
     const handleFeaturedScroll = () =>
-      handleScroll(featuredScrollRef, setFeaturedActiveIndex, featuredGifts.length)
+      handleScroll(featuredScrollRef, setFeaturedActiveIndex, giftItemsCategory?.subcategories.length || 4)
     const handleHomeDecorScroll = () =>
-      handleScroll(homeDecorScrollRef, setHomeDecorActiveIndex, homeDecorItems.length)
+      handleScroll(homeDecorScrollRef, setHomeDecorActiveIndex, homeDecorCategory?.subcategories.length || 4)
     const handleJewelryScroll = () =>
-      handleScroll(jewelryScrollRef, setJewelryActiveIndex, jewelryItems.length)
+      handleScroll(jewelryScrollRef, setJewelryActiveIndex, jewelaryCategory?.subcategories.length || 4)
 
     featuredRef?.addEventListener("scroll", handleFeaturedScroll)
     homeDecorRef?.addEventListener("scroll", handleHomeDecorScroll)
@@ -536,10 +433,10 @@ const Home = () => {
               margin: "0 auto",
             }}
           >
-            {featuredGifts.map((item, idx) => (
+            {giftItemsCategory?.subcategories.slice(0, 4).map((subcat, idx) => (
               <Link
                 key={idx}
-                to={`/category/gift-items/${item.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/gift-items/${subcat.slug}`}
               >
                 <div
                   key={idx}
@@ -548,15 +445,15 @@ const Home = () => {
 
                   {/* Image Section */}
                   <div
-                    className="relative overflow-hidden flex-shrink-0 md:h-[70%] h-[65%]" // 🔹 slightly smaller image for mobile
+                    className="relative overflow-hidden flex-shrink-0 md:h-[70%] h-[65%]"
                     style={{
                       border: "3px solid #FFFFFF",
                       backgroundColor: "#FFFFFF",
                     }}
                   >
                     <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
+                      src={giftItemsCategory?.image || "/placeholder.svg"}
+                      alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
@@ -564,7 +461,7 @@ const Home = () => {
                   {/* Text Section */}
                   <div className="text-center py-2 flex-grow flex flex-col justify-center">
                     <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
-                      {item.name}
+                      {subcat.name}
                     </h3>
                   </div>
                 </div>
@@ -656,7 +553,7 @@ const Home = () => {
             <div className="flex items-center justify-center gap-4 mb-2 px-4">
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
               <h2 className="text-2xl md:text-3xl font-serif text-[#3E2723] font-semibold">
-                Home Decor & Lifestyle
+                Home Decor
               </h2>
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
@@ -677,10 +574,10 @@ const Home = () => {
               margin: "0 auto",
             }}
           >
-            {homeDecorItems.map((cat, idx) => (
+            {homeDecorCategory?.subcategories.slice(0, 4).map((subcat, idx) => (
               <Link
                 key={idx}
-                to={`/category/home-decor/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/home-decor/${subcat.slug}`}
               >
                 <div
                   key={idx}
@@ -689,8 +586,8 @@ const Home = () => {
                   {/* Image Section */}
                   <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
                     <img
-                      src={cat.image || "/placeholder.svg"}
-                      alt={cat.name}
+                      src={homeDecorCategory?.image || "/placeholder.svg"}
+                      alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
@@ -698,7 +595,7 @@ const Home = () => {
                   {/* Text Section */}
                   <div className="text-center py-2 flex-grow flex flex-col justify-center">
                     <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
-                      {cat.name}
+                      {subcat.name}
                     </h3>
                   </div>
                 </div>
@@ -713,7 +610,7 @@ const Home = () => {
         {/* Offer Banner 2 - Full Width */}
         <div className="w-full mb-6">
     <Link
-    to="/category/flower"
+    to="/category/flowers"
     className="block"
   >
     <Card
@@ -747,7 +644,7 @@ const Home = () => {
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#D4AF76]"></div>
             </div>
             <Link
-              to="/category/jewelry"
+              to="/category/jewellary"
               className="text-sm text-[#ff0066] font-semibold underline-offset-2 hover:underline"
             >
               View All
@@ -763,10 +660,10 @@ const Home = () => {
               margin: "0 auto",
             }}
           >
-            {jewelryItems.map((cat, idx) => (
+            {jewelaryCategory?.subcategories.slice(0, 4).map((subcat, idx) => (
               <Link
                 key={idx}
-                to={`/category/jewelry/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/jewellary/${subcat.slug}`}
               >
                 <div
                   className="bg-[#FFFFFF] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[6px] border-white rounded-none h-[300px] md:h-[440px]"
@@ -780,8 +677,8 @@ const Home = () => {
                     }}
                   >
                     <img
-                      src={cat.image || "/placeholder.svg"}
-                      alt={cat.name}
+                      src={jewelaryCategory?.image || "/placeholder.svg"}
+                      alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
@@ -789,7 +686,7 @@ const Home = () => {
                   {/* Text Section */}
                   <div className="text-center py-2 flex-grow flex flex-col justify-center">
                     <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
-                      {cat.name}
+                      {subcat.name}
                     </h3>
                   </div>
                 </div>
@@ -803,7 +700,7 @@ const Home = () => {
         <div className="w-full mb-0">
 
             <Link
-    to="/category/jewelry"
+    to="/category/stanley-sippers"
     className="block"
   >
           <Card
@@ -841,7 +738,7 @@ const Home = () => {
             <div className="flex items-center justify-center gap-4 mb-2 px-4 ">
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
               <h2 className="text-2xl md:text-3xl font-serif text-[#3E2723] font-semibold">
-                Delightful Toy Gifts
+                Toys
               </h2>
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
@@ -862,10 +759,10 @@ const Home = () => {
               margin: "0 auto",
             }}
           >
-            {toyItems.map((cat, idx) => (
+            {toysCategory?.subcategories.slice(0, 4).map((subcat, idx) => (
               <Link
                 key={idx}
-                to={`/category/toys/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/toys/${subcat.slug}`}
               >
                 <div
                   key={idx}
@@ -874,8 +771,8 @@ const Home = () => {
                   {/* Image Section */}
                   <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
                     <img
-                      src={cat.image || "/placeholder.svg"}
-                      alt={cat.name}
+                      src={toysCategory?.image || "/placeholder.svg"}
+                      alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
@@ -883,7 +780,7 @@ const Home = () => {
                   {/* Text Section */}
                   <div className="text-center py-2 flex-grow flex flex-col justify-center">
                     <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
-                      {cat.name}
+                      {subcat.name}
                     </h3>
                   </div>
                 </div>
@@ -897,7 +794,7 @@ const Home = () => {
 
 
 
-        {/* Gifting Stationery & More */}
+        {/* Hampers Section */}
 
         <section
           className="w-full py-8"
@@ -908,12 +805,12 @@ const Home = () => {
             <div className="flex items-center justify-center gap-4 mb-2 px-4">
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#D4AF76]"></div>
               <h2 className="text-2xl md:text-3xl font-serif text-[#5D4037] font-semibold">
-                Hair Accessories
+                Hampers
               </h2>
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#D4AF76]"></div>
             </div>
             <Link
-              to="/category/hair-accessories"
+              to="/category/hampers"
               className="text-sm text-[#ff0066] font-semibold underline-offset-2 hover:underline"
             >
               View All
@@ -929,10 +826,10 @@ const Home = () => {
               margin: "0 auto",
             }}
           >
-            {stationaryItems.map((cat, idx) => (
+            {hampersCategory?.subcategories.slice(0, 4).map((subcat, idx) => (
               <Link
                 key={idx}
-                to={`/category/gift-items/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/hampers/${subcat.slug}`}
               >
                 <div
                   className="bg-[#FFFFFF] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[6px] border-white rounded-none h-[300px] md:h-[440px]"
@@ -946,8 +843,8 @@ const Home = () => {
                     }}
                   >
                     <img
-                      src={cat.image || "/placeholder.svg"}
-                      alt={cat.name}
+                      src={hampersCategory?.image || "/placeholder.svg"}
+                      alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
@@ -955,7 +852,7 @@ const Home = () => {
                   {/* Text Section */}
                   <div className="text-center py-2 flex-grow flex flex-col justify-center">
                     <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
-                      {cat.name}
+                      {subcat.name}
                     </h3>
                   </div>
                 </div>
@@ -997,7 +894,7 @@ const Home = () => {
         </div>
 
 
-        {/* Beauty & Fragrance Collection */}
+        {/* Stanley & Sippers */}
 
         <section className="w-full py-8 ">
           {/* Section Heading */}
@@ -1005,12 +902,12 @@ const Home = () => {
             <div className="flex items-center justify-center gap-4 mb-2 px-4">
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
               <h2 className="text-2xl md:text-3xl font-serif text-[#3E2723] font-semibold">
-                Fashion Accessories
+                Stanley & Sippers
               </h2>
               <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
             </div>
             <Link
-              to="/category/bags-wallets"
+              to="/category/stanley-sippers"
               className="text-sm text-[#B94C63] font-semibold underline-offset-2 hover:underline"
             >
               View All
@@ -1026,10 +923,10 @@ const Home = () => {
               margin: "0 auto",
             }}
           >
-            {beautyItems.map((cat, idx) => (
+            {stanleyCategory?.subcategories.slice(0, 4).map((subcat, idx) => (
               <Link
                 key={idx}
-                to={`/category/bags-wallets/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
+                to={`/category/stanley-sippers/${subcat.slug}`}
               >
                 <div
                   key={idx}
@@ -1038,8 +935,8 @@ const Home = () => {
                   {/* Image Section */}
                   <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
                     <img
-                      src={cat.image || "/placeholder.svg"}
-                      alt={cat.name}
+                      src={stanleyCategory?.image || "/placeholder.svg"}
+                      alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
@@ -1047,7 +944,7 @@ const Home = () => {
                   {/* Text Section */}
                   <div className="text-center py-2 flex-grow flex flex-col justify-center">
                     <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
-                      {cat.name}
+                      {subcat.name}
                     </h3>
                   </div>
                 </div>

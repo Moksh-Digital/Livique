@@ -28,43 +28,29 @@ export const createProduct = async (req, res) => {
         // Create product with proper slugs that match frontend categories
         // Map category names to their exact slugs from frontend (new taxonomy)
         const categorySlugMap = {
-            'home decor': 'home-decor',
             'gift items': 'gift-items',
             'toys': 'toys',
-            'jewelry': 'jewelry',
-            'hair accessories': 'hair-accessories',
-            'bags & wallets': 'bags-wallets',
-            'bags and wallets': 'bags-wallets',
-            'sunglasses & eyewear': 'sunglasses-eyewear',
-            'sunglasses and eyewear': 'sunglasses-eyewear',
-            'watches': 'watches',
-            'belts & scarves': 'belts-scarves',
-            'belts and scarves': 'belts-scarves',
-            'footwear accessories': 'footwear-accessories',
-            'other fashion accessories': 'other-fashion-accessories'
+            'jewellary': 'jewellary',
+            'jewelry': 'jewellary',
+            'hampers': 'hampers',
+            "men's accessories": 'mens-accessories',
+            'mens accessories': 'mens-accessories',
+            'flowers': 'flowers',
+            'stanley & sippers': 'stanley-sippers',
+            'stanley and sippers': 'stanley-sippers',
+            'home decor': 'home-decor',
         };
         
         const categorySlug = categorySlugMap[category.toLowerCase()] || category.toLowerCase().trim().replace(/\s+/g, "-").replace(/&/g, "and");
         
         // Map subcategory names to their exact slugs from frontend (new taxonomy)
         const subcategorySlugMap = {
-            // Home Decor
-            'wall clock': 'wall-clock',
-            'candle stand': 'candle-stand',
-            'flower vase': 'flower-vase',
-            'table lamp': 'table-lamp',
-            'photo frame': 'photo-frame',
-            'decorative mirror': 'decorative-mirror',
-            'wall art': 'wall-art',
-
             // Gift Items
             'perfume set': 'perfume-set',
             'greeting card': 'greeting-card',
             'mini plant pot': 'mini-plant-pot',
             'gift box': 'gift-box',
-            'jewelry organizer': 'jewelry-organizer',
             'customized mug': 'customized-mug',
-            'scented candle': 'scented-candle',
 
             // Toys
             'teddy bear': 'teddy-bear',
@@ -75,63 +61,41 @@ export const createProduct = async (req, res) => {
             'soft toy bunny': 'soft-toy-bunny',
             'action figure': 'action-figure',
 
-            // Jewelry
+            // Jewellary
             'earrings': 'earrings',
             'necklaces': 'necklaces',
-            'bracelets & bangles': 'bracelets-bangles',
-            'bracelets and bangles': 'bracelets-bangles',
+            'bracelets': 'bracelets',
+            'bangles': 'bangles',
             'rings': 'rings',
-            'anklets': 'anklets',
-            'nose pins': 'nose-pins',
-
-            // Hair Accessories
-            'hairbands': 'hairbands',
-            'scrunchies': 'scrunchies',
-            'claw clips': 'claw-clips',
-            'hair pins & barrettes': 'hair-pins-barrettes',
-            'hair pins and barrettes': 'hair-pins-barrettes',
-            'head wraps & scarves': 'head-wraps-scarves',
-            'head wraps and scarves': 'head-wraps-scarves',
-
-            // Bags & Wallets
-            'handbags': 'handbags',
-            'sling bags': 'sling-bags',
-            'tote bags': 'tote-bags',
-            'mini purses': 'mini-purses',
             'clutches': 'clutches',
-            'wallets': 'wallets',
+            'hair accessories': 'hair-accessories',
 
-            // Sunglasses & Eyewear
-            'oversized sunglasses': 'oversized-sunglasses',
-            'cat-eye sunglasses': 'cat-eye-sunglasses',
-            'round frames': 'round-frames',
-            'transparent frames': 'transparent-frames',
-            'fashion specs': 'fashion-specs',
+            // Hampers
+            'festive hampers': 'festive-hampers',
+            'customised hampers': 'customised-hampers',
+            'specially themed hampers': 'specially-themed-hampers',
 
-            // Watches
-            'metal strap watches': 'metal-strap-watches',
-            'leather strap watches': 'leather-strap-watches',
-            'bracelet watches': 'bracelet-watches',
-            'smart analog styles': 'smart-analog-styles',
+            // Men's Accessories
+            'wallet': 'wallet',
 
-            // Belts & Scarves
-            'leather belts': 'leather-belts',
-            'chain belts': 'chain-belts',
-            'fabric belts': 'fabric-belts',
-            'printed scarves': 'printed-scarves',
-            'solid color scarves': 'solid-color-scarves',
+            // Flowers
+            'birthday bouquets': 'birthday-bouquets',
+            'anniversary bouquet': 'anniversary-bouquet',
+            'relationship based': 'relationship-based',
+            'occasionally': 'occasionally',
 
-            // Footwear Accessories
-            'toe rings': 'toe-rings',
-            'anklets beaded metal': 'anklets-beaded-metal',
-            'shoe clips charms': 'shoe-clips-charms',
+            // Stanley & Sippers
+            'stanley': 'stanley',
+            'sippers': 'sippers',
 
-            // Other Fashion Accessories
-            'brooches': 'brooches',
-            'caps & hats': 'caps-hats',
-            'caps and hats': 'caps-hats',
-            'gloves': 'gloves',
-            'keychains bag charms': 'keychains-bag-charms'
+            // Home Decor
+            'wall clock': 'wall-clock',
+            'candle stand': 'candle-stand',
+            'flower vase': 'flower-vase',
+            'table lamp': 'table-lamp',
+            'photo frame': 'photo-frame',
+            'decorative mirror': 'decorative-mirror',
+            'wall art': 'wall-art',
         };
         
         const subcategorySlug = subcategory ? (subcategorySlugMap[subcategory.toLowerCase()] || subcategory.toLowerCase().trim().replace(/\s+/g, "-")) : undefined;
@@ -193,16 +157,14 @@ export const getProducts = async (req, res) => {
             // Define category to subcategory mapping based on new fashion shop structure
             const categorySubcategoryMap = {
                 'home-decor': ['wall-clock', 'candle-stand', 'flower-vase', 'table-lamp', 'photo-frame', 'decorative-mirror', 'wall-art'],
-                'gift-items': ['perfume-set', 'greeting-card', 'mini-plant-pot', 'gift-box', 'jewelry-organizer', 'customized-mug', 'scented-candle'],
+                'gift-items': ['perfume-set', 'greeting-card', 'mini-plant-pot', 'gift-box', 'customized-mug'],
                 'toys': ['teddy-bear', 'remote-car', 'building-blocks', 'doll-set', 'puzzle-game', 'soft-toy-bunny', 'action-figure'],
-                'jewelry': ['earrings', 'necklaces', 'bracelets-bangles', 'rings', 'anklets', 'nose-pins'],
-                'hair-accessories': ['hairbands', 'scrunchies', 'claw-clips', 'hair-pins-barrettes', 'head-wraps-scarves'],
-                'bags-wallets': ['handbags', 'sling-bags', 'tote-bags', 'mini-purses', 'clutches', 'wallets'],
-                'sunglasses-eyewear': ['oversized-sunglasses', 'cat-eye-sunglasses', 'round-frames', 'transparent-frames', 'fashion-specs'],
-                'watches': ['metal-strap-watches', 'leather-strap-watches', 'bracelet-watches', 'smart-analog-styles'],
-                'belts-scarves': ['leather-belts', 'chain-belts', 'fabric-belts', 'printed-scarves', 'solid-color-scarves'],
-                'footwear-accessories': ['toe-rings', 'anklets-beaded-metal', 'shoe-clips-charms'],
-                'other-fashion-accessories': ['brooches', 'caps-hats', 'gloves', 'keychains-bag-charms']
+                'jewellary': ['earrings', 'necklaces', 'bracelets', 'bangles', 'rings', 'clutches', 'hair-accessories'],
+                'hampers': ['festive-hampers', 'customised-hampers', 'specially-themed-hampers'],
+                'mens-accessories': ['wallet'],
+                'flowers': ['birthday-bouquets', 'anniversary-bouquet', 'relationship-based', 'occasionally'],
+                'stanley-sippers': ['stanley', 'sippers'],
+                'home-decor': ['wall-clock', 'candle-stand', 'flower-vase', 'table-lamp', 'photo-frame', 'decorative-mirror', 'wall-art']
             };
 
             // Get subcategories for this category
