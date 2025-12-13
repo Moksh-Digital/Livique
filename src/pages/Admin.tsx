@@ -118,6 +118,26 @@ const Admin = () => {
     quantity: 0,
   });
 
+  // Bulk import state
+  const [bulkFormat, setBulkFormat] = useState<"json"|"csv">("json");
+  const [bulkText, setBulkText] = useState<string>(
+    `[
+  {
+    "name": "Sample Product",
+    "price": 199,
+    "originalPrice": 249,
+    "category": "decor",
+    "subcategory": "table-decor",
+    "description": "Short description",
+    "inStock": true,
+    "quantity": 10,
+    "images": ["https://example.com/img.jpg"]
+  }
+]`
+  );
+  const [bulkStatus, setBulkStatus] = useState<string>("");
+  const [bulkFileName, setBulkFileName] = useState<string>("");
+
   // State for tracking IDs
   const [trackingIds, setTrackingIds] = useState<{ [orderId: string]: string }>({});
   const [updatingTracking, setUpdatingTracking] = useState<string | null>(null);
@@ -355,6 +375,102 @@ const Admin = () => {
   const handleDelete = (id: string) => {
     setProductToDelete(id);
     setIsDeleteDialogOpen(true);
+  };
+
+  const parseCsv = (text: string) => {
+    const [headerLine, ...rows] = text.trim().split(/\r?\n/);
+    const headers = headerLine.split(",").map(h => h.trim());
+    return rows.map(row => {
+      const cols = row.split(",").map(c => c.trim());
+      const obj: any = {};
+      headers.forEach((h, i) => {
+        obj[h] = cols[i];
+      });
+      // normalize
+      if (obj.price) obj.price = Number(obj.price);
+      if (obj.originalPrice) obj.originalPrice = Number(obj.originalPrice);
+      if (obj.inStock !== undefined) obj.inStock = String(obj.inStock).toLowerCase() === "true";
+      if (obj.quantity) obj.quantity = Number(obj.quantity);
+      if (obj.images) obj.images = String(obj.images).split("|").filter(Boolean);
+      if (obj.media) obj.media = String(obj.media).split("|").filter(Boolean);
+      return obj;
+    });
+  };
+
+  const handleBulkFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBulkFileName(file.name);
+    try {
+      const text = await file.text();
+      const ext = file.name.split(".").pop()?.toLowerCase();
+      if (ext === "csv") {
+        setBulkFormat("csv");
+        setBulkText(text);
+      } else if (ext === "json") {
+        setBulkFormat("json");
+        setBulkText(text);
+      } else {
+        // Try to detect by content
+        const looksJson = text.trim().startsWith("[") || text.trim().startsWith("{");
+        setBulkFormat(looksJson ? "json" : "csv");
+        setBulkText(text);
+      }
+    } catch (err: any) {
+      setBulkStatus(`Error reading file: ${err.message}`);
+    }
+  };
+
+  const handleBulkImport = async () => {
+    try {
+      setBulkStatus("Importing...");
+      let items: any[] = [];
+      if (bulkFormat === "json") {
+        items = JSON.parse(bulkText);
+      } else {
+        items = parseCsv(bulkText);
+      }
+
+      let success = 0;
+      let failed = 0;
+      for (const item of items) {
+        const payload = {
+          name: item.name,
+          price: item.price,
+          originalPrice: item.originalPrice ?? item.price,
+          category: item.category,
+          subcategory: item.subcategory,
+          mainImage: item.mainImage || (Array.isArray(item.media) ? item.media[0] : ""),
+          images: (Array.isArray(item.media) ? item.media : Array.isArray(item.images) ? item.images : []),
+          description: item.description || "",
+          delivery: item.delivery || "Today",
+          deliveryCharge: item.deliveryCharge ?? 0,
+          inStock: item.inStock ?? true,
+          quantity: item.quantity ?? 0,
+        };
+
+        try {
+          const res = await axios.post(`${API_BASE_URL}/products`, payload);
+          if (res.status === 201 || res.status === 200) {
+            success++;
+          } else {
+            failed++;
+          }
+        } catch (err) {
+          failed++;
+        }
+      }
+
+      setBulkStatus(`Done. Success: ${success}, Failed: ${failed}`);
+      // Refresh products list
+      const res = await fetch(`${API_BASE_URL}/products`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setProducts(data.map((p: any) => ({ ...p, id: p._id })));
+      }
+    } catch (err: any) {
+      setBulkStatus(`Error: ${err.message}`);
+    }
   };
 
   const confirmDelete = async () => {
@@ -770,6 +886,10 @@ const Admin = () => {
             <TabsTrigger value="users" className="gap-1 md:gap-2 flex-shrink-0">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Users</span>
+            </TabsTrigger>
+            <TabsTrigger value="bulk" className="gap-1 md:gap-2 flex-shrink-0">
+              <Package className="h-4 w-4" />
+              <span className="hidden sm:inline">Bulk Import</span>
             </TabsTrigger>
           </TabsList>
 
@@ -1455,6 +1575,49 @@ const Admin = () => {
                   );
                 })
               )}
+            </Card>
+          </TabsContent>
+
+          {/* Bulk Import */}
+          <TabsContent value="bulk">
+            <Card className="p-4 md:p-6 rounded-xl md:rounded-2xl">
+              <h2 className="text-xl md:text-2xl font-bold mb-4">Bulk Import Products</h2>
+              <p className="text-sm text-muted-foreground mb-4">Paste JSON array or CSV to create products in bulk.</p>
+
+              <div className="mb-4 flex gap-4">
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="bulk-format" defaultChecked value="json" onChange={() => setBulkFormat("json")} />
+                  JSON
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="bulk-format" value="csv" onChange={() => setBulkFormat("csv")} />
+                  CSV
+                </label>
+              </div>
+
+              <div className="mb-4 flex items-center gap-3">
+                <input
+                  type="file"
+                  accept=".csv,.json,text/csv,application/json"
+                  onChange={handleBulkFileChange}
+                  className="text-sm"
+                />
+                {bulkFileName && (
+                  <span className="text-xs text-muted-foreground">Selected: {bulkFileName}</span>
+                )}
+              </div>
+
+              <textarea
+                className="w-full h-64 border rounded p-2 mb-4"
+                value={bulkText}
+                onChange={(e) => setBulkText(e.target.value)}
+                placeholder={bulkFormat === "json" ? "[{\n  \"name\": \"Sample\", \"price\": 199, \"category\": \"decor\", \"inStock\": true\n}]" : "name,price,category,inStock,description,images\nSample,199,decor,true,Short desc,https://example.com/img.jpg"}
+              />
+
+              <div className="flex items-center gap-3">
+                <Button onClick={handleBulkImport} className="bg-primary text-white">Import</Button>
+                <span className="text-sm text-muted-foreground">{bulkStatus}</span>
+              </div>
             </Card>
           </TabsContent>
 
