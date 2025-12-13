@@ -414,7 +414,7 @@ const Home = () => {
               {/* <h2 className="absolute top-4 left-6 text-lg md:text-2xl font-semibold text-[#B67A43]">
         Calendar
       </h2> */}
-              <button onClick={() => navigate('/category')} className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
+              <button onClick={() => navigate('/category/gift')} className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
                 Explore Now
               </button>
             </div>
@@ -432,7 +432,7 @@ const Home = () => {
                 {/* <h2 className="absolute top-3 left-6 text-md md:text-xl font-semibold text-[#B67A43]">
           New Year & Christmas
         </h2> */}
-                <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
+                <button onClick={() => navigate('/category/home-decor/flower-vase')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105">
                   Explore Now
                 </button>
               </div>
@@ -449,7 +449,7 @@ const Home = () => {
                   {/* <h2 className="absolute top-3 left-4 text-md md:text-lg font-semibold text-[#B67A43]">
             Seasons Greetings Card
           </h2> */}
-                  <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
+                  <button onClick={() => navigate('/category/mens-accessories')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
                     Explore Now
                   </button>
 
@@ -464,7 +464,7 @@ const Home = () => {
                   {/* <h2 className="absolute top-3 left-4 text-md md:text-lg font-semibold text-[#B67A43]">
             Corporate Gifts
           </h2> */}
-                  <button onClick={() => navigate('/category')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
+                  <button onClick={() => navigate('/category/toys/teddy-bear')} className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2 rounded-full shadow-lg transition-transform group-hover:scale-105 whitespace-nowrap">
                     Explore Now
                   </button>
 
@@ -630,7 +630,7 @@ const Home = () => {
         <div className="w-full mb-0">
 
           <Link
-            to="/category/stanley-sippers"
+            to="/category/jewellary"
             className="block"
           >
             <Card
@@ -794,7 +794,7 @@ const Home = () => {
         {/* Final Offer Banner - 4 Full Width */}
         <div className="w-full mb-0">
           <Link
-            to="/category/watches"
+            to="/category/stanley-sippers"
             className="block"
           >
             <Card

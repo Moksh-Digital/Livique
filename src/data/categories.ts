@@ -63,7 +63,7 @@ export const CATEGORIES = [
     id: "mens-accessories",
     name: "Men's Accessories",
     slug: "mens-accessories",
-    image: "https://m.media-amazon.com/images/I/71izkVh7BML._AC_UY1100_.jpg",
+    image: "https://shoppingsmart.in/cdn/shop/files/1_304b1456-eae5-42ee-93e5-d37a0e8b6a09.jpg?v=1714628998",
     description: "Stylish accessories for men",
     subcategories: [
       { name: "Wallet", slug: "wallet", image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600" },
@@ -97,7 +97,7 @@ export const CATEGORIES = [
     id: "home-decor",
     name: "Home Decor",
     slug: "home-decor",
-    image: "https://i.pinimg.com/736x/bb/73/ca/bb73ca5bf2470414e6ba6f226b514137.jpg",
+    image: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765624280/WhatsApp_Image_2025-12-11_at_20.13.13_24414af8_rs5wgg.jpg",
     description: "Beautiful home decor items",
     subcategories: [
       { name: "Wall Clock", slug: "wall-clock", image: "https://www.titan.co.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw6ef4a954/images/Titan/Catalog/W0046PA01_1.jpg?sw=800&sh=800" },
