@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import Order from "../models/orderModel.js";
 import sendEmail from "../utils/sendEmail.js";
 import { generateOrderConfirmationEmail, generateOwnerNotificationEmail } from "../utils/orderEmailTemplate.js";
+import { sendToAdmins } from "./pushNotificationController.js";
 
 dotenv.config();
 
@@ -79,7 +80,20 @@ export const verifyPayment = async (req, res) => {
     await newOrder.save();
     console.log("✅ Order created in database:", newOrder._id);
 
-    // Step 3: Send order confirmation emails
+    // Step 3: Send push notification to admins (non-blocking)
+    try {
+      await sendToAdmins({
+        title: "🛒 New Order",
+        body: `Order #${newOrder._id.toString().slice(-6)} • ₹${newOrder.total?.toFixed(0) || "0"}`,
+        icon: "/logo.png",
+        url: "/admin",
+      });
+      console.log("✅ Push notification sent to admins");
+    } catch (notificationErr) {
+      console.error("⚠️ Failed to send push notification:", notificationErr?.message || notificationErr);
+    }
+
+    // Step 4: Send order confirmation emails
     try {
       // Send email to customer
       const emailHtml = generateOrderConfirmationEmail(newOrder, { name: userName, email: userEmail }, items);
