@@ -312,7 +312,7 @@ const ProductDetail = () => {
 
             {/* ---------------- Action buttons ---------------- */}
             
-            <div className="mb-6">
+            <div className="mb-10">
               <h3 className="font-semibold mb-3">Delivery</h3>
               <Card className="p-4 rounded-xl shadow-md">
                 <div className="text-center">
@@ -326,7 +326,7 @@ const ProductDetail = () => {
               </Card>
             </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="mb-6 grid grid-cols-2 gap-3">
               {product.inStock === false ? (
                 <div className="col-span-2">
                   <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 text-center">
@@ -355,7 +355,7 @@ const ProductDetail = () => {
             </div>
 
             {/* ---------------- DELIVERY INFORMATION ---------------- */}
-            <div className="mb-8 bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <div className="mt-4 mb-8 bg-gray-50 rounded-xl p-6 border border-gray-200">
               <h3 className="text-lg font-semibold mb-4 text-gray-800">Delivery Information</h3>
               <ul className="space-y-3">
                 <li className="flex gap-3">

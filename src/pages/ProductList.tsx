@@ -64,6 +64,12 @@ const ProductList = () => {
   }, [category, subcategory]);
 
   // Filter products
+    // Close filter sheet when navigating to different category/subcategory
+    useEffect(() => {
+      setShowFilters(false);
+    }, [category, subcategory]);
+
+    // Filter products
   let displayProducts = products.filter((product: any) => {
     const priceMatch =
       product.price >= priceRange[0] && product.price <= priceRange[1];
