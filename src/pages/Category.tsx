@@ -1,6 +1,6 @@
 // src/pages/Category.tsx
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Star, Filter, ShoppingCart, Home, Search, User, Minus, Plus } from "lucide-react";
+import { Star, Filter, ShoppingCart, Gift } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "@/components/Header";
@@ -51,9 +51,7 @@ const Category = () => {
   const cartCtx: any = useCart() || {};
   const cart = Array.isArray(cartCtx.cart) ? cartCtx.cart : cartCtx.items || [];
   const addToCart = cartCtx.addToCart || cartCtx.addItem || cartCtx.add;
-  const removeFromCart = cartCtx.removeFromCart || cartCtx.removeItem || cartCtx.remove;
-  const updateQuantity = cartCtx.updateQuantity || cartCtx.setQuantity;
-  const getTotalItems = cartCtx.getTotalItems || cartCtx.totalItems || (() => (cart || []).reduce((s: any, it: any) => s + (it.quantity || 0), 0));
+  // Note: removeFromCart and updateQuantity are available in context but currently unused in the grid UI
 
   const currentCategory = getCategoryBySlug(category || "");
   let breadcrumb = "All Products";
@@ -158,77 +156,6 @@ const Category = () => {
     </div>
   );
 
-  // helper to get quantity in cart (robust)
-  const getQuantity = (productId: string) => {
-    const item = (cart || []).find((i: any) => i && (i.id === productId || i._id === productId));
-    return item ? (item.quantity ?? 0) : 0;
-  };
-
-  // Add to cart - defensive
-  const handleAdd = (e: React.MouseEvent, product: Product) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (typeof addToCart === "function") {
-      addToCart({
-        id: product._id,
-        name: product.name,
-        price: product.price,
-        image: product.mainImage || product.images?.[0] || "/placeholder.svg",
-        quantity: 1,
-        delivery: product.delivery || "Standard",
-      });
-    } else {
-      console.warn("addToCart not available in useCart context");
-    }
-  };
-
-  // increment (defensive)
-  const handleIncrement = (e: React.MouseEvent, product: Product) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const current = getQuantity(product._id);
-    if (typeof updateQuantity === "function") {
-      updateQuantity(product._id, current + 1);
-    } else if (typeof addToCart === "function") {
-      addToCart({
-        id: product._id,
-        name: product.name,
-        price: product.price,
-        image: product.mainImage || product.images?.[0] || "/placeholder.svg",
-        quantity: 1,
-      });
-    } else {
-      console.warn("no updateQuantity or addToCart available");
-    }
-  };
-
-  // decrement (defensive)
-  const handleDecrement = (e: React.MouseEvent, product: Product) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const current = getQuantity(product._id);
-    if (current <= 1) {
-      if (typeof removeFromCart === "function") {
-        removeFromCart(product._id);
-      } else if (typeof updateQuantity === "function") {
-        updateQuantity(product._id, 0);
-      } else {
-        console.warn("no removeFromCart/updateQuantity available");
-      }
-    } else {
-      if (typeof updateQuantity === "function") {
-        updateQuantity(product._id, current - 1);
-      } else {
-        console.warn("updateQuantity not available to decrement");
-      }
-    }
-  };
-
-  const discountPercent = (orig?: number, cur?: number) => {
-    if (!orig || !cur || orig <= cur) return null;
-    return Math.round(((orig - cur) / orig) * 100);
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
@@ -272,8 +199,12 @@ const Category = () => {
           <section className="flex-1">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h1 className="text-3xl font-bold text-[#3b2b28]">{breadcrumb === "All Products" ? "Home Decor" : breadcrumb}</h1>
-                <div className="text-sm text-[#8B7355] mt-1">Showing {displayProducts.length} Products</div>
+                <h1 className="text-3xl font-bold text-[#3b2b28]">
+                  {breadcrumb === "All Products" ? "Home Decor" : breadcrumb}
+                </h1>
+                <div className="text-sm text-[#8B7355] mt-1">
+                  Showing {displayProducts.length} Products
+                </div>
               </div>
 
               {/* Filters button for smaller screens */}
@@ -286,141 +217,199 @@ const Category = () => {
                   </SheetTrigger>
 
                   <SheetContent
-  side="left"
-  className="w-80 fixed left-0"
-  style={{
-    top: "100px",                        // navbar + promo bar height
-    height: "calc(100vh - 70px)",       // remaining height
-    overflowY: "auto",                  // scrollable content
-    WebkitOverflowScrolling: "touch",   // smooth scroll for mobile
-  }}
->
-  <SheetHeader>
-    <SheetTitle>Filters</SheetTitle>
-  </SheetHeader>
+                    side="left"
+                    className="w-80 fixed left-0"
+                    style={{
+                      top: "100px",
+                      height: "calc(100vh - 70px)",
+                      overflowY: "auto",
+                      WebkitOverflowScrolling: "touch",
+                    }}
+                  >
+                    <SheetHeader>
+                      <SheetTitle>Filters</SheetTitle>
+                    </SheetHeader>
 
-  {/* Remove overflow-y-auto from inside */}
-  <div className="mt-6 px-4 pb-6">
-    <FilterSidebar />
-  </div>
-</SheetContent>
-
+                    <div className="mt-6 px-4 pb-6">
+                      <FilterSidebar />
+                    </div>
+                  </SheetContent>
                 </Sheet>
               </div>
             </div>
 
-            {/* Desktop grid: 4 columns on xl, 3 on lg, 2 on md */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {displayProducts.length === 0 ? (
+              <div className="col-span-2 md:col-span-3 lg:col-span-3 xl:col-span-4 flex flex-col items-center justify-center py-20 px-6">
+                <div className="text-center max-w-md">
+                  {/* Decorative Icon */}
+                  <div className="mb-6 flex justify-center">
+                    <div className="relative w-24 h-24 md:w-32 md:h-32">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF76]/20 to-[#C18E63]/20 rounded-full animate-pulse"></div>
+                      <div className="absolute inset-2 md:inset-3 flex items-center justify-center bg-white rounded-full border-2 border-[#D4AF76]">
+                        <Gift className="w-12 h-12 md:w-16 md:h-16 text-[#C18E63]" strokeWidth={1.5} />
+                      </div>
+                    </div>
+                  </div>
 
+                  {/* Heading */}
+                  <h2 className="text-2xl md:text-3xl font-serif font-semibold text-[#5D4037] mb-3">
+                    Coming Soon
+                  </h2>
 
-{displayProducts.map((product) => {
-  const isOOS = product.inStock === false;
-const isAdded = cart?.some((item) => item.id === product._id || (item as any)._id === product._id);
+                  {/* Description */}
+                  <p className="text-[#8B7355] text-sm md:text-base mb-6 leading-relaxed">
+                    We're curating an amazing collection of {breadcrumb.toLowerCase()} just for you. Check back soon for exclusive products!
+                  </p>
 
-  return (
-    <div
-      key={product._id}
-      onClick={() => navigate(`/product/${product._id}`)}
-      className="relative bg-white rounded-lg border border-[#f0e6e2] shadow-sm overflow-hidden"
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => { if (e.key === "Enter") navigate(`/product/${product._id}`); }}
-    >
+                  {/* Decorative Line */}
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[#D4AF76]"></div>
+                    <span className="text-[#C18E63] text-lg">✨</span>
+                    <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[#D4AF76]"></div>
+                  </div>
 
-      {/* IMAGE AREA */}
-      <div className="relative bg-white p-3 flex items-center justify-center aspect-square">
-        <img
-          src={product.mainImage || product.images?.[0] || "/placeholder.svg"}
-          alt={product.name}
-          className={`w-full h-full object-cover rounded-md ${isOOS ? "grayscale" : ""}`}
-          onError={(e) => e.currentTarget.src = "/placeholder.svg"}
-        />
+                  {/* CTA Button */}
+                  <button
+                    onClick={() => navigate("/")}
+                    className="px-6 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-[#C18E63] to-[#D4AF76] text-white rounded-full font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
+                  >
+                    Browse Other Categories
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {displayProducts.map((product) => {
+                  const isOOS = product.inStock === false;
+                  const isAdded = cart?.some(
+                    (item: any) =>
+                      item.id === product._id || item._id === product._id
+                  );
 
-        {/* OUT OF STOCK LABEL */}
-        {isOOS && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-            <span className="bg-red-600 text-white px-3 py-1 rounded-md font-semibold shadow">
-              Out of Stock
-            </span>
-          </div>
-        )}
-      </div>
+                  return (
+                    <div
+                      key={product._id}
+                      onClick={() => navigate(`/product/${product._id}`)}
+                      className="relative bg-white rounded-lg border border-[#f0e6e2] shadow-sm overflow-hidden"
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter")
+                          navigate(`/product/${product._id}`);
+                      }}
+                    >
+                      {/* IMAGE AREA */}
+                      <div className="relative bg-white p-3 flex items-center justify-center aspect-square">
+                        <img
+                          src={
+                            product.mainImage ||
+                            product.images?.[0] ||
+                            "/placeholder.svg"
+                          }
+                          alt={product.name}
+                          className={`w-full h-full object-cover rounded-md ${
+                            isOOS ? "grayscale" : ""
+                          }`}
+                          onError={(e) =>
+                            (e.currentTarget.src = "/placeholder.svg")
+                          }
+                        />
 
-      {/* CONTENT */}
-      <div className="px-3 py-2">
-        <h3 className="text-sm font-medium text-[#2b2b2b] line-clamp-2 mb-1">
-          {product.name}
-        </h3>
+                        {/* OUT OF STOCK LABEL */}
+                        {isOOS && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <span className="bg-red-600 text-white px-3 py-1 rounded-md font-semibold shadow">
+                              Out of Stock
+                            </span>
+                          </div>
+                        )}
+                      </div>
 
-        <div className="flex items-center gap-2 text-xs mb-2">
-          <span className="text-sm font-semibold text-[#2b2b2b]">
-            {(product.rating ?? 0).toFixed(1)}
-          </span>
-          <Star size={14} className="fill-green-600 text-green-600" />
-          <span className="text-xs text-[#6b6b6b]">({product.reviews ?? 0})</span>
-        </div>
+                      {/* CONTENT */}
+                      <div className="px-3 py-2">
+                        <h3 className="text-sm font-medium text-[#2b2b2b] line-clamp-2 mb-1">
+                          {product.name}
+                        </h3>
 
-        <div className="flex items-end justify-between">
-          <div>
-            <div className="text-base font-bold text-[#172021]">
-              ₹{product.price?.toLocaleString()}
-            </div>
+                        <div className="flex items-center gap-2 text-xs mb-2">
+                          <span className="text-sm font-semibold text-[#2b2b2b]">
+                            {(product.rating ?? 0).toFixed(1)}
+                          </span>
+                          <Star
+                            size={14}
+                            className="fill-green-600 text-green-600"
+                          />
+                          <span className="text-xs text-[#6b6b6b]">
+                            ({product.reviews ?? 0})
+                          </span>
+                        </div>
 
-            {product.originalPrice && product.originalPrice > product.price && (
-              <div className="text-xs text-[#8B7355] line-through">
-                ₹{product.originalPrice?.toLocaleString()}
+                        <div className="flex items-end justify-between">
+                          <div>
+                            <div className="text-base font-bold text-[#172021]">
+                              ₹{product.price?.toLocaleString()}
+                            </div>
+
+                            {product.originalPrice &&
+                              product.originalPrice > product.price && (
+                                <div className="text-xs text-[#8B7355] line-through">
+                                  ₹{product.originalPrice?.toLocaleString()}
+                                </div>
+                              )}
+                          </div>
+
+                          {/* BUTTON - Add / Added / Disabled */}
+                          {isOOS ? (
+                            <button
+                              disabled
+                              className="flex items-center gap-2 px-3 py-1.5 bg-gray-200 text-gray-500 border border-gray-300 rounded-md text-sm"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              <span className="hidden md:block">
+                                Unavailable
+                              </span>
+                            </button>
+                          ) : isAdded ? (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                              className="flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white border border-green-600 rounded-md text-sm"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              <span>Added</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                addToCart({
+                                  id: product._id,
+                                  name: product.name,
+                                  price: product.price,
+                                  image:
+                                    product.mainImage ||
+                                    product.images?.[0] ||
+                                    "/placeholder.svg",
+                                  delivery: product.delivery || "Standard",
+                                  deliveryCharge: 0,
+                                  quantity: 1,
+                                });
+                              }}
+                              className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#e9e2de] rounded-md shadow-sm text-sm hover:shadow-md"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              <span>Add</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
-          </div>
-
-          {/* BUTTON - Add / Added / Disabled */}
-{isOOS ? (
-  <button
-    disabled
-    className="flex items-center gap-2 px-3 py-1.5 bg-gray-200 text-gray-500 border border-gray-300 rounded-md text-sm"
-  >
-    {/* Cart icon always visible */}
-    <ShoppingCart className="w-4 h-4" />
-
-    {/* Text hidden on mobile, shown on desktop */}
-    <span className="hidden md:block">Unavailable</span>
-  </button>
-) : isAdded ? (
-            <button
-              onClick={(e) => { e.stopPropagation(); }}
-              className="flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white border border-green-600 rounded-md text-sm"
-            >
-              <ShoppingCart className="w-4 h-4" />
-              <span>Added</span>
-            </button>
-          ) : (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                addToCart({
-                  id: product._id,
-                  name: product.name,
-                  price: product.price,
-                  image: product.mainImage || product.images?.[0] || "/placeholder.svg",
-                  delivery: product.delivery || "Standard",
-                  deliveryCharge: 0,
-                });
-              }}
-              className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#e9e2de] rounded-md shadow-sm text-sm hover:shadow-md"
-            >
-              <ShoppingCart className="w-4 h-4" />
-              <span>Add</span>
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-})}
-
-
-            </div>
           </section>
         </div>
       </main>
