@@ -101,13 +101,6 @@ export const createProduct = async (req, res) => {
         
         const subcategorySlug = subcategory ? (subcategorySlugMap[subcategory.toLowerCase()] || subcategory.toLowerCase().trim().replace(/\s+/g, "-")) : undefined;
         
-        console.log("🔄 Creating product with:", {
-            category,
-            categorySlug,
-            subcategory,
-            subcategorySlug
-        });
-        
         const product = await Product.create({
             name,
             price,
@@ -126,14 +119,6 @@ export const createProduct = async (req, res) => {
             reviews: req.body.reviews || 100,
             quantity: quantity || 0,
             inStock: (quantity && quantity > 0) ? true : false,
-        });
-
-        console.log("🆕 Created product:", {
-            name: product.name,
-            category: product.category,
-            categorySlug: product.categorySlug,
-            subcategory: product.subcategory,
-            subcategorySlug: product.subcategorySlug
         });
 
         res.status(201).json(product);
@@ -193,9 +178,6 @@ export const getProducts = async (req, res) => {
                     { subcategory: { $regex: new RegExp(`^${flexibleSub}$`, "i") } }
                 );
             });
-            
-            console.log("🔍 Category conditions:", JSON.stringify(categoryConditions, null, 2));
-            console.log("🔍 Subcategories for", category, ":", subcategories);
 
             filter.$or = categoryConditions;
         }
@@ -221,21 +203,7 @@ export const getProducts = async (req, res) => {
             }
         }
 
-        console.log("🧠 Applied Filter:", JSON.stringify(filter, null, 2));
-        console.log("🔍 Category:", category);
-        console.log("🔍 Subcategory:", subcategory);
-
         const products = await Product.find(filter);
-        console.log(`✅ Found ${products.length} products`);
-        
-        // Debug: Log first few products to see their category/subcategory
-        if (products.length > 0) {
-            console.log("📦 Sample products:");
-            products.slice(0, 3).forEach((product, index) => {
-                console.log(`  ${index + 1}. ${product.name} - Category: ${product.category} (${product.categorySlug}) - Subcategory: ${product.subcategory} (${product.subcategorySlug})`);
-            });
-        }
-        
         res.json(products);
     } catch (error) {
         console.error("❌ Error fetching products:", error);

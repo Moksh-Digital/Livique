@@ -55,8 +55,6 @@ const sendOtp = async (req, res) => {
         
         await user.save(); // Save the new/updated user data to MongoDB
 
-        console.log(`Generated OTP for ${email}: ${otp}`);
-
         const emailResult = await sendEmail({
             to: email,
             subject: 'Your Account Verification Code',
@@ -164,8 +162,6 @@ const sendSigninOtp = async (req, res) => {
         user.signinOtpExpires = signinOtpExpires;
         await user.save(); // Save the new OTP and expiry
 
-        console.log(`Generated Signin OTP for ${email}: ${signinOtp}`);
-
         const emailResult = await sendEmail({
             to: email,
             subject: 'Your Sign In Verification Code',
@@ -262,8 +258,6 @@ const forgotPassword = async (req, res) => {
         user.resetPasswordToken = resetToken;
         user.resetPasswordExpires = resetTokenExpires;
         await user.save();
-        
-        console.log(`Generated Password Reset Token for ${email}: ${resetToken}`);
 
         const emailResult = await sendEmail({
             to: email,

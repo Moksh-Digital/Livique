@@ -3,26 +3,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-console.log("📧 Email Configuration (Resend):");
-console.log("- Email From:", process.env.EMAIL_USER);
-console.log(
-  "- Resend API Key Configured:",
-  process.env.RESEND_API_KEY ? "✅ Yes" : "❌ No"
-);
-
 // Initialize Resend client
 let resendClient = null;
 
 if (process.env.RESEND_API_KEY) {
   resendClient = new Resend(process.env.RESEND_API_KEY);
-  console.log("✅ Resend client initialized successfully");
-} else {
-  console.error(
-    "❌ RESEND_API_KEY not found in environment variables"
-  );
-  console.log(
-    "💡 Get your API key from: https://resend.com/api-keys"
-  );
 }
 
 /**
@@ -37,14 +22,11 @@ if (process.env.RESEND_API_KEY) {
 const sendEmail = async ({ to, subject, text, html }) => {
   try {
     if (!resendClient) {
-      console.error("❌ Cannot send email: Resend client not initialized");
       return {
         success: false,
         error: "Email service not configured. Please contact support.",
       };
     }
-
-    console.log("📤 Attempting to send email via Resend to:", to);
 
     const result = await resendClient.emails.send({
       from: process.env.EMAIL_USER || "noreply@livique.co.in",
@@ -55,16 +37,11 @@ const sendEmail = async ({ to, subject, text, html }) => {
     });
 
     if (result.error) {
-      console.error("❌ ERROR: Failed to send email via Resend");
-      console.error("   - Error:", result.error.message);
       return {
         success: false,
         error: "Failed to send email. Please try again later.",
       };
     }
-
-    console.log("✅ Email sent successfully via Resend");
-    console.log("   - Message ID:", result.data.id);
 
     return {
       success: true,

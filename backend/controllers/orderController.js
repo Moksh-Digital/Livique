@@ -95,8 +95,6 @@ const addOrderItems = asyncHandler(async (req, res) => {
     try {
       // Send email to customer
       if (user.email) {
-        console.log("📧 Sending order confirmation email to customer:", user.email);
-        
         const emailHtml = generateOrderConfirmationEmail(createdOrder, user, items);
         
         const emailResult = await sendEmail({
@@ -104,32 +102,18 @@ const addOrderItems = asyncHandler(async (req, res) => {
           subject: `Order Confirmed! #${createdOrder._id.toString().substring(0, 8).toUpperCase()} - Livique`,
           html: emailHtml,
         });
-
-        if (emailResult && emailResult.success) {
-          console.log("✅ Customer order confirmation email sent successfully");
-        } else {
-          console.warn("⚠️ Failed to send customer order confirmation email");
-        }
       }
 
       // Send email to owner/admin
-      console.log("📧 Sending order notification email to owner: liviqueofficial@gmail.com");
       
       try {
         const ownerEmailHtml = generateOwnerNotificationEmail(createdOrder, user, items);
-        console.log("✅ Owner email HTML generated successfully");
         
         const ownerEmailResult = await sendEmail({
           to: "liviqueofficial@gmail.com",
           subject: `New Order Received! #${createdOrder._id.toString().substring(0, 8).toUpperCase()} - ₹${createdOrder.total?.toFixed(2) || "0.00"}`,
           html: ownerEmailHtml,
         });
-
-        if (ownerEmailResult && ownerEmailResult.success) {
-          console.log("✅ Owner order notification email sent successfully");
-        } else {
-          console.warn("⚠️ Failed to send owner order notification email:", ownerEmailResult?.error);
-        }
       } catch (ownerEmailErr) {
         console.error("❌ Error generating/sending owner email:", ownerEmailErr.message);
         console.error("Stack:", ownerEmailErr.stack);

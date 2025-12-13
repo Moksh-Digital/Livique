@@ -80,7 +80,6 @@ export const sendToAdmins = async (payload) => {
     const adminSubscriptions = await PushSubscription.find({ role: 'admin' });
 
     if (adminSubscriptions.length === 0) {
-      console.log('No admin subscriptions found');
       return { success: true, sent: 0 };
     }
 
@@ -100,7 +99,6 @@ export const sendToAdmins = async (payload) => {
         } catch (error) {
           // If subscription is invalid (410 Gone), remove it
           if (error.statusCode === 410) {
-            console.log('Removing invalid subscription:', sub._id);
             await PushSubscription.deleteOne({ _id: sub._id });
           }
           throw error;
@@ -110,8 +108,6 @@ export const sendToAdmins = async (payload) => {
 
     const successCount = results.filter(r => r.status === 'fulfilled').length;
     const failureCount = results.filter(r => r.status === 'rejected').length;
-
-    console.log(`Push notifications sent: ${successCount} succeeded, ${failureCount} failed`);
 
     return { 
       success: true, 
@@ -130,7 +126,6 @@ export const sendToUser = async (userId, payload) => {
     const userSubscriptions = await PushSubscription.find({ userId });
 
     if (userSubscriptions.length === 0) {
-      console.log(`No subscriptions found for user: ${userId}`);
       return { success: true, sent: 0 };
     }
 
