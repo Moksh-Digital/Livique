@@ -2,11 +2,23 @@ import { useNavigate } from "react-router-dom";
 import { Trash2, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
+import { useState } from "react";
+
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart, getTotalPrice } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // ✅ Calculate total delivery dynamically
   const totalDeliveryCharges = cart.reduce(
@@ -18,6 +30,10 @@ const Cart = () => {
   const grandTotal = totalPrice + totalDeliveryCharges;
 
   const handleCheckout = () => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
     navigate("/address");
   };
 
@@ -177,6 +193,18 @@ const Cart = () => {
           </div>
         </div>
       </main>
+
+      {/* Login Modal */}
+      <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Login Required</DialogTitle>
+            <DialogDescription className="text-base mt-2">
+              Please login to your account to proceed with checkout.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

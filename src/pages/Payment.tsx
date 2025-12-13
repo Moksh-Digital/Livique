@@ -318,7 +318,7 @@ const handlePlaceOrder = async () => {
                       </div>
                       <p className="text-xs text-[#7A5E55] mt-1">Pay securely using Razorpay gateway</p>
                     </Label>
-                    <img alt="Razorpay" src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Razorpay_logo.svg" className="h-5" />
+                    <img alt="Razorpay" src="https://d6xcmfyh68wv8.cloudfront.net/newsroom-content/uploads/2024/05/Razorpay-Logo.jpg" className="h-5" />
                   </div>
                 </div>
               </RadioGroup>
