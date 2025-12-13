@@ -824,66 +824,6 @@ const Home = () => {
         </div>
 
 
-        {/* Stanley & Sippers */}
-
-        <section className="w-full py-8 ">
-          {/* Section Heading */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-4 mb-2 px-4">
-              <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
-              <h2 className="text-2xl md:text-3xl font-serif text-[#3E2723] font-semibold">
-                Stanley & Sippers
-              </h2>
-              <div className="flex-1 max-w-[250px] h-[1px] bg-[#C18E63]"></div>
-            </div>
-            <Link
-              to="/category/stanley-sippers"
-              className="text-sm text-[#B94C63] font-semibold underline-offset-2 hover:underline"
-            >
-              View All
-            </Link>
-          </div>
-
-          {/* Cards Grid */}
-          <div
-            ref={beautyScrollRef}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 md:px-10 cursor-pointer"
-            style={{
-              maxWidth: "1400px",
-              margin: "0 auto",
-            }}
-          >
-            {stanleyCategory?.subcategories.slice(0, 4).map((subcat, idx) => (
-              <Link
-                key={idx}
-                to={`/category/stanley-sippers/${subcat.slug}`}
-              >
-                <div
-                  key={idx}
-                  className="bg-[#F3ECE5] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[8px] border-[#F3ECE5] rounded-none h-[320px] md:h-[440px]"
-                >
-                  {/* Image Section */}
-                  <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
-                    <img
-                      src={stanleyCategory?.image || "/placeholder.svg"}
-                      alt={subcat.name}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                    />
-                  </div>
-
-                  {/* Text Section */}
-                  <div className="text-center py-2 flex-grow flex flex-col justify-center">
-                    <h3 className="text-xs md:text-sm font-medium text-gray-800 truncate">
-                      {subcat.name}
-                    </h3>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-        </section>
-
         {/* Flowers Section */}
         <section className="w-full py-8">
           {/* Section Heading */}

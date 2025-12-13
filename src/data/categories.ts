@@ -56,6 +56,7 @@ export const CATEGORIES = [
       { name: "Festive Hampers", slug: "festive-hampers" },
       { name: "Customised Hampers", slug: "customised-hampers" },
       { name: "Specially Themed Hampers", slug: "specially-themed-hampers" },
+      {name: "Birthday Anniversary Hampers", slug: "birthday-anniversary-hampers"}
     ],
   },
   {

@@ -74,6 +74,7 @@ export const createProduct = async (req, res) => {
             'festive hampers': 'festive-hampers',
             'customised hampers': 'customised-hampers',
             'specially themed hampers': 'specially-themed-hampers',
+            'birthday anniversary hampers': 'birthday-anniversary-hampers',
 
             // Men's Accessories
             'wallet': 'wallet',
