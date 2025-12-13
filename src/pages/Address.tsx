@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import StepsTracker from "@/components/StepsTracker";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2, MapPin, Home, Building2, Ellipsis } from "lucide-react";
 
 // ✅ AUTO SWITCH API BASE URL
 const isLocalhost =
@@ -189,36 +189,45 @@ const Address = () => {
       <Header />
       <StepsTracker currentStep={1} />
 
-      <main className="max-w-3xl mx-auto px-4 py-8 pb-24 md:pb-8">
-        <h1 className="text-3xl font-bold mb-6">Delivery Address</h1>
+      <main className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#5D4037]">Delivery Address</h1>
+          <p className="text-sm md:text-base text-[#7A5E55]">Choose a saved address or add a new one.</p>
+        </div>
 
         {/* ✅ Saved Addresses Section */}
         {savedAddresses.length > 0 && !addingNew && (
-          <Card className="p-6 rounded-2xl shadow-md mb-8">
-            <h2 className="text-xl font-semibold mb-4">Saved Addresses</h2>
+          <Card className="p-6 rounded-2xl shadow-md mb-8 border-[1.5px]" style={{ borderColor: '#D4AF76' }}>
+            <h2 className="text-xl font-semibold mb-4 text-[#5D4037]">Saved Addresses</h2>
             <div className="space-y-4">
               {savedAddresses.map((addr) => (
                 <div
                   key={addr._id}
-                  className="border border-gray-200 p-4 rounded-lg flex justify-between items-center hover:bg-gray-50 transition"
+                  className="border p-4 rounded-xl flex justify-between items-center transition"
+                  style={{ borderColor:'#E7D6BD', background:'#FFFDF5' }}
                 >
                   <div className="flex items-start gap-3">
-                    <MapPin className="h-6 w-6 text-gray-500 mt-1" />
+                    <MapPin className="h-6 w-6 text-[#5D4037] mt-1" />
                     <div>
-                      <p className="font-semibold text-gray-900">{addr.fullName}</p>
-                      <p className="text-gray-600 text-sm">{addr.mobile}</p>
-                      <p className="text-gray-600 text-sm">
+                      <p className="font-semibold text-[#3E2723]">{addr.fullName}</p>
+                      <p className="text-[#7A5E55] text-sm">{addr.mobile}</p>
+                      <p className="text-[#7A5E55] text-sm">
                         {addr.houseNo}, {addr.street}, {addr.locality}
                       </p>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-[#7A5E55] text-sm">
                         {addr.city}, {addr.state} - {addr.pincode}
                       </p>
-                      {addr.landmark && <p className="text-gray-500 text-sm">Landmark: {addr.landmark}</p>}
-                      <p className="text-xs mt-1 text-gray-500 uppercase">{addr.addressType}</p>
+                      {addr.landmark && <p className="text-[#7A5E55] text-sm">Landmark: {addr.landmark}</p>}
+                      <p className="text-[11px] mt-1 uppercase inline-flex items-center gap-1 px-2 py-1 rounded-full" style={{background:'#F3ECE5', color:'#5D4037', border:'1px solid #D4AF76'}}>
+                        {addr.addressType === 'home' && <Home className="h-3 w-3" />}
+                        {addr.addressType === 'work' && <Building2 className="h-3 w-3" />}
+                        {addr.addressType !== 'home' && addr.addressType !== 'work' && <Ellipsis className="h-3 w-3" />}
+                        {addr.addressType}
+                      </p>
                     </div>
                   </div>
-                  <Button onClick={() => handleUseAddress(addr)} className="bg-primary hover:bg-primary/90">
-                    Use this
+                  <Button onClick={() => handleUseAddress(addr)} className="text-white rounded-xl" style={{ background:'#5D4037' }}>
+                    Deliver here
                   </Button>
                 </div>
               ))}
@@ -226,7 +235,7 @@ const Address = () => {
 
             <Button
               variant="outline"
-              className="mt-6 w-full"
+              className="mt-6 w-full border-[1.5px]"
               onClick={() => setAddingNew(true)}
             >
               + Add New Address
@@ -236,8 +245,8 @@ const Address = () => {
 
         {/* ✅ New Address Form */}
         {(addingNew || savedAddresses.length === 0) && (
-          <Card className="p-6 rounded-2xl shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
+          <Card className="p-6 rounded-2xl shadow-md border-[1.5px]" style={{ borderColor: '#D4AF76' }}>
+            <h2 className="text-xl font-semibold mb-4 text-[#5D4037]">Add New Address</h2>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -364,7 +373,7 @@ const Address = () => {
                 </RadioGroup>
               </div>
 
-              <Button type="submit" className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90">
+              <Button type="submit" className="w-full h-12 rounded-xl text-white" style={{ background:'#5D4037' }}>
                 Save & Continue to Payment
               </Button>
             </form>

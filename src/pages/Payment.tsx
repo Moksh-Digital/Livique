@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import StepsTracker from "@/components/StepsTracker";
 import axios from 'axios'; // 👈 IMPORT AXIOS
+import { Wallet, CreditCard, Landmark, Banknote } from "lucide-react";
 
 // ✅ AUTO SWITCH API BASE URL
 const isLocalhost =
@@ -110,106 +111,101 @@ const handlePlaceOrder = async () => {
         config
       );
 
-const options = {
-  key: import.meta.env.RAZORPAY_KEY_ID,
-  amount: data.amount,
-  currency: data.currency,
-  name: "Livique Store",
-  description: "E-commerce Payment",
-  order_id: data.id,
+      const options = {
+        key: import.meta.env.RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        name: "Livique Store",
+        description: "E-commerce Payment",
+        order_id: data.id,
 
-  handler: async (response) => {
-    try {
-      // Prepare complete order data for verification
-      const verifyData = {
-        razorpay_order_id: response.razorpay_order_id,
-        razorpay_payment_id: response.razorpay_payment_id,
-        razorpay_signature: response.razorpay_signature,
-        userId: user?._id || localStorage.getItem("userId"),
-        userEmail: user?.email || localStorage.getItem("userEmail"),
-        userName: user?.name || localStorage.getItem("userName"),
-        items: orderData.items,
-        address: orderData.address,
-        subtotal: orderData.subtotal,
-        deliveryCharges: orderData.deliveryCharges,
-        total: orderData.total,
-        paymentMethod: "razorpay",
-      };
+        handler: async (response: any) => {
+          try {
+            const verifyData = {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              userId: user?._id || localStorage.getItem("userId"),
+              userEmail: user?.email || localStorage.getItem("userEmail"),
+              userName: user?.name || localStorage.getItem("userName"),
+              items: orderData.items,
+              address: orderData.address,
+              subtotal: orderData.subtotal,
+              deliveryCharges: orderData.deliveryCharges,
+              total: orderData.total,
+              paymentMethod: "razorpay",
+            };
 
-      console.log("🔍 Sending payment verification with data:", verifyData);
+            const verifyRes = await axios.post(
+              `${API_BASE_URL}/payment/verify`,
+              verifyData
+            );
 
-      const verifyRes = await axios.post(
-        `${API_BASE_URL}/payment/verify`,
-        verifyData
-      );
+            if (verifyRes.data.success) {
+              clearCart();
+              localStorage.removeItem("shippingAddress");
 
-      if (verifyRes.data.success) {
-        clearCart();
-        localStorage.removeItem("shippingAddress");
+              toast({
+                title: "Payment Successful!",
+                description: `Order ID: ${verifyRes.data.orderId}`,
+              });
 
-        toast({
-          title: "Payment Successful!",
-          description: `Order ID: ${verifyRes.data.orderId}`,
-        });
-
-        navigate("/order-confirmation", { state: { orderId: verifyRes.data.orderId } });
-      } else {
-        toast({
-          title: "Payment Verification Failed",
-          description: verifyRes.data.message || "Please try again.",
-          variant: "destructive",
-        });
-      }
-    } catch (error: any) {
-      console.error("❌ Payment verification error:", error.response?.data || error);
-      toast({
-        title: "Payment Verification Failed",
-        description: error.response?.data?.message || "Please contact support.",
-        variant: "destructive",
-      });
-    }
-  },
-
-  prefill: {
-    name: address.fullName,
-    email: "customer@example.com",
-    contact: address.mobile,
-  },
-
-  theme: { color: "#3399cc" },
-
-  method: {
-    upi: true,
-    card: true,
-    netbanking: true,
-    wallet: true,
-  },
-
-  upi: {
-    flow: "intent",
-  },
-
-  // 👇👇👇 FORCE SHOW UPI BLOCK EVEN IN TEST MODE
-  config: {
-    display: {
-      blocks: {
-        upi: {
-          name: "Pay via UPI",
-          instruments: [
-            {
-              method: "upi",
-            },
-          ],
+              navigate("/order-confirmation", { state: { orderId: verifyRes.data.orderId } });
+            } else {
+              toast({
+                title: "Payment Verification Failed",
+                description: verifyRes.data.message || "Please try again.",
+                variant: "destructive",
+              });
+            }
+          } catch (error: any) {
+            console.error("❌ Payment verification error:", error.response?.data || error);
+            toast({
+              title: "Payment Verification Failed",
+              description: error.response?.data?.message || "Please contact support.",
+              variant: "destructive",
+            });
+          }
         },
-      },
-      sequence: ["upi", "card", "netbanking", "wallet"],
-      preferences: {
-        show_default_blocks: true,
-      },
-    },
-  },
-};
 
+        prefill: {
+          name: address.fullName,
+          email: "customer@example.com",
+          contact: address.mobile,
+        },
+
+        theme: { color: "#3399cc" },
+
+        method: {
+          upi: true,
+          card: true,
+          netbanking: true,
+          wallet: true,
+        },
+
+        upi: {
+          flow: "intent",
+        },
+
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via UPI",
+                instruments: [
+                  {
+                    method: "upi",
+                  },
+                ],
+              },
+            },
+            sequence: ["upi", "card", "netbanking", "wallet"],
+            preferences: {
+              show_default_blocks: true,
+            },
+          },
+        },
+      };
 
       const razor = new (window as any).Razorpay(options);
       razor.open();
@@ -270,91 +266,129 @@ const options = {
   // };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ background: '#F8F8F8' }}>
       <Header />
-            <StepsTracker currentStep={2} />   {/* 👈 Add this line */}
+      <StepsTracker currentStep={2} />
 
+      <main className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-8">
+        <div className="grid lg:grid-cols-[1fr,380px] gap-6">
+          {/* ---------------- LEFT: PAYMENT OPTIONS ---------------- */}
+          <div className="space-y-4">
+            {/* Payment Options Card */}
+            <Card className="p-6 border-[1.5px]" style={{ borderColor: '#D4AF76', background: '#FFFFFF' }}>
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-[#5D4037]">Select Payment Option</h2>
+                <p className="text-xs text-[#7A5E55] mt-1">All transactions are secure and encrypted</p>
+              </div>
 
-      <main className="max-w-5xl mx-auto px-4 py-8 pb-24 md:pb-8">
-        <h1 className="text-3xl font-bold mb-6">Payment Options</h1>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* ---------------- PAYMENT METHODS ---------------- */}
-          <div className="lg:col-span-2">
-            <Card className="p-6 rounded-2xl">
               <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3 p-4 border rounded-xl hover:bg-accent/50">
-                    <RadioGroupItem value="cod" id="cod" />
+                <div className="space-y-3">
+                  {/* COD */}
+                  <div
+                    className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all cursor-pointer
+                      ${paymentMethod === 'cod' ? 'border-[#5D4037] bg-[#FFF8E6]' : 'border-gray-200 hover:border-[#D4AF76]'}`}
+                    onClick={() => setPaymentMethod('cod')}
+                  >
+                    <RadioGroupItem value="cod" id="cod" className="mt-0" />
                     <Label htmlFor="cod" className="flex-1 cursor-pointer">
-                      <div className="font-semibold">Cash on Delivery</div>
-                      <div className="text-sm text-muted-foreground">
-                        Pay when you receive
+                      <div className="flex items-center gap-2">
+                        <Banknote className="h-5 w-5 text-[#5D4037]" />
+                        <span className="font-semibold text-[#3E2723]">Cash on Delivery</span>
                       </div>
+                      <p className="text-xs text-[#7A5E55] mt-1">Pay when your order arrives at your doorstep</p>
                     </Label>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] px-2 py-1 rounded-full font-medium" style={{background:'#F3ECE5', color:'#5D4037'}}>
+                        Most Popular
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center space-x-3 p-4 border rounded-xl hover:bg-accent/50">
-                    <RadioGroupItem value="razorpay" id="razorpay" />
+                  {/* Razorpay */}
+                  <div
+                    className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all cursor-pointer
+                      ${paymentMethod === 'razorpay' ? 'border-[#5D4037] bg-[#FFF8E6]' : 'border-gray-200 hover:border-[#D4AF76]'}`}
+                    onClick={() => setPaymentMethod('razorpay')}
+                  >
+                    <RadioGroupItem value="razorpay" id="razorpay" className="mt-0" />
                     <Label htmlFor="razorpay" className="flex-1 cursor-pointer">
-                      <div className="font-semibold">
-                        Razorpay (UPI, Cards, Net Banking)
+                      <div className="flex items-center gap-2">
+                        <Wallet className="h-5 w-5 text-[#5D4037]" />
+                        <span className="font-semibold text-[#3E2723]">UPI / Cards / Net Banking</span>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        Secure online payment
-                      </div>
+                      <p className="text-xs text-[#7A5E55] mt-1">Pay securely using Razorpay gateway</p>
                     </Label>
-                  </div>
-
-                  <div className="flex items-center space-x-3 p-4 border rounded-xl hover:bg-accent/50">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card" className="flex-1 cursor-pointer">
-                      <div className="font-semibold">Credit/Debit Card</div>
-                      <div className="text-sm text-muted-foreground">
-                        Visa, Mastercard, Amex
-                      </div>
-                    </Label>
+                    <img alt="Razorpay" src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Razorpay_logo.svg" className="h-5" />
                   </div>
                 </div>
               </RadioGroup>
+
+              {/* Terms acceptance */}
+              <div className="mt-6 pt-4 border-t" style={{ borderColor: '#E7D6BD' }}>
+                <p className="text-xs text-[#7A5E55] flex items-start gap-2">
+                  <span className="text-[#5D4037] mt-0.5">✓</span>
+                  <span>By placing this order, you agree to our Terms & Conditions and Privacy Policy</span>
+                </p>
+              </div>
             </Card>
           </div>
 
-          {/* ---------------- ORDER SUMMARY ---------------- */}
-          <div>
-            <Card className="p-6 rounded-2xl sticky top-24">
-              <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+          {/* ---------------- RIGHT: YOUR CART ---------------- */}
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <Card className="p-5 border-[1.5px]" style={{ borderColor: '#D4AF76', background: '#FFFFFF' }}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-[#5D4037]">Your Cart ({cart.length})</h2>
+              </div>
 
-              <div className="space-y-3 mb-4">
+              {/* Cart Items */}
+              <div className="space-y-3 mb-4 max-h-[300px] overflow-y-auto">
+                {cart.map((item) => (
+                  <div key={item.id} className="flex gap-3 pb-3 border-b" style={{ borderColor: '#F3ECE5' }}>
+                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0" style={{ background: '#F8F8F8' }}>
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-medium text-[#3E2723] line-clamp-2">{item.name}</h3>
+                      <p className="text-xs text-[#7A5E55] mt-1">Qty: {item.quantity}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-sm font-bold text-[#3E2723]">₹{(item.price * item.quantity).toLocaleString()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Price Summary */}
+              <div className="space-y-2 py-4" style={{ borderTop: '1.5px solid #D4AF76' }}>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-semibold">
-                    ₹{subtotal.toLocaleString()}
+                  <span className="text-[#7A5E55]">Subtotal</span>
+                  <span className="font-semibold text-[#3E2723]">₹{subtotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#7A5E55]">Shipping</span>
+                  <span className="font-semibold text-[#3E2723]">
+                    {totalDeliveryCharges === 0 ? 'Free' : `₹${totalDeliveryCharges.toLocaleString()}`}
                   </span>
                 </div>
-
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Delivery Charges</span>
-                  <span className="font-semibold">
-                    ₹{totalDeliveryCharges.toLocaleString()}
-                  </span>
-                </div>
-
-                <div className="h-px bg-border my-3"></div>
-
-                <div className="flex justify-between">
-                  <span className="font-bold">Total</span>
-                  <span className="font-bold text-xl">
-                    ₹{total.toLocaleString()}
-                  </span>
+                  <span className="text-[#7A5E55]">Tax</span>
+                  <span className="font-semibold text-[#3E2723]">₹0</span>
                 </div>
               </div>
 
+              {/* Total */}
+              <div className="flex justify-between items-center py-3 mb-4" style={{ borderTop: '1.5px solid #D4AF76' }}>
+                <span className="text-base font-bold text-[#5D4037]">Total</span>
+                <span className="text-2xl font-bold text-[#3E2723]">₹{total.toLocaleString()}</span>
+              </div>
+
+              {/* Pay Button */}
               <Button
                 onClick={handlePlaceOrder}
-                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90"
+                className="w-full h-12 rounded-lg text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all"
+                style={{ background: '#5D4037' }}
               >
-                Place Order
+                Pay ₹{total.toLocaleString()}
               </Button>
             </Card>
           </div>

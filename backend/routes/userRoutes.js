@@ -7,6 +7,7 @@ import {
     authUser,
     getUserProfile,
     updateProfile,
+      changePassword,
     // --- NEW IMPORTS ---
     forgotPassword,
     validateResetToken,
@@ -44,6 +45,7 @@ router.route('/reset-password').post(resetPassword);
 // Private/Protected Route
 router.get("/profile", protect, getUserProfile);
 router.patch("/profile", protect, updateProfile);
+router.patch("/change-password", protect, changePassword);
 
 router.route('/addresses')
   .get(protect, getAddresses)

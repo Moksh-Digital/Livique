@@ -99,10 +99,22 @@ const ProfilePage = () => {
   // Modals & Forms State
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+    const [showSecurityModal, setShowSecurityModal] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [editingName, setEditingName] = useState("");
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [editSuccess, setEditSuccess] = useState(false);
+
+  // Password change state
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
   
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [trackingOrder, setTrackingOrder] = useState<Order | null>(null);
@@ -226,6 +238,53 @@ const ProfilePage = () => {
       setEditError(err.response?.data?.message || err.message || "Failed update.");
     } finally {
       setEditLoading(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      setPasswordError("All fields are required.");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters.");
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError("New passwords do not match.");
+      return;
+    }
+
+    setPasswordLoading(true);
+    setPasswordError(null);
+    setPasswordSuccess(false);
+
+    try {
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      await axios.patch(
+        `${API_BASE_URL}/users/change-password`,
+        {
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        },
+        config
+      );
+
+      setPasswordSuccess(true);
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+
+      setTimeout(() => {
+        setShowSecurityModal(false);
+        setPasswordSuccess(false);
+      }, 1500);
+    } catch (err: any) {
+      setPasswordError(err.response?.data?.message || err.message || "Failed to change password.");
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -370,19 +429,25 @@ const ProfilePage = () => {
                   Account Settings
                 </h3>
                 <ul className="space-y-2">
-                  <li className="flex justify-between items-center p-3 rounded-lg hover:bg-[#FFF8F0] cursor-pointer">
+                    <li 
+                      className="flex justify-between items-center p-3 rounded-lg hover:bg-[#FFF8F0] cursor-pointer"
+                      onClick={() => setShowSecurityModal(true)}
+                    >
                     <div className="flex items-center">
                       <ShieldCheck className="h-5 w-5 mr-3 text-[#8B4513]" />
                       <span className="text-[#5D4037]">Login & Security</span>
                     </div>
                     <ChevronRight className="h-5 w-5 text-[#8B7355]" />
                   </li>
-                  <li className="flex justify-between items-center p-3 rounded-lg hover:bg-[#FFF8F0] cursor-pointer">
+                    <li 
+                      className="flex justify-between items-center p-3 rounded-lg hover:bg-[#FFF8F0] cursor-pointer"
+                      onClick={() => setShowPaymentModal(true)}
+                    >
                     <div className="flex items-center">
                       <CreditCard className="h-5 w-5 mr-3 text-[#8B4513]" />
                       <span className="text-[#5D4037]">Payment Methods</span>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400" />
+                      <ChevronRight className="h-5 w-5 text-[#8B7355]" />
                   </li>
                 </ul>
               </div>
@@ -852,7 +917,7 @@ const ProfilePage = () => {
 
       {/* Tracking Modal */}
       {trackingOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[100]">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center p-4 pt-16 md:pt-24 z-[120]">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full border-2 border-[#E8D5C4]">
             <div className="border-b border-[#E8D5C4] p-6 flex justify-between items-start">
               <div>
@@ -989,7 +1054,7 @@ const ProfilePage = () => {
 
       {/* Order Details Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[100] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center p-4 pt-16 md:pt-24 z-[120] overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full my-8 border-2 border-[#E8D5C4] max-h-[90vh] overflow-y-auto">
             <div className="border-b border-[#E8D5C4] p-6 flex justify-between items-start sticky top-0 bg-white rounded-t-2xl z-10">
               <div>
@@ -1173,7 +1238,7 @@ const ProfilePage = () => {
 
       {/* Contact Us Modal */}
       {showContactForm && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 pt-16 md:pt-24 z-[120] overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border-2 border-[#E8D5C4] my-8 z-[10000]">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#5D4037]">Contact Us</h2>
@@ -1305,7 +1370,7 @@ const ProfilePage = () => {
 
       {/* Edit Profile Modal */}
       {showEditProfileModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 pt-16 md:pt-24 z-[120]">
           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 border-2 border-[#E8D5C4]">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#5D4037]">
@@ -1400,7 +1465,7 @@ const ProfilePage = () => {
 
       {/* Query Details Modal */}
       {selectedQuery && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 pt-16 md:pt-24 z-[120] overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 border-2 border-[#E8D5C4] my-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#5D4037]">
@@ -1492,6 +1557,195 @@ const ProfilePage = () => {
           </div>
         </div>
       )}
+
+        {/* Login & Security Modal */}
+        {showSecurityModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 pt-16 md:pt-24 z-[120] overflow-y-auto">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border-2 border-[#E8D5C4] my-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-[#5D4037]">Login & Security</h2>
+                <button
+                  onClick={() => setShowSecurityModal(false)}
+                  className="text-[#8B7355] hover:text-[#5D4037] transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-[#FFF8F0] rounded-lg p-4 border border-[#E8D5C4]">
+                  <p className="text-sm text-[#8B7355] font-semibold mb-1">Email</p>
+                  <p className="text-[#5D4037] font-medium">{user.email}</p>
+                  <p className="text-xs text-[#8B7355] mt-2">
+                    Email changes are not available here. Contact support if you need to update it.
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-lg p-4 border border-[#E8D5C4] space-y-3">
+                  <p className="text-sm text-[#5D4037] font-semibold">Change Password</p>
+
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-semibold text-[#5D4037] block mb-1">Current Password</label>
+                      <input
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                        className="w-full px-4 py-2.5 border border-[#E8D5C4] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-[#5D4037]"
+                        placeholder="Enter current password"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-semibold text-[#5D4037] block mb-1">New Password</label>
+                      <input
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                        className="w-full px-4 py-2.5 border border-[#E8D5C4] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-[#5D4037]"
+                        placeholder="Enter new password (min 6 characters)"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-semibold text-[#5D4037] block mb-1">Confirm New Password</label>
+                      <input
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                        className="w-full px-4 py-2.5 border border-[#E8D5C4] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-[#5D4037]"
+                        placeholder="Confirm new password"
+                      />
+                    </div>
+                  </div>
+
+                  {passwordError && (
+                    <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm border border-red-200">
+                      {passwordError}
+                    </div>
+                  )}
+
+                  {passwordSuccess && (
+                    <div className="p-3 bg-green-50 text-green-700 rounded-lg text-sm border border-green-200">
+                      Password changed successfully!
+                    </div>
+                  )}
+
+                  <div className="text-xs text-[#8B7355] bg-[#FFF8F0] p-3 rounded-lg border border-[#E8D5C4]">
+                    You can also reset your password during login using OTP-based verification. If you face any issues, reach out via Help/Contact.
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      onClick={() => {
+                        setShowSecurityModal(false);
+                        setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                        setPasswordError(null);
+                        setPasswordSuccess(false);
+                      }}
+                      className="flex-1 px-4 py-2.5 border border-[#E8D5C4] text-[#5D4037] rounded-lg font-semibold hover:bg-[#FFF8F0] transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleChangePassword}
+                      disabled={passwordLoading}
+                      className="flex-1 px-4 py-2.5 bg-[#8B4513] text-white rounded-lg font-semibold hover:bg-[#5D4037] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {passwordLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Changing...
+                        </>
+                      ) : (
+                        "Change Password"
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  Need to update your password or login details? Contact support and we will assist you securely.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowSecurityModal(false)}
+                className="w-full mt-6 px-4 py-2.5 bg-[#8B4513] text-white rounded-lg font-semibold hover:bg-[#5D4037] transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Payment Methods Modal */}
+        {showPaymentModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 pt-16 md:pt-24 z-[120] overflow-y-auto">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border-2 border-[#E8D5C4] my-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-[#5D4037]">Payment Methods</h2>
+                <button
+                  onClick={() => setShowPaymentModal(false)}
+                  className="text-[#8B7355] hover:text-[#5D4037] transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Cash on Delivery */}
+                <div className="border-2 border-[#E8D5C4] rounded-lg p-4 bg-[#FFF8F0]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-white border-2 border-[#8B4513] flex items-center justify-center">
+                      <svg className="w-6 h-6 text-[#8B4513]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-[#5D4037]">Cash on Delivery</h3>
+                      <p className="text-xs text-[#8B7355] mt-1">Pay when you receive your order</p>
+                    </div>
+                    <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
+                      Active
+                    </span>
+                  </div>
+                </div>
+
+                {/* UPI / Online */}
+                <div className="border-2 border-[#E8D5C4] rounded-lg p-4 bg-[#FFF8F0]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-white border-2 border-[#8B4513] flex items-center justify-center">
+                      <CreditCard className="w-6 h-6 text-[#8B4513]" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-[#5D4037]">UPI / Cards / Net Banking</h3>
+                      <p className="text-xs text-[#8B7355] mt-1">Pay securely via Razorpay gateway</p>
+                    </div>
+                    <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
+                      Active
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  <span className="font-semibold">Note:</span> Payment methods are selected during checkout. Both options are always available for your convenience.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                className="w-full mt-6 px-4 py-2.5 bg-[#8B4513] text-white rounded-lg font-semibold hover:bg-[#5D4037] transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
     </>
   );
 };
