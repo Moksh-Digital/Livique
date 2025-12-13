@@ -382,7 +382,7 @@ const Home = () => {
                     }}
                   >
                     <img
-                      src={giftItemsCategory?.image || "/placeholder.svg"}
+                      src={subcat.image || giftItemsCategory?.image || "/placeholder.svg"}
                       alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
@@ -516,7 +516,7 @@ const Home = () => {
                   {/* Image Section */}
                   <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
                     <img
-                      src={homeDecorCategory?.image || "/placeholder.svg"}
+                      src={subcat.image || homeDecorCategory?.image || "/placeholder.svg"}
                       alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
@@ -607,7 +607,7 @@ const Home = () => {
                     }}
                   >
                     <img
-                      src={jewelaryCategory?.image || "/placeholder.svg"}
+                      src={subcat.image || jewelaryCategory?.image || "/placeholder.svg"}
                       alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
@@ -701,7 +701,7 @@ const Home = () => {
                   {/* Image Section */}
                   <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
                     <img
-                      src={toysCategory?.image || "/placeholder.svg"}
+                      src={subcat.image || toysCategory?.image || "/placeholder.svg"}
                       alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
@@ -773,7 +773,7 @@ const Home = () => {
                     }}
                   >
                     <img
-                      src={hampersCategory?.image || "/placeholder.svg"}
+                      src={subcat.image || hampersCategory?.image || "/placeholder.svg"}
                       alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
@@ -863,7 +863,7 @@ const Home = () => {
                   {/* Image Section */}
                   <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
                     <img
-                      src={flowersCategory?.image || "/placeholder.svg"}
+                      src={subcat.image || flowersCategory?.image || "/placeholder.svg"}
                       alt={subcat.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
