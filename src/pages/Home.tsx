@@ -885,7 +885,7 @@ const Home = () => {
         </section>
 
         {/* Flowers Section */}
-        <section className="w-full py-8" style={{ backgroundColor: "#F3ECE5" }}>
+        <section className="w-full py-8">
           {/* Section Heading */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-2 px-4">
@@ -918,16 +918,10 @@ const Home = () => {
               >
                 <div
                   key={idx}
-                  className="bg-[#FFFFFF] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[6px] border-white rounded-none h-[300px] md:h-[440px]"
+                  className="bg-[#F3ECE5] shadow-md hover:shadow-lg transition-all duration-300 flex flex-col border-[8px] border-[#F3ECE5] rounded-none h-[320px] md:h-[440px]"
                 >
                   {/* Image Section */}
-                  <div
-                    className="relative overflow-hidden flex-shrink-0 md:h-[70%] h-[65%]"
-                    style={{
-                      border: "3px solid #FFFFFF",
-                      backgroundColor: "#FFFFFF",
-                    }}
-                  >
+                  <div className="relative overflow-hidden flex-shrink-0 h-[65%] md:h-[70%] border-[3px] border-white bg-white">
                     <img
                       src={flowersCategory?.image || "/placeholder.svg"}
                       alt={subcat.name}
