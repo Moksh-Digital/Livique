@@ -1,6 +1,6 @@
 // Push Notification Utilities
 
-const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+const VAPID_PUBLIC_KEY = import.meta.env.VAPID_PUBLIC_KEY;
 
 // Convert VAPID key from base64 to Uint8Array
 function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
@@ -91,7 +91,7 @@ export async function sendSubscriptionToBackend(
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/push/subscribe`, {
+    const response = await fetch(`${import.meta.env.API_URL}/api/push/subscribe`, {
       method: 'POST',
       headers,
       credentials: 'include',
@@ -132,7 +132,7 @@ export async function unsubscribeFromPushNotifications(
     }
     
     // Optionally, remove from backend
-    await fetch(`${import.meta.env.VITE_API_URL}/api/push/unsubscribe`, {
+    await fetch(`${import.meta.env.API_URL}/api/push/unsubscribe`, {
       method: 'POST',
       headers,
       credentials: 'include',
