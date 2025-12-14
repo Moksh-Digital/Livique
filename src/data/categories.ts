@@ -10,7 +10,7 @@ export const CATEGORIES = [
       { name: "Perfume Set", slug: "perfume-set", image: "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcR5y1uhbIQBhW7vYqJCpO6W9J1uHO6dlxoYEIKXx4Uw4ogiBaSPGloJwtfDyIcdYzpHh41yGBR6zgMFROkTb2X5Ca9nEjQzqX7xqpYbl5b2dYOKYlgnhbHItw" },
       { name: "Greeting Card", slug: "greeting-card", image: "https://www.yourprint.in/new-admin-ajax.php?action=resize_outer_image&cfcache=all&url=med-s3/d-i-o/Greeting_Cards/greeting_card_pat_d86_o.jpg&resizeTo=600" },
       { name: "Mini Plant Pot", slug: "mini-plant-pot", image: "https://m.media-amazon.com/images/I/71o0s0eQRcL.jpg" },
-      { name: "Gift Box", slug: "gift-box", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFAOA5V6dv3q0r6oy6qVtl-SSCTlYDT3aXPg&s" },
+      { name: "Gift Box", slug: "gift-box", image: "https://confettigifts.in/cdn/shop/files/openwhen1.jpg?v=1757330150" },
       { name: "Customized Mug", slug: "customized-mug", image: "https://m.media-amazon.com/images/I/61r-qqwQxcL._AC_UY1100_.jpg" },
     ],
   },
@@ -97,7 +97,7 @@ export const CATEGORIES = [
     id: "home-decor",
     name: "Home Decor",
     slug: "home-decor",
-    image: "https://res.cloudinary.com/dkngwrebq/image/upload/v1765624280/WhatsApp_Image_2025-12-11_at_20.13.13_24414af8_rs5wgg.jpg",
+    image: "https://m.media-amazon.com/images/I/51pMFt0S0vL._AC_UF894,1000_QL80_.jpg",
     description: "Beautiful home decor items",
     subcategories: [
       { name: "Wall Clock", slug: "wall-clock", image: "https://www.titan.co.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw6ef4a954/images/Titan/Catalog/W0046PA01_1.jpg?sw=800&sh=800" },
