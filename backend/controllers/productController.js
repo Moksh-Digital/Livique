@@ -113,7 +113,8 @@ export const createProduct = async (req, res) => {
             images,
             description,
             delivery,
-            deliveryCharge: req.body.deliveryCharge || 0,
+            // Respect provided value; fallback to standard shipping fee when missing
+            deliveryCharge: req.body.deliveryCharge ?? 499,
             discount: req.body.discount || "0% OFF",
             rating: req.body.rating || 4.8,
             reviews: req.body.reviews || 100,

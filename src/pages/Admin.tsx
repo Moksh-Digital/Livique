@@ -113,7 +113,7 @@ const Admin = () => {
     images: [] as string[],
     description: "",
     delivery: "Today",
-    deliveryCharge: 0,
+    deliveryCharge: 499,
     inStock: true,
     quantity: 0,
   });
@@ -732,7 +732,7 @@ const Admin = () => {
       images: [],
       description: "",
       delivery: "Today",
-      deliveryCharge: 0,
+      deliveryCharge: 499,
       inStock: true,
       quantity: 0,
     });
@@ -1000,7 +1000,7 @@ const Admin = () => {
                         images: [],       // added
                         description: "",
                         delivery: "Today",
-                        deliveryCharge: 0,
+                        deliveryCharge: 499,
                         inStock: true,
                         quantity: 0,
                       });

@@ -144,7 +144,8 @@ const SearchResultsPage = () => {
         price: product.price,
         image: product.mainImage || product.images?.[0] || "/placeholder.svg",
         delivery: product.delivery || "Standard",
-        deliveryCharge: 0,
+        // Keep shipping fee consistent with product detail page
+        deliveryCharge: product.deliveryCharge ?? 499,
       })
     }
   }
@@ -163,7 +164,7 @@ const SearchResultsPage = () => {
         price: product.price,
         image: product.mainImage || product.images?.[0] || "/placeholder.svg",
         delivery: product.delivery || "Standard",
-        deliveryCharge: 0,
+        deliveryCharge: product.deliveryCharge ?? 499,
       })
     }
   }

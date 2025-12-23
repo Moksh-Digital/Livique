@@ -393,7 +393,8 @@ const Category = () => {
                                     product.images?.[0] ||
                                     "/placeholder.svg",
                                   delivery: product.delivery || "Standard",
-                                  deliveryCharge: 0,
+                                  // Preserve delivery charges even when adding from category grid
+                                  deliveryCharge: product.deliveryCharge ?? 499,
                                   quantity: 1,
                                 });
                               }}
