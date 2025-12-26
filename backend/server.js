@@ -110,8 +110,10 @@ app.get(
 );
 
 // ================== API ROOT ==================
+// Return 404 to avoid soft-404 indexing of the bare API domain
 app.get("/", (req, res) => {
-  res.send("Server running & MongoDB connected ✅");
+  res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  return res.status(404).json({ message: "API root has no content" });
 });
 
 // ================== API Routes ==================
